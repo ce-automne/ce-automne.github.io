@@ -271,7 +271,7 @@ height:50vh;
                 
                 
                     <div class="post-intro-read">
-                        <span>Word count: <span class="post-count">6</span> / Reading time: <span class="post-count">1 min</span></span>
+                        <span>Word count: <span class="post-count">742</span> / Reading time: <span class="post-count">3 min</span></span>
                     </div>
                 
                 <div class="post-intro-meta">
@@ -400,16 +400,52 @@ height:50vh;
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p>题目内容如下：</p>
-<p><img src="\\images\pasted-0.png\" alt="upload successful"></p>
+        <p>题目内容：</p>
+<p><img src="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/1.png" alt="1534953900624"></p>
+<p>下载下来的文件是一个名为Hacker.iso的镜像文件。在Linux里使用mount进行挂载。</p>
+<p>创建待挂载的目录：</p>
+<pre><code>sudo mkdir /mnt/disk
+</code></pre><p>挂载镜像：</p>
+<pre><code>sudo mount –o loop Hacker.iso /mnt/disk
+</code></pre><p>挂载后得到的目录结构如下，简单翻了一下，没什么关键信息。<br><img src="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/2.png" alt="1534953920322"></p>
+<p>Hint提示了saintgiong.jpg.pgp，可以想到这里有gpg加密。直接在010Editor找对应信息。很明显这就是加密信息。<br><img src="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/3.png" alt="1534953953372"></p>
+<p> 但是要想解密还需要一个private key，那就只能继续在文件里搜，根据PGP Private Key的特点，关键字选择PRIVATE KEY BLOCK<br><img src="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/4.png" alt="1534953964228"></p>
+<p>可以看到这里的private key的格式是正常的，导出为private.key。<br>但是.pgp文件需要修改成如下形式才能正常使用gpg命令去处理，导出为message.pgp</p>
+<pre><code>-----BEGIN PGP MESSAGE-----
+Version: BCPG v1.56
 
+hI4D0zLiVvDuQpMQAfwJB2xNvUDbiinZHhOoxdk4JQWg3SvVsnprCNNl6bXWaXMN1PTyY2G3xs0g
+3dnv7TV+dhCxZBBdomWoacCpUPpsAf9VAtQrRZBS+3rvOXF5MfP97aU7/PZCKHbaXSradsbGdawm
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+-----END PGP MESSAGE-----
+</code></pre><p>使用gpg命令处理<br>导入private.key</p>
+<pre><code>gpg --allow-secret-key-import --import private.key
+</code></pre><p>开始破解</p>
+<pre><code>gpg --decrypt message.pgp
+</code></pre><p>但是问题哪有这么简单，提示需要密码。<br><img src="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/5.png" alt="1534953976699"></p>
+<p>猜测了各种弱密码无果之后，一度陷入僵局。到哪里找这个密码？那只能从挂载出的目录里翻阅可能遗漏的关键文件。通过foremost Hacker.iso提取出来了大量HTML文件，查看数据，发现是邮件内容，但是打开后基本都是乱码。</p>
+<p>而且在etc/mail目录下发现了比较可疑的文件，其中让我更觉猫腻的就是private.asc里的内容就是上面分解出来的private.key内容。<br><img src="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/6.png" alt="1534953987012"></p>
+<p>于是我反编译了这个encrypt.pyc，终于看到了一个类似password的字符串，如获至宝</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line">password_enc = <span class="string">'JTd1XyoIbmc3PWhpOjhfVhsIbmcAAAAA'</span></span><br><span class="line"><span class="keyword">if</span> len(sys.argv) != <span class="number">2</span>:</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'Usage: %s data'</span> % sys.argv[<span class="number">0</span>]</span><br><span class="line">    exit(<span class="number">0</span>)</span><br><span class="line">data = sys.argv[<span class="number">1</span>]</span><br><span class="line">padding = <span class="number">4</span> - len(data) % <span class="number">4</span></span><br><span class="line"><span class="keyword">print</span> padding</span><br><span class="line"><span class="keyword">if</span> padding != <span class="number">0</span>:</span><br><span class="line">    data = data + <span class="string">'\x00'</span> * padding</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'**'</span> + data</span><br><span class="line">result = []</span><br><span class="line">blocks = struct.unpack(<span class="string">'I'</span> * (len(data) / <span class="number">4</span>), data)</span><br><span class="line"><span class="keyword">print</span> blocks</span><br><span class="line"><span class="keyword">for</span> block <span class="keyword">in</span> blocks:</span><br><span class="line">	result += [block ^ block &gt;&gt; <span class="number">16</span>]</span><br><span class="line"><span class="keyword">print</span> result</span><br><span class="line"></span><br><span class="line">output = <span class="string">''</span></span><br><span class="line"><span class="keyword">for</span> block <span class="keyword">in</span> result:</span><br><span class="line">    output += struct.pack(<span class="string">'I'</span>, block)</span><br><span class="line"><span class="keyword">print</span> output</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> base64.b64encode(output)</span><br></pre></td></tr></table></figure>
+<p>但是还是不对，到这里又卡住了。后来在使用这个加密脚本加密随意一段字符串时才发现后缀基本是以AAAAAA结尾，这才反应过来，原来这是一串密文。。</p>
+<p>网上搜了一下文件内容，发现这是Ekoparty_CTF_2015里的一道密码题加密脚本，对应找到其解密脚本，<a href="https://github.com/bl4de/ctf/blob/master/2015/Ekoparty_CTF_2015/XOR_Crypter_Crypto200.md" target="_blank" rel="noopener">戳这里</a></p>
+<p>解密后，终于我拿到了password</p>
+<pre><code>Phu_Dong_Thien_Vuong
+</code></pre><p>然后使用上面的gpg命令解密并将结果导出为saint.jpg，就得到一张jpg图片。</p>
+<p>驾轻就熟，根据outguess这个hint，就在Linux里编译安装，然后解析图片。<br><img src="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/7.png" alt="1534954001689"></p>
+<p>查看导出的result.txt内容，细心点就能发现每行首字母就是flag<br><img src="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/8.png" alt="1534954010426"></p>
+<p>最后将得到的字符串使用SHA1进行加密，包上WhiteHat{}外壳就是flag</p>
+<p>flag</p>
+<pre><code>WhiteHat{05cc532353023d5954da9507e189a55296f6db97}
+</code></pre>
     </article>
     <!-- license  -->
     
         <div class="license-wrapper">
             <p>原文作者: <a href="http://yoursite.com">John Doe</a>
             <p>原文链接: <a href="http://yoursite.com/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/">http://yoursite.com/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/</a>
-            <p>发表日期: <a href="http://yoursite.com/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/">August 23rd 2018, 7:00:00 pm</a>
+            <p>发表日期: <a href="http://yoursite.com/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/">August 23rd 2018, 7:00:13 pm</a>
             <p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
     
@@ -419,11 +455,6 @@ height:50vh;
             
         </li>
         <li class="previous">
-            
-                <div class="prevSlogan">Previous Post</div>
-                <a href= "/2018/08/16/hello-world/" title= Hello World >
-                    <div class="prevTitle">Hello World</div>
-                </a>
             
         </li>
     </ul>
@@ -562,16 +593,9 @@ top:50vh;
     
     
     
-    
-    
-    
-    
-    
-    
-    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 2
+        Total : 1
         </div>
         <!-- search  -->
         
@@ -581,20 +605,6 @@ top:50vh;
     
     
     
-    
-    <div class="archive-year"> Invalid date </div>
-    <ul class="year-list">
-    
-    
-        <li class="archive-post-item">
-            <span class="archive-post-date">Invalid date</span><a class="archive-post-title" href= "/2018/08/16/hello-world/" >Hello World</a>
-        </li>
-    
-    
-    
-    
-    
-        </ul>
     
     <div class="archive-year"> 2018 </div>
     <ul class="year-list">
@@ -647,6 +657,8 @@ jsonContent:
 </div>
         <div class="sidebar-panel-categories">
     <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     
     </div>
     <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
