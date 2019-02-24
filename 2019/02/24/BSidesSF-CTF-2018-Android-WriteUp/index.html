@@ -393,21 +393,27 @@
 <p><img src="1.png" alt="1534953920322"></p>
 <p>接着开始分析磁盘文件，通过file命令得知文件格式为.xz，解压后发现是FAT文件系统。</p>
 <p><img src="2.png" alt="1534953953372"></p>
-<p>通过apt-get install fatcat安装fatcat进行分析。<br>使用-l参数列出目录</p>
+<p>安装fatcat进行分析</p>
+<pre><code>apt-get install fatcat
+</code></pre><p>使用-l参数列出目录</p>
 <p><img src="3.png" alt="1534953964228"></p>
 <p>添加-d参数列出删除的文件，使用-r参数读取文件内容</p>
 <p><img src="4.png" alt="1534953976699"></p>
 <p>拿到了password的内容。<br>然后继续分析那个.git目录，使用mount加载磁盘镜像到/mnt目录</p>
 <p><img src="5.png" alt="1534953976699"></p>
-<p>使用git checkout -f master切换到master分支<br>git log查看commit记录</p>
+<p>切换到master分支</p>
+<pre><code>git checkout -f master
+</code></pre><p>git log查看commit记录</p>
 <p><img src="6.png" alt="1534953987012"></p>
-<p>git checkout -f 55bb1750d984691c154aa7b8a4877e2e6ac3e055切换到Temp test file的分支<br>查看该分支下的文件</p>
+<p>切换到Temp test file的分支</p>
+<pre><code>git checkout -f 55bb1750d984691c154aa7b8a4877e2e6ac3e055
+</code></pre><p>查看该分支下的文件</p>
 <p><img src="7.png" alt="1534953987012"></p>
 <p>找到了vault.db，使用sqlite3打开，找到了flag的加密形式</p>
 <p><img src="8.png" alt="1534953987012"></p>
-<p>配合前面的password，就可以解密了。使用Android Studio编写解密代码<br>关键代码如下：</p>
+<p>配合前面的password，就可以解密了。<br>使用Android Studio编写解密代码。<br>关键代码如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Toast.makeText(<span class="keyword">this</span>, decrypt(<span class="string">"J0yGSBs5EaApkR67G/iZjK12kkTk1XBMzWdy7P58iqGUDfLjLlGOZf/nryFXQqBh"</span>), Toast.LENGTH_LONG).show();</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">decrypt</span><span class="params">(String arg6)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">byte</span>[] v0 = Base64.decode(arg6.getBytes(), <span class="number">2</span>);</span><br><span class="line">        Log.d(<span class="string">"Status"</span>, v0.toString());</span><br><span class="line">        Cipher cipher = Cipher.getInstance(<span class="string">"AES/ECB/PKCS5Padding"</span>);</span><br><span class="line">        SecretKeySpec key = getKey(<span class="string">"I&lt;/3Porgis!"</span>);</span><br><span class="line">        cipher.init(<span class="number">2</span>, key);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> String(cipher.doFinal(v0), <span class="string">"UTF-8"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SecretKeySpec <span class="title">getKey</span><span class="params">(String arg10)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> SecretKeySpec(SecretKeyFactory.getInstance(<span class="string">"PBKDF2WithHmacSHA1"</span>).generateSecret(<span class="keyword">new</span> PBEKeySpec(arg10.toCharArray(), <span class="string">"SampleSalt"</span>.getBytes(), <span class="number">1000</span>, <span class="number">128</span>)).getEncoded(), <span class="string">"AES"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>弹出flag</p>
+<p>安装应用并打开，即可弹出flag</p>
 <p><img src="9.png" alt="1534953987012"></p>
 
     </article>
@@ -616,17 +622,17 @@ top:50vh;
         <div class="sidebar-panel-tags">
     <div class="sidebar-tags-name">
     
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
-    
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
     
         <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
+    
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+    
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -661,9 +667,9 @@ jsonContent:
         <div class="sidebar-panel-categories">
     <div class="sidebar-categories-name">
     
-        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
-    
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
+    
+        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     
     </div>
     <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
