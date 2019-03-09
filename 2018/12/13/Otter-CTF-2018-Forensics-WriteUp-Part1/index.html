@@ -15,7 +15,7 @@
     <meta name="description" content>
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Android CTF Practice の BSidesSF_CTF_2018_passwordvault · Automne&#39;s Shadow</title>
+    <title>OtterCTF 2018 Forensics WriteUp Part 1 · Automne&#39;s Shadow</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -210,7 +210,7 @@
                 <a href="/">Automne&#39;s Shadow.</a>
             </div>
             <div class="post-title">
-                <a href="#" class="post-name">Android CTF Practice の BSidesSF_CTF_2018_passwordvault</a>
+                <a href="#" class="post-name">OtterCTF 2018 Forensics WriteUp Part 1</a>
             </div>
     </div>
     
@@ -231,7 +231,7 @@
         <h1 class="intro-title">
             <!-- 主页  -->
             
-            Android CTF Practice の BSidesSF_CTF_2018_passwordvault
+            OtterCTF 2018 Forensics WriteUp Part 1
             <!-- 404 -->
             
         </h1>
@@ -250,11 +250,9 @@
                 
                     <div class="post-intro-tags">
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="reverse">reverse</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="volatility">volatility</a>
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="fat">fat</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="git">git</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="yara plugin">yara plugin</a>
     
 </div>
                 
@@ -264,7 +262,7 @@
                 
                 <div class="post-intro-meta">
                     <span class="post-intro-calander iconfont-archer">&#xe676;</span>
-                    <span class="post-intro-time">2019/02/24</span>
+                    <span class="post-intro-time">2018/12/13</span>
                     
                     <span id="busuanzi_container_page_pv" class="busuanzi-pv">
                         <span class="iconfont-archer">&#xe602;</span>
@@ -388,41 +386,71 @@
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p><strong>Android</strong><br><a id="more"></a></p>
-<p>拿到了两个文件，disk image和apk<br>首先用jeb分析了apk，提供了登录注册功能，将用户名密码以加密的形式保存在数据库里，其他的没有什么内容。</p>
-<p><img src="1.png" alt="1534953920322"></p>
-<p>接着开始分析磁盘文件，通过file命令得知文件格式为.xz，解压后发现是FAT文件系统。</p>
-<p><img src="2.png" alt="1534953953372"></p>
-<p>安装fatcat进行分析</p>
-<pre><code>apt-get install fatcat
-</code></pre><p>使用-l参数列出目录</p>
-<p><img src="3.png" alt="1534953964228"></p>
-<p>添加-d参数列出删除的文件，使用-r参数读取文件内容</p>
-<p><img src="4.png" alt="1534953976699"></p>
-<p>拿到了password的内容。<br>然后继续分析那个.git目录，使用mount加载磁盘镜像到/mnt目录</p>
-<p><img src="5.png" alt="1534953976699"></p>
-<p>切换到master分支</p>
-<pre><code>git checkout -f master
-</code></pre><p>git log查看commit记录</p>
-<p><img src="6.png" alt="1534953987012"></p>
-<p>切换到Temp test file的分支</p>
-<pre><code>git checkout -f 55bb1750d984691c154aa7b8a4877e2e6ac3e055
-</code></pre><p>查看该分支下的文件</p>
-<p><img src="7.png" alt="1534953987012"></p>
-<p>找到了vault.db，使用sqlite3打开，找到了flag的加密形式</p>
-<p><img src="8.png" alt="1534953987012"></p>
-<p>配合前面的password，就可以解密了。<br>使用Android Studio编写解密代码。<br>关键代码如下：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Toast.makeText(<span class="keyword">this</span>, decrypt(<span class="string">"J0yGSBs5EaApkR67G/iZjK12kkTk1XBMzWdy7P58iqGUDfLjLlGOZf/nryFXQqBh"</span>), Toast.LENGTH_LONG).show();</span><br><span class="line">        &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">decrypt</span><span class="params">(String arg6)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">byte</span>[] v0 = Base64.decode(arg6.getBytes(), <span class="number">2</span>);</span><br><span class="line">        Log.d(<span class="string">"Status"</span>, v0.toString());</span><br><span class="line">        Cipher cipher = Cipher.getInstance(<span class="string">"AES/ECB/PKCS5Padding"</span>);</span><br><span class="line">        SecretKeySpec key = getKey(<span class="string">"I&lt;/3Porgis!"</span>);</span><br><span class="line">        cipher.init(<span class="number">2</span>, key);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> String(cipher.doFinal(v0), <span class="string">"UTF-8"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SecretKeySpec <span class="title">getKey</span><span class="params">(String arg10)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> SecretKeySpec(SecretKeyFactory.getInstance(<span class="string">"PBKDF2WithHmacSHA1"</span>).generateSecret(<span class="keyword">new</span> PBEKeySpec(arg10.toCharArray(), <span class="string">"SampleSalt"</span>.getBytes(), <span class="number">1000</span>, <span class="number">128</span>)).getEncoded(), <span class="string">"AES"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>安装应用并打开，即可弹出flag</p>
-<p><img src="9.png" alt="1534953987012"></p>
+        <p><strong>Forensics</strong><br><a id="more"></a></p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>首先提供了一个vmem的内存镜像，使用volatility进行分析。<br>确定其操作系统为Win7：</p>
+<pre><code>volatility -f OtterCTF.vmem imageinfo
+</code></pre><p><img src="1.png" alt="automne"></p>
+<h2 id="一、获取默认用户的密码"><a href="#一、获取默认用户的密码" class="headerlink" title="一、获取默认用户的密码"></a>一、获取默认用户的密码</h2><p><img src="2.png" alt="automne"></p>
+<p>两种常规操作方法：</p>
+<p>第一种方法：<br>首先使用hivelist获取到SYSTEM和SAM注册表项的虚拟地址</p>
+<p><img src="3.png" alt="automne"></p>
+<p>接着使用hashdump将用户的NTLM哈希（最后一部分）显示出来进行破解。</p>
+<p><img src="4.png" alt="automne"></p>
+<p>当然，这里使用了cmd5在线破解或者john去破解都没有成功。</p>
+<p>第二种方法：<br>直接使用lsadump插件</p>
+<p><img src="5.png" alt="automne"></p>
+<p>第一题：CTF{MortyIsReallyAnOtter}</p>
+<h2 id="二、获取PC名称和IP地址"><a href="#二、获取PC名称和IP地址" class="headerlink" title="二、获取PC名称和IP地址"></a>二、获取PC名称和IP地址</h2><p><img src="6.png" alt="automne"></p>
+<p>主机的IP地址可以通过netscan命令查询，在win7系统取证里。<br>诸如connections、connscan、sockets和socketscan，上述4个命令适用于Windows XP和2003系统。</p>
+<p><img src="7.png" alt="automne"></p>
+<p>从Local Address即可确定PC的IP地址为：192.168.202.131</p>
+<p>接着确定PC的主机名，这就需要从对应注册表项里进行读取，同样使用hivelist确定SYSTEM的虚拟地址，然后使用printkey打印数据。<br>注意这里读取的注册表项为：</p>
+<pre><code>ControlSet001\Control\ComputerName\ComputerName
+</code></pre><p><img src="8.png" alt="automne"></p>
+<p>得到主机名为：WIN-LO6FAF3DTFE</p>
+<p>第二题：<br>CTF{192.168.202.131}<br>CTF{WIN-LO6FAF3DTFE}</p>
+<h2 id="三、获取游戏名称和服务器IP"><a href="#三、获取游戏名称和服务器IP" class="headerlink" title="三、获取游戏名称和服务器IP"></a>三、获取游戏名称和服务器IP</h2><p><img src="9.png" alt="automne"></p>
+<p>为了了解Rick玩了什么游戏，需要从命令行里看看有没有启动什么exe文件，使用cmdline命令，最终经过简单的过滤，发现LunarMS是一款比较老的游戏。</p>
+<p><img src="10.png" alt="automne"></p>
+<p>然后要获取对应的服务器IP地址，只需要查看刚才执行的netscan命令里的对应进程号，即708</p>
+<p><img src="11.png" alt="automne"></p>
+<p>服务器IP地址为：77.102.199.102</p>
+<p>第三题：<br>CTF{LunarMS}<br>CTF{77.102.199.102}</p>
+<h2 id="四、获取游戏账号"><a href="#四、获取游戏账号" class="headerlink" title="四、获取游戏账号"></a>四、获取游戏账号</h2><p><img src="12.png" alt="automne"></p>
+<p>既然是玩这个LunarMS的游戏，那么就用memdump把对应708进程的内存dump出来</p>
+<p><img src="13.png" alt="automne"></p>
+<p>Dump出来后再使用strings去搜索对应字符串Lunar-3</p>
+<p><img src="14.png" alt="automne"></p>
+<p>疑似账号：0tt3r8r33z3，提交成功。</p>
+<p>第四题：CTF{0tt3r8r33z3}</p>
+<h2 id="五、获取游戏角色名称"><a href="#五、获取游戏角色名称" class="headerlink" title="五、获取游戏角色名称"></a>五、获取游戏角色名称</h2><p><img src="15.png" alt="automne"></p>
+<p>使用strings搜索对应的签名显然没有奏效，一种思路是将上面dump出的708进程的文件使用二进制编辑软件打开，这里签名用到了正则，取最后一部分，搜索5a0c0000 hex串，结果有185个结果。</p>
+<p><img src="16.png" alt="automne"></p>
+<p>另一种思路是使用volatility里的yarascan，将要搜索的签名转换为对应的Yara rules：</p>
+<pre><code>/\x64(.{6,8})\x40\x06(.{18})\x5a\x0c\x00\x00/
+</code></pre><p><img src="17.png" alt="automne"></p>
+<p>于是定位到了角色名称为M0rtyL0L</p>
+<p>第五题：CTF{M0rtyL0L}</p>
+<h2 id="六、获取邮箱密码"><a href="#六、获取邮箱密码" class="headerlink" title="六、获取邮箱密码"></a>六、获取邮箱密码</h2><p><img src="18.png" alt="automne"></p>
+<p>从题目中可以get到Rick会使用Windows的剪贴板功能，volatility里有专门查看剪贴板内容的命令clipboard</p>
+<p><img src="19.png" alt="automne"></p>
+<p>第六题：CTF{M@il_Pr0vid0rs}</p>
+<h2 id="七、获取感染恶意软件名称"><a href="#七、获取感染恶意软件名称" class="headerlink" title="七、获取感染恶意软件名称"></a>七、获取感染恶意软件名称</h2><p><img src="20.png" alt="automne"></p>
+<p>首先使用pstree查看进程之间的关系</p>
+<p><img src="21.png" alt="automne"></p>
+<p>可以看到vmware-tray.exe是Rick And Morty的子进程，这就很奇怪了，因为vmware-tray.exe是vmware workstation的托盘程序，不可能是它的子进程。使用memdump将对应的3720进程导出尝试通过上传到virustotal里识别，但是文件太大。</p>
+<p>继续查看对应3720进程调用的DLL文件</p>
+<p><img src="22.png" alt="automne"></p>
+<p>可见程序从Temp目录下执行，显然上面的Rick And Morty充当的是一个dropper用来释放恶意程序的。</p>
+<p>第七题：CTF{vmware-tray.exe}</p>
 
     </article>
     <!-- license  -->
     
         <div class="license-wrapper">
             <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
-            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/">https://ce-automne.github.io/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/</a>
-            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/">February 24th 2019, 12:10:13 pm</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/">https://ce-automne.github.io/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/">December 13th 2018, 9:13:11 pm</a>
             </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
     
@@ -431,16 +459,16 @@
         <li class="next">
             
                 <div class="nextSlogan">Next Post</div>
-                <a href="/2019/03/03/BSidesSF-CTF-2017-Pinlock-WriteUp/" title="Android" ctf practice の bsidessf_ctf_2017_pinlock>
-                    <div class="nextTitle">Android CTF Practice の BSidesSF_CTF_2017_pinlock</div>
+                <a href="/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/" title="Android" ctf practice の bsidessf_ctf_2018_passwordvault>
+                    <div class="nextTitle">Android CTF Practice の BSidesSF_CTF_2018_passwordvault</div>
                 </a>
             
         </li>
         <li class="previous">
             
                 <div class="prevSlogan">Previous Post</div>
-                <a 1 2018 href="/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/" title="OtterCTF" forensics writeup part>
-                    <div class="prevTitle">OtterCTF 2018 Forensics WriteUp Part 1</div>
+                <a 2018 href="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/" title="WhiteHat" grand prix misc02 writeup>
+                    <div class="prevTitle">WhiteHat Grand Prix 2018 Misc02 WriteUp</div>
                 </a>
             
         </li>
@@ -541,7 +569,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一、获取默认用户的密码"><span class="toc-number">2.</span> <span class="toc-text">一、获取默认用户的密码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、获取PC名称和IP地址"><span class="toc-number">3.</span> <span class="toc-text">二、获取PC名称和IP地址</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、获取游戏名称和服务器IP"><span class="toc-number">4.</span> <span class="toc-text">三、获取游戏名称和服务器IP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、获取游戏账号"><span class="toc-number">5.</span> <span class="toc-text">四、获取游戏账号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五、获取游戏角色名称"><span class="toc-number">6.</span> <span class="toc-text">五、获取游戏角色名称</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#六、获取邮箱密码"><span class="toc-number">7.</span> <span class="toc-text">六、获取邮箱密码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#七、获取感染恶意软件名称"><span class="toc-number">8.</span> <span class="toc-text">七、获取感染恶意软件名称</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
