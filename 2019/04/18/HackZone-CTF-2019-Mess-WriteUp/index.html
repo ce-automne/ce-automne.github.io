@@ -250,9 +250,9 @@
                 
                     <div class="post-intro-tags">
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="rsa">rsa</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="sage">sage</a>
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="convert">convert</a>
+        <a class="post-tag" href="javascript:void(0);" data-tags="rsa">rsa</a>
     
 </div>
                 
@@ -401,8 +401,9 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">n = 00b3d6bd85c58f72c351318961a9bc77b5c27e93a37eebaf66ccf9daa31d6dc0e6ab03e55c6ba06bbf31c77bb9e4eb3b245abeb8750ea9eabe2a2f0a761d72c9ea58a84bf6131ea2c4610418dded3a659829c42bba3ecac7160297cc9227c9267260bbf61d93fc8ce755a284f3135568e571b453d5fe40f64c2c897446a089c47683a21662d50353236ee9cd8ccff24407fda2af4fc3fde5e56ae83b6c4dfa7c51ef962d295a289364ce7b14373d1f784f406baedf32774873334bca1321555981848684337fc6080f0f8ff20710775029974b40601ab1b9953370af7466510db4603a482b1fd35eba28dd9ae2141c16ef2f0b1a219fd3ac69f4dc8bd71ef722a9</span><br><span class="line"></span><br><span class="line">e = 65537</span><br><span class="line"></span><br><span class="line">d = 43fe2a858b1e231ba974fb260b90900a0e50e0ecedad9a1159ea15399a84c66befb8775d2bebe910ce7747560f30c899841d9b8bd65173c91615d6f4b5499301a1277020c735cc004755cf3908da0d532c6758c8ffb896f0c16637180326cffc6a8a6610e4c49559594d2acae44264786b36ec8379af81ef66df4930f2bd63a370f475ce2353a8cb20f91e74ce7f418841fdd075aab74782b793669290549e3725355461027429e59487b5490f20495a50a086076a829d5c9e82ef16d4f9739a4fbc52954a1609b2d69daf02fd8ddaf65e9308f3b9324c79b7fc12acc0847914c0a4b7bfa2249a1f887894516fac570d7f854e898b1b70bb21fd9d2f5a5ec849</span><br><span class="line"></span><br><span class="line">First prime = b5349890aea227801b284c3ddda57602</span><br><span class="line"></span><br><span class="line">Second prime = 590e9df02867430e6c1e10dd913e860f</span><br><span class="line"></span><br><span class="line">Exp_1 = e02813cc1f8ac0810000d546        </span><br><span class="line"></span><br><span class="line">Exp_2 = 78d1a6f7d6c534d70000fc47        </span><br><span class="line"></span><br><span class="line">Coef = db280abd494a5f50</span><br></pre></td></tr></table></figure>
 <p>f3elfj6rlU.key</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">n = 00b3d6bd85c58f72c351318961a9bc77b5c27e93a37eebaf66ccf9daa31d6dc0e6ab03e55c6ba06bbf31c77bb9e4eb3b245abeb8750ea9eabe2a2f0a761d72c9ea58a84bf6131ea2c4610418dded3a659829c42bba3ecac7160297cc9227c9267260bbf61d93fc8ce755a284f3135568e571b453d5fe40f64c2c897446a089c47683a21662d50353236ee9cd8ccff24407fda2af4fc3fde5e56ae83b6c4dfa7c51ef962d295a289364ce7b14373d1f784f406baedf32774873334bca1321555981848684337fc6080f0f8ff20710775029974b40601ab1b9953370af7466510db4603a482b1fd35eba28dd9ae2141c16ef2f0b1a219fd3ac69f4dc8bd71ef722a9</span><br><span class="line"></span><br><span class="line">e = 257</span><br></pre></td></tr></table></figure>
-<p>可见两个key的n一致，而且f3elfj6rlU.key没有私钥(n , d)</p>
+<p>可见两个key的n一致，而且f3elfj6rlU.key没有私钥(n , d)<br>于是可以猜想cipher文件可能就是f3elfj6rlU.key文件加密生成的。</p>
 <p>因此可以通过9hpUS3qszH.key分解n求得p和q用于f3elfj6rlU.key<br>分解之前首先使用在线转换工具将上面的Hex形式的n和d转换为Decimal形式<br>推荐使用<a href="https://www.rapidtables.com/convert/number/hex-to-decimal.html" target="_blank" rel="noopener">https://www.rapidtables.com/convert/number/hex-to-decimal.html</a></p>
+<p>直接使用yafu或者sage等分解n在这里是行不通的<br>这里知道了e,d,n可以使用下面的脚本进行分解。</p>
 <p>脚本摘录如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> fractions <span class="comment">#for gcd function (or easily implementable to avoid import)</span></span><br><span class="line"><span class="keyword">import</span> random <span class="comment">#for random elements drawing in RecoverPrimeFactors</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">failFunction</span><span class="params">()</span>:</span></span><br><span class="line">	print(<span class="string">"Prime factors not found"</span>)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">outputPrimes</span><span class="params">(a, n)</span>:</span></span><br><span class="line">	p = fractions.gcd(a, n)</span><br><span class="line">	q = int(n / p)</span><br><span class="line">	<span class="keyword">if</span> p &gt; q:</span><br><span class="line">		p, q = q, p</span><br><span class="line">	print(<span class="string">"Found factors p and q"</span>)</span><br><span class="line">	print(<span class="string">"p = &#123;0&#125;"</span>.format(str(p)))</span><br><span class="line">	print(<span class="string">"q = &#123;0&#125;"</span>.format(str(q)))</span><br><span class="line">	<span class="keyword">return</span> p,q</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">RecoverPrimeFactors</span><span class="params">(n, e, d)</span>:</span></span><br><span class="line">	<span class="string">"""The following algorithm recovers the prime factor</span></span><br><span class="line"><span class="string">		s of a modulus, given the public and private</span></span><br><span class="line"><span class="string">		exponents.</span></span><br><span class="line"><span class="string">		Function call: RecoverPrimeFactors(n, e, d)</span></span><br><span class="line"><span class="string">		Input: 	n: modulus</span></span><br><span class="line"><span class="string">				e: public exponent</span></span><br><span class="line"><span class="string">				d: private exponent</span></span><br><span class="line"><span class="string">		Output: (p, q): prime factors of modulus"""</span></span><br><span class="line"></span><br><span class="line">	k = d * e - <span class="number">1</span></span><br><span class="line">	<span class="keyword">if</span> k % <span class="number">2</span> == <span class="number">1</span>:</span><br><span class="line">		failFunction()</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>, <span class="number">0</span></span><br><span class="line">	<span class="keyword">else</span>:</span><br><span class="line">		t = <span class="number">0</span></span><br><span class="line">		r = k</span><br><span class="line">		<span class="keyword">while</span>(r % <span class="number">2</span> == <span class="number">0</span>):</span><br><span class="line">			r = int(r / <span class="number">2</span>)</span><br><span class="line">			t += <span class="number">1</span></span><br><span class="line">		<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>, <span class="number">101</span>):</span><br><span class="line">			g = random.randint(<span class="number">0</span>, n) <span class="comment"># random g in [0, n-1]</span></span><br><span class="line">			y = pow(g, r, n)</span><br><span class="line">			<span class="keyword">if</span> y == <span class="number">1</span> <span class="keyword">or</span> y == n - <span class="number">1</span>:</span><br><span class="line">				<span class="keyword">continue</span></span><br><span class="line">			<span class="keyword">else</span>:</span><br><span class="line">				<span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">1</span>, t): <span class="comment"># j \in [1, t-1]</span></span><br><span class="line">					x = pow(y, <span class="number">2</span>, n)</span><br><span class="line">					<span class="keyword">if</span> x == <span class="number">1</span>:</span><br><span class="line">						p, q = outputPrimes(y - <span class="number">1</span>, n)</span><br><span class="line">						<span class="keyword">return</span> p, q</span><br><span class="line">					<span class="keyword">elif</span> x == n - <span class="number">1</span>:</span><br><span class="line">						<span class="keyword">continue</span></span><br><span class="line">					y = x</span><br><span class="line">					x = pow(y, <span class="number">2</span>, n)</span><br><span class="line">					<span class="keyword">if</span>  x == <span class="number">1</span>:</span><br><span class="line">						p, q = outputPrimes(y - <span class="number">1</span>, n)</span><br><span class="line">						<span class="keyword">return</span> p, q</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">	n = <span class="number">22702548988585639637851431705875336575429862255188645528887111724338807108889571748597184000150880723937377646354782096179701969674522159233980700069669264159299994181571326564481560158416010897880474527515788236201435179106261470748150803007008802283045789226818457497417965570752028940845456738725432663418600719742841282343631476474796788118645986891324395254581787259492873305556198898579932343345978999277950429982957945557756158193790593989493517773943223087713762372788006918693003764533210155652090146152802657740521088243457672570665828910803472880085783454809883948635370279397426446590104641086404651590313</span></span><br><span class="line">	e = <span class="number">65537</span></span><br><span class="line">	d = <span class="number">8583300408001205104699372488947908657186034254834128185830368407245784252316490055796588570666013436344665506833983715750502088966466424485398687555522300797093782990234132316320919444058042297140277977978641086967654315392754424557085014524736623631983590421626069851702432990708970094698700384090494995715071183650922088075193246723137605407860036257002232313278864050794322031813665828387902387594617981849621559689493473674817599252679718986483691803809453381924322783193113102258652902805929559824002574465193743370946566891428836357847005942547746759368450889782252295496543534609564235482473199601293945915465</span></span><br><span class="line">	RecoverPrimeFactors(n, e, d)</span><br></pre></td></tr></table></figure>
 <p>得到p和q</p>
@@ -782,6 +783,12 @@ top:50vh;
     
     
     
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
         Total : 17
@@ -897,25 +904,25 @@ top:50vh;
         <div class="sidebar-panel-tags">
     <div class="sidebar-tags-name">
     
-        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
-    
-        <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
-    
         <span class="sidebar-tag-name" data-tags="lfsr"><span class="iconfont-archer">&#xe606;</span>lfsr</span>
     
         <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
     
+        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
+    
+        <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
+    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
     
         <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
-    
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
     
@@ -929,21 +936,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
-        <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
         <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
-        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
-    
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
-    
-        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+        <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
     
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+    
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+    
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
         <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
@@ -951,13 +954,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
         <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
         <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
-    
-        <span class="sidebar-tag-name" data-tags="convert"><span class="iconfont-archer">&#xe606;</span>convert</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -992,9 +997,9 @@ jsonContent:
         <div class="sidebar-panel-categories">
     <div class="sidebar-categories-name">
     
-        <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
-    
         <span class="sidebar-category-name" data-categories="Crypto"><span class="iconfont-archer">&#xe60a;</span>Crypto</span>
+    
+        <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
     
