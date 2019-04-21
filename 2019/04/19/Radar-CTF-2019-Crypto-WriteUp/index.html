@@ -421,7 +421,7 @@ sage: d = inverse_mod(e,phi)
 <p>密码字典就使用的rockyou.txt</p>
 <p>直接贴出参考的脚本。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># flag.enc and AEScipher class are given, we just have to brute force :P</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"><span class="keyword">from</span> Crypto.Random <span class="keyword">import</span> new <span class="keyword">as</span> Random</span><br><span class="line"><span class="keyword">from</span> hashlib <span class="keyword">import</span> sha256</span><br><span class="line"><span class="keyword">from</span> base64 <span class="keyword">import</span> b64encode,b64decode</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AESCipher</span>:</span></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self,data,key)</span>:</span></span><br><span class="line">    self.block_size = <span class="number">16</span></span><br><span class="line">    self.data = data</span><br><span class="line">    self.key = sha256(key.encode()).digest()[:<span class="number">32</span>]</span><br><span class="line">    self.pad = <span class="keyword">lambda</span> s: s + (self.block_size - len(s) % self.block_size) * chr (self.block_size - len(s) % self.block_size)</span><br><span class="line">    self.unpad = <span class="keyword">lambda</span> s: s[:-ord(s[len(s) - <span class="number">1</span>:])]</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(self)</span>:</span></span><br><span class="line">    plain_text = self.pad(self.data)</span><br><span class="line">    iv = Random().read(AES.block_size)</span><br><span class="line">    cipher = AES.new(self.key,AES.MODE_OFB,iv)</span><br><span class="line">    <span class="keyword">return</span> b64encode(iv + cipher.encrypt(plain_text.encode())).decode()</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">def</span> <span class="title">decrypt</span><span class="params">(self)</span>:</span></span><br><span class="line">    cipher_text = b64decode(self.data.encode())</span><br><span class="line">    iv = cipher_text[:self.block_size]</span><br><span class="line">    cipher = AES.new(self.key,AES.MODE_OFB,iv)</span><br><span class="line">    <span class="keyword">return</span> self.unpad(cipher.decrypt(cipher_text[self.block_size:])).decode()</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">brute</span><span class="params">(test)</span>:</span></span><br><span class="line">    data = <span class="string">'vLlZz11nZdu84N57/eqkJJ0EXIlgedx41w/akqmreH7aD8pr0Bds8dNaWvbWd9MW/zeCAFzjYav+XQtyv6eijA=='</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        result = AESCipher(data, test.strip()).decrypt()</span><br><span class="line">        <span class="keyword">if</span> <span class="string">'radar'</span> <span class="keyword">in</span> result:</span><br><span class="line">            <span class="keyword">print</span> result</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line">path = <span class="string">'/usr/share/wordlists/rockyou.txt'</span></span><br><span class="line"><span class="keyword">with</span> open(path, <span class="string">'r'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    lines = f.readlines()</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> lines:</span><br><span class="line">        thread1 = threading.Thread(target=brute, args=[i,])</span><br><span class="line">        thread1.start()</span><br><span class="line">        time.sleep(<span class="number">0.01</span>)</span><br></pre></td></tr></table></figure>
-<p>爆破得到flag</p>
+<p>爆破30分钟左右得到flag：</p>
 <p><img src="6.png" alt="automne"></p>
 
     </article>
@@ -803,14 +803,6 @@ top:50vh;
     
     
     
-    
-    
-    
-    
-    
-    
-    
-    
     <div class="total-and-search">
         <div class="total-archive">
         Total : 18
@@ -935,11 +927,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
         <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
     
-        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
@@ -951,10 +943,6 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
-    
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
@@ -963,15 +951,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
+    
         <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
     
         <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
-        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
-    
-        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
@@ -979,15 +967,19 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+    
+        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+    
         <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
         <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
     
         <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
-    
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
-    
-        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
         <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
     
