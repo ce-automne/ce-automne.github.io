@@ -430,57 +430,10 @@
 <pre><code>bbb2c5e63d2ef893106fdd0d797aa97a
 </code></pre><p>这段hash可以经过md5解密，解密后的内容为supersecretpassword</p>
 <p>最后给出了一段加密代码，告诉我们使用的是AES加密</p>
-<pre><code class="python"><span class="keyword">import</span> base64
-<span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES
-<span class="keyword">from</span> Crypto <span class="keyword">import</span> Random
-<span class="keyword">from</span> Crypto.Hash <span class="keyword">import</span> SHA256
-<span class="keyword">from</span> struct <span class="keyword">import</span> pack
-
-BS = <span class="number">16</span>
-secret = <span class="string">b'not_the_secret'</span>
-key = SHA256.new()
-key.update(secret)
-
-<span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(key, message)</span>:</span>
-    iv = Random.new().read(BS)
-    pad_len = BS - divmod(len(message), BS)[<span class="number">1</span>]
-    padding = [pad_len]*pad_len
-    padding = pack(<span class="string">'b'</span>*pad_len, *padding)
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    <span class="keyword">return</span> base64.b64encode(iv + cipher.encrypt(message + padding))
-</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"><span class="keyword">from</span> Crypto <span class="keyword">import</span> Random</span><br><span class="line"><span class="keyword">from</span> Crypto.Hash <span class="keyword">import</span> SHA256</span><br><span class="line"><span class="keyword">from</span> struct <span class="keyword">import</span> pack</span><br><span class="line"></span><br><span class="line">BS = <span class="number">16</span></span><br><span class="line">secret = <span class="string">b'not_the_secret'</span></span><br><span class="line">key = SHA256.new()</span><br><span class="line">key.update(secret)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(key, message)</span>:</span></span><br><span class="line">    iv = Random.new().read(BS)</span><br><span class="line">    pad_len = BS - divmod(len(message), BS)[<span class="number">1</span>]</span><br><span class="line">    padding = [pad_len]*pad_len</span><br><span class="line">    padding = pack(<span class="string">'b'</span>*pad_len, *padding)</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line">    <span class="keyword">return</span> base64.b64encode(iv + cipher.encrypt(message + padding))</span><br></pre></td></tr></table></figure>
 <p>这里有个坑，就是上面的代码里key.update(secret)得到的不是可用的key</p>
 <p>修改代码，再加载正确的密码就可以解出原文。</p>
-<pre><code class="python"><span class="keyword">import</span> base64
-<span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES
-<span class="keyword">from</span> Crypto <span class="keyword">import</span> Random
-<span class="keyword">from</span> struct <span class="keyword">import</span> pack
-<span class="keyword">import</span> hashlib
-
-BS = <span class="number">16</span>
-secret = <span class="string">b'supersecretpassword'</span>
-key = hashlib.sha256(secret.encode(<span class="string">'utf-8'</span>)).digest()
-
-unpad = <span class="keyword">lambda</span> s: s[:-ord(s[len(s) - <span class="number">1</span>:])]
-
-<span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(key, message)</span>:</span>
-    iv = Random.new().read(BS)
-    pad_len = BS - divmod(len(message), BS)[<span class="number">1</span>]
-    padding = [pad_len]*pad_len
-    padding = pack(<span class="string">'b'</span>*pad_len, *padding)
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    <span class="keyword">return</span> base64.b64encode(iv + cipher.encrypt(message + padding))
-
-<span class="function"><span class="keyword">def</span> <span class="title">decrypt</span><span class="params">(key, cipher)</span>:</span>
-    enc = base64.b64decode(cipher)
-    iv = enc[:<span class="number">16</span>]
-    cipher = AES.new(key, AES.MODE_CBC, iv)
-    <span class="keyword">return</span> unpad(cipher.decrypt(enc[<span class="number">16</span>:])).decode(<span class="string">'utf8'</span>)
-
-<span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:
-    cipher = <span class="string">'vyLlwWSY1PCK5ELNTPUVdpl8z0rIXiB2+Ybcu/BeXidR3MEiym852HCkS6wHVCr+CdpP6Moe9VQUeFcyq3vZDpVK/orl+8vREYMRrnQR9O4='</span>
-    <span class="keyword">print</span> decrypt(key,cipher)
-</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"><span class="keyword">from</span> Crypto <span class="keyword">import</span> Random</span><br><span class="line"><span class="keyword">from</span> struct <span class="keyword">import</span> pack</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line">BS = <span class="number">16</span></span><br><span class="line">secret = <span class="string">b'supersecretpassword'</span></span><br><span class="line">key = hashlib.sha256(secret.encode(<span class="string">'utf-8'</span>)).digest()</span><br><span class="line"></span><br><span class="line">unpad = <span class="keyword">lambda</span> s: s[:-ord(s[len(s) - <span class="number">1</span>:])]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(key, message)</span>:</span></span><br><span class="line">    iv = Random.new().read(BS)</span><br><span class="line">    pad_len = BS - divmod(len(message), BS)[<span class="number">1</span>]</span><br><span class="line">    padding = [pad_len]*pad_len</span><br><span class="line">    padding = pack(<span class="string">'b'</span>*pad_len, *padding)</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line">    <span class="keyword">return</span> base64.b64encode(iv + cipher.encrypt(message + padding))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decrypt</span><span class="params">(key, cipher)</span>:</span></span><br><span class="line">    enc = base64.b64decode(cipher)</span><br><span class="line">    iv = enc[:<span class="number">16</span>]</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line">    <span class="keyword">return</span> unpad(cipher.decrypt(enc[<span class="number">16</span>:])).decode(<span class="string">'utf8'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    cipher = <span class="string">'vyLlwWSY1PCK5ELNTPUVdpl8z0rIXiB2+Ybcu/BeXidR3MEiym852HCkS6wHVCr+CdpP6Moe9VQUeFcyq3vZDpVK/orl+8vREYMRrnQR9O4='</span></span><br><span class="line">    <span class="keyword">print</span> decrypt(key,cipher)</span><br></pre></td></tr></table></figure>
 <p>运行</p>
 <p><img src="6.png" alt="automne"></p>
 <h3 id="Superb-Owlput"><a href="#Superb-Owlput" class="headerlink" title="Superb Owlput"></a>Superb Owlput</h3><p><a href="superb-owlput.pcap">superb-owlput.pcap</a> </p>
@@ -511,6 +464,11 @@ unpad = <span class="keyword">lambda</span> s: s[:-ord(s[len(s) - <span class="n
     <!-- paginator  -->
     <ul class="post-paginator">
         <li class="next">
+            
+                <div class="nextSlogan">Next Post</div>
+                <a 2019 href="/2019/04/23/ASIS-CTF-2019-ADeliciousSoup-WriteUp/" title="ASIS" ctf a delicious soup writeup>
+                    <div class="nextTitle">ASIS CTF 2019 A delicious soup WriteUp</div>
+                </a>
             
         </li>
         <li class="previous">
@@ -870,9 +828,20 @@ top:50vh;
     
     
     
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 19
+        Total : 20
         </div>
         <!-- search  -->
         
@@ -885,6 +854,11 @@ top:50vh;
     
     <div class="archive-year"> 2019 </div>
     <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/23</span><a class="archive-post-title" href="/2019/04/23/ASIS-CTF-2019-ADeliciousSoup-WriteUp/">ASIS CTF 2019 A delicious soup WriteUp</a>
+        </li>
     
     
         <li class="archive-post-item">
@@ -995,15 +969,15 @@ top:50vh;
         <div class="sidebar-panel-tags">
     <div class="sidebar-tags-name">
     
-        <span class="sidebar-tag-name" data-tags="lfsr"><span class="iconfont-archer">&#xe606;</span>lfsr</span>
-    
-        <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
-    
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
         <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
     
         <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+    
+        <span class="sidebar-tag-name" data-tags="lfsr"><span class="iconfont-archer">&#xe606;</span>lfsr</span>
+    
+        <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
     
         <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
     
@@ -1011,43 +985,41 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
     
-        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
-        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
+    
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
-    
-        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
         <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
+    
+        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
+    
+        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
         <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
@@ -1055,11 +1027,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
-        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
     
-        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
     
         <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
+    
+        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
     
     </div>
     <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
@@ -1094,17 +1070,17 @@ jsonContent:
         <div class="sidebar-panel-categories">
     <div class="sidebar-categories-name">
     
-        <span class="sidebar-category-name" data-categories="Crypto"><span class="iconfont-archer">&#xe60a;</span>Crypto</span>
-    
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
+    
+        <span class="sidebar-category-name" data-categories="Crypto"><span class="iconfont-archer">&#xe60a;</span>Crypto</span>
     
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
     
         <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
     
-        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
-    
         <span class="sidebar-category-name" data-categories="Crypto/Misc"><span class="iconfont-archer">&#xe60a;</span>Crypto/Misc</span>
+    
+        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     
     </div>
     <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
