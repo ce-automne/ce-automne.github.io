@@ -15,7 +15,7 @@
     <meta name="description" content>
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Automne&#39;s Shadow</title>
+    <title>Plaid CTF 2019  Project Eulernt WriteUp · Automne&#39;s Shadow</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -70,6 +70,8 @@
 
     <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
@@ -194,6 +196,8 @@
 </head>
 
     
+        <body class="post-body">
+    
     
 <header class="header">
 
@@ -201,27 +205,83 @@
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
     
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">Plaid CTF 2019  Project Eulernt WriteUp</a>
+            </div>
+    </div>
+    
     <a class="home-link" href="/">Automne's Shadow.</a>
 </header>
     <div class="wrapper">
-        <div class="site-intro" style>
+        <div class="site-intro" style="height:50vh;">
     
     <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/)"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
+            
+            Plaid CTF 2019  Project Eulernt WriteUp
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
+            
+            <!-- 404 -->
+            
         </p>
         <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="gmpy2">gmpy2</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/04/27</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
         
     </div>
 </div>
@@ -322,258 +382,74 @@
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main index-page">
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/">
-            
-                <span>Plaid CTF 2019  Project Eulernt WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/27</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="gmpy2">gmpy2</a>
-    
-</div>
-            
-        </div>
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Crypto</strong><br><a id="more"></a></p>
+<p>谢谢大佬分享：<a href="https://github.com/hyperreality/ctf-writeups/tree/master/2019-plaidctf" target="_blank" rel="noopener">https://github.com/hyperreality/ctf-writeups/tree/master/2019-plaidctf</a></p>
+<p>这道Misc题我将它归类为Crypto，因为我觉得其中的运算更贴近数学领域。</p>
+<p>首先看一下题目贴出的脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> decimal <span class="keyword">import</span> Decimal</span><br><span class="line"></span><br><span class="line">N = int(gmpy2.fac(<span class="number">333</span>))</span><br><span class="line"><span class="comment">#N = 10334465434588059156093965538297516550622260041682062823432902469783188597914276568552700194849877929894375950252570477080418352732597658745665925604704669227133726477243854317836635130694123893711638533001980496229875665476598568821806170303765540489814402234159901540440432134155844542962445153646330595588291605924429211352279943471372817279938720974895260387784578239150931816946786416232516666251965421919651838044618050991294403546958930745419743836966520198735201123255884089263272829846640538826979843642885775791641575109178753509580001660392092396798648924375401024147883702298145910046889402880394195369984000000000000000000000000000000000000000000000000000000000000000000000000000000000</span></span><br><span class="line">sN = int(gmpy2.isqrt(N))</span><br><span class="line"><span class="comment">#sN = 3214726338988757399964463840205273148284735043324463579894976679845078166928105412104944973948893914339037572694382785661727648297539107767478128297633669341356440278480314502443731079340424764653103468238563073341496690901434197268615240607985890327844073738551115260849983966971570699838147501655616953786428037017304945538845583678438817092853062</span></span><br><span class="line"></span><br><span class="line">k = int(input(<span class="string">"Enter number: "</span>))</span><br><span class="line"></span><br><span class="line">goodness = Decimal(abs(k - sN)) / sN </span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> k <span class="keyword">and</span> N % k == <span class="number">0</span> <span class="keyword">and</span> goodness &lt; <span class="number">1e-8</span>:</span><br><span class="line">    print(open(<span class="string">'/home/eulernt/flag.txt'</span>).read())</span><br><span class="line"><span class="keyword">elif</span> k <span class="keyword">and</span> N % k == <span class="number">0</span> <span class="keyword">and</span> goodness &lt; <span class="number">1e-4</span>:</span><br><span class="line">	print(<span class="string">"Good work! You're getting there."</span>)</span><br><span class="line"><span class="keyword">else</span>:</span><br><span class="line">    print(<span class="string">"Nope!"</span>)</span><br></pre></td></tr></table></figure>
+<p>需要注意gmpy2.fac(333)是333的阶乘，1<em>2</em>3…*333，表示为333！<del>数学都忘光了哈哈</del></p>
+<p>gmpy2.isqrt(N)是对N开根号，然后程序的逻辑就是要我们求一个同时满足N % k == 0并且Decimal(abs(k - sN)) / sN  &lt; 1e-8的整数</p>
+<p>开始的时候尝试使用z3进行约束求解，但是不可行。</p>
+<p>其实知道是阶乘运算之后，就可以挨个因子去测试，最终在相邻的因子间再做处理，直到得到小于1e-8的数字。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"><span class="keyword">from</span> decimal <span class="keyword">import</span> Decimal</span><br><span class="line"></span><br><span class="line">N = int(gmpy2.fac(<span class="number">333</span>))</span><br><span class="line">sN = int(gmpy2.isqrt(N))</span><br><span class="line"></span><br><span class="line">lastgoodness = <span class="number">2</span>**<span class="number">32</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">333</span>):</span><br><span class="line">    k = int(gmpy2.fac(i))</span><br><span class="line">    goodness = Decimal(abs(k - sN)) / sN</span><br><span class="line">    print(goodness)</span><br><span class="line">    <span class="keyword">if</span> goodness &gt; lastgoodness:</span><br><span class="line">        i = i - <span class="number">1</span>    <span class="comment">#i=189进入条件</span></span><br><span class="line">        <span class="keyword">break</span></span><br><span class="line">    lastgoodness = goodness</span><br><span class="line"></span><br><span class="line">k = int(gmpy2.fac(i))</span><br><span class="line">factor = i - <span class="number">1</span></span><br><span class="line">direction = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">not</span> (N % k == <span class="number">0</span> <span class="keyword">and</span> goodness &lt; <span class="number">1e-8</span>):</span><br><span class="line">    x = int(gmpy2.fac(factor))</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> direction == <span class="number">0</span>:</span><br><span class="line">        k = k + x</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        k = k - x</span><br><span class="line"></span><br><span class="line">    goodness = Decimal(abs(k - sN)) / sN</span><br><span class="line"></span><br><span class="line">    print(<span class="string">"%s %s %s"</span> % (factor, N % k == <span class="number">0</span>, goodness))</span><br><span class="line">    <span class="keyword">if</span> goodness &gt; lastgoodness:</span><br><span class="line">        <span class="keyword">if</span> factor != <span class="number">1</span>:</span><br><span class="line">            factor = factor - <span class="number">1</span></span><br><span class="line">        direction = direction ^ <span class="number">1</span></span><br><span class="line">    lastgoodness = goodness</span><br><span class="line"></span><br><span class="line">print(<span class="string">"Solution is %s"</span> % k)</span><br></pre></td></tr></table></figure>
+<p>最终得到满足条件的整数：</p>
+<pre><code>...
+...
+0.9995539612695387806518950648
+187
+0.9161447186732907625562721817
+188
+14.84864817074804587686455766
+189
+187 True 0.9156986799428295432081672465
+187 True 0.9152526412123683238600623113
+187 True 0.9148066024819071045119573761
+...
+...
+184 True 3.447727270606120732779613170E-9
+Solution is 3214726350072257066431779235750840929219380986500824976682691501005045658412547178850613283446572126454848437809927102959300721991188613732891480424816898090401474090228882047516881401960775657269052068936565791968436947912579621385034525890482950410176853479808655903537176316978841327570169928228012032000000000000000000000000000000000000000000000
+</code></pre>
     </article>
+    <!-- license  -->
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/">
-            
-                <span>TG:HACK CTF 2019  UnSolved WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong> <strong>Web</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/25</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="flask">flask</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="ssti">ssti</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="ecc">ecc</a>
-    
-</div>
-            
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/">https://ce-automne.github.io/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/">April 27th 2019, 1:16:00 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/23/ASIS-CTF-2019-ADeliciousSoup-WriteUp/">
-            
-                <span>ASIS CTF 2019 A delicious soup WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/23</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="reverse">reverse</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="python">python</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/21/TGHACK-CTF-2019-Solved-WriteUp/">
-            
-                <span>TG:HACK CTF 2019  Solved WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/21</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="AES">AES</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="tshark">tshark</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/19/Radar-CTF-2019-Crypto-WriteUp/">
-            
-                <span>RadarCTF 2019  Crypto WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/19</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="rsa">rsa</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="binary">binary</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/18/HackZone-CTF-2019-Mess-WriteUp/">
-            
-                <span>HackZone CTF 2019 MeSS WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/18</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="rsa">rsa</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="sage">sage</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/11/0CTF-2019-zer0lfsr-WriteUp/">
-            
-                <span>0CTF 2019 zer0lfsr WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/11</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="lfsr">lfsr</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="z3">z3</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/11/0CTF-2019-babyrsa-WriteUp/">
-            
-                <span>0CTF 2019  babyrsa WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/11</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="rsa">rsa</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="sage">sage</a>
-    
-</div>
-            
-        </div>
-    </article>
     
     <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a 2019 href="/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/" title="TG:HACK" ctf unsolved writeup>
+                    <div class="prevTitle">TG:HACK CTF 2019  UnSolved WriteUp</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
     
+    
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
 </main>
             <!-- profile -->
             
@@ -647,6 +523,24 @@
 </footer>
     </div>
     <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        
+    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -1229,6 +1123,8 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>
