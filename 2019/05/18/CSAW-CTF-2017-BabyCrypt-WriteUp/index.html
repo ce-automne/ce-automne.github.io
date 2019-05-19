@@ -398,17 +398,19 @@
 <p>使用socat本地搭建环境测试</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat -T60 TCP-LISTEN:8000,reuseaddr,fork EXEC:&quot;python -u baby_crypt.py&quot;</span><br></pre></td></tr></table></figure>
 <p>然后使用nc连接本地IP的8000端口</p>
-<p>首先手工做一下测试，从代码里可以看到密文以16位一组，而且是input+flag的形式</p>
-<p>那么如果输入是15个A的话，那么就会和flag里的第一个字符一起拼接，从而达到16位分组，然后使用ECB模式加密成一组密文。我们可以依次尝试AAAAAAAAAAAAAAA?里?这个字符，直到密文的前32位与直接输入15个A的内容一致，那么这个字符就猜对了。</p>
+<p>首先手工做一下测试，从代码里可以看到这是AES加密，这种加密的block长度固定为128位，也就是加密的密文以16byte为一组，我们常见的AES-128/AES-256等指的是密钥key的长度为128或者256位。</p>
+<p>当然，这里的加密为AES-256，而且明文是input+flag的形式</p>
+<p>那么如果输入是15个A的话，那么就会和flag里的第一个字符一起拼接，从而达到16 byte分组，然后使用ECB模式加密成一组密文。我们可以依次尝试15个A+?里的?这个字符，直到密文的前32位与直接输入15个A的内容一致，那么这个字符就猜对了。</p>
 <p>如下图所示，</p>
 <p><img src="2.png" alt="automne"></p>
 <p>第一个字符是f，接着猜第二个字符，输入14个A+f+?，可以确定第二个字符是l</p>
 <p><img src="3.png" alt="automne"></p>
-<p>以此类推，就可以还原flag的前16位，那么如果flag的长度超过16位呢，像本题这样。</p>
-<p>同样的我们可以从第17位开始用上面相同的方法，发送15个A+flag{Crypt0_is_s+? 和发送15个A得到的密文进行比较，来猜解?里的字符，注意这里比较的将是第二组密文。</p>
+<p>以此类推，就可以还原flag的前16 byte，那么如果flag的长度超过16 byte呢，本题就超过了16 byte。</p>
+<p>同样的我们可以从第17 byte开始用上面相同的方法，发送15个A+flag{Crypt0_is_s+? 和发送15个A得到的密文进行比较，来猜解?里的字符，注意这里比较的将是第二组密文。</p>
 <p><img src="4.png" alt="automne"></p>
 <p>最终就是用脚本来处理，参考这位大佬的脚本：<a href="https://github.com/liamh95/CTF-writeups/blob/master/CSAW17/baby_crypt/solve.py" target="_blank" rel="noopener">https://github.com/liamh95/CTF-writeups/blob/master/CSAW17/baby_crypt/solve.py</a></p>
-<p>直接贴在这里</p>
+<p>注意这里取r.recvline()[16:48]是因为返回的数据里前16位字符是：”Your Cookie is: “</p>
+<p>脚本直接贴在这里：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">r = remote(<span class="string">'192.168.126.146'</span>, <span class="number">8000</span>)</span><br><span class="line"></span><br><span class="line">flag = <span class="string">''</span></span><br><span class="line">found = <span class="string">''</span></span><br><span class="line"></span><br><span class="line">r.recv()</span><br><span class="line"><span class="keyword">while</span> found != <span class="string">'&#125;'</span>:</span><br><span class="line">	<span class="keyword">if</span> len(flag) &lt; <span class="number">16</span>:</span><br><span class="line">		sendme = <span class="string">'A'</span>*(<span class="number">15</span>-len(flag))</span><br><span class="line">	<span class="keyword">else</span>:</span><br><span class="line">		sendme = <span class="string">'A'</span>*(<span class="number">15</span>-(len(flag)%<span class="number">16</span>))</span><br><span class="line">	r.sendline(sendme)</span><br><span class="line">	<span class="keyword">if</span> len(flag) &lt; <span class="number">16</span>:</span><br><span class="line">		matchme = r.recvline()[<span class="number">16</span>:<span class="number">48</span>]</span><br><span class="line">	<span class="keyword">else</span>:</span><br><span class="line">		matchme = r.recvline()[<span class="number">48</span>:<span class="number">80</span>]</span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">32</span>, <span class="number">127</span>): <span class="comment">#only need to check printable characters</span></span><br><span class="line">		prompt = r.recv()</span><br><span class="line">		r.sendline(sendme + flag + chr(i))</span><br><span class="line">		response = r.recvline()</span><br><span class="line">		<span class="keyword">if</span> len(flag) &lt; <span class="number">16</span> <span class="keyword">and</span> response[<span class="number">16</span>:<span class="number">48</span>] == matchme:</span><br><span class="line">			flag += chr(i)</span><br><span class="line">			found = chr(i)</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">		<span class="keyword">elif</span> len(flag) &gt;= <span class="number">16</span> <span class="keyword">and</span> response[<span class="number">48</span>:<span class="number">80</span>] == matchme:</span><br><span class="line">			flag += chr(i)</span><br><span class="line">			found = chr(i)</span><br><span class="line">			<span class="keyword">break</span></span><br><span class="line">	<span class="keyword">print</span> flag</span><br><span class="line">	r.recv()</span><br></pre></td></tr></table></figure>
 <p>运行可得flag：</p>
 <p><img src="5.png" alt="automne"></p>
@@ -554,6 +556,14 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1074,23 +1084,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
     
         <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
-    
-        <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
-    
-        <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
-    
-        <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
-    
-        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
-    
-        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
@@ -1100,9 +1100,19 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
+        <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
+    
+        <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
+    
+        <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
+    
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
     
         <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
     
@@ -1120,33 +1130,27 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
+        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
+    
+        <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
+    
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
         <span class="sidebar-tag-name" data-tags="rsatool"><span class="iconfont-archer">&#xe606;</span>rsatool</span>
     
         <span class="sidebar-tag-name" data-tags="ssl"><span class="iconfont-archer">&#xe606;</span>ssl</span>
     
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+    
         <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
     
         <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
-    
-        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
-    
-        <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
         <span class="sidebar-tag-name" data-tags="ssti"><span class="iconfont-archer">&#xe606;</span>ssti</span>
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
-    
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
-    
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
-    
-        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
-    
-        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
     
         <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
@@ -1157,6 +1161,12 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+    
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+    
+        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
     
         <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
     
@@ -1199,9 +1209,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
-    
         <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
+    
+        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     
