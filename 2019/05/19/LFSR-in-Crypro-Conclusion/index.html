@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html>
+    <!-- title -->
+
+
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Automne">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Automne">
+    <meta name="keywords" content="Hexo | Automne">
+    <meta name="description" content>
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>LFSR in Crypro Conclusion · Automne&#39;s Shadow</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s 1;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href="/assets/favicon2.ico">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">LFSR in Crypro Conclusion</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href="/">Automne's Shadow.</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="height:50vh;">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            LFSR in Crypro Conclusion
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="lfsr">lfsr</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="z3">z3</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/05/19</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Crypto</strong><br><a id="more"></a></p>
+<p>LFSR-线性反馈移位寄存器是一种比较简单的PRNG（伪随机数生成器），属于流密码里的概念。LFSR主要用于生成一串随机的比特流，比特流可用做加密明文的密钥流。</p>
+<p>参考<a href="https://zhuanlan.zhihu.com/p/33920501" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/33920501</a></p>
+<p>看一下LFSR的基本操作。</p>
+<p><img src="1.png" alt="automne"></p>
+<p><img src="2.png" alt="automne"></p>
+<p><img src="3.png" alt="automne"></p>
+<h3 id="已知明文攻击"><a href="#已知明文攻击" class="headerlink" title="已知明文攻击"></a>已知明文攻击</h3><p>LFSR存在已知明文攻击，可以通过比特流，枚举度数，然后还原随机的抽头序列。</p>
+<p>举个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">假设某lfsr输出的比特流为：101011001101，比特流长度为12，优先考虑12/2=6的度，也就是将比特流6位一组：101011 001101，现在要求解该lfsr接下来12bit的内容。</span><br></pre></td></tr></table></figure>
+<p>根据lfsr的特点，该时刻的初始状态为101011，那么001101里的最左边一位0就是初始状态产生的last bit，现在要确定其抽头序列P，取其索引值从左到右依次为P0,P1,…P5。</p>
+<p>可以列出下面的方程组，注意异或操作：</p>
+<p>101011 <strong>0</strong>01101      0 = P0^P2^P4^P5</p>
+<p>1 010110 <strong>0</strong>1101     0 = P1^P3^P4</p>
+<p>10 101100 <strong>1</strong>101     1 = P0^P2^P3</p>
+<p>101 011001 <strong>1</strong>01     1 = P1^P2^P5</p>
+<p>1010 110011 <strong>0</strong>1     0 = P0^P1^P4^P5</p>
+<p>10101 100110 <strong>1</strong>     1 = P0^P3^P4</p>
+<p>使用z3-solver来求解这个方程。</p>
+<p>python脚本如下图：</p>
+<p><img src="4.png" alt="automne"></p>
+<p>求解得到该抽头序列P为[1,0,0,0,0,1]</p>
+<p><img src="5.png" alt="automne"></p>
+<p>使用下面的脚本（python3）就可以每6位一次计算接下来的比特流</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line">instr = input(<span class="string">"Please input last 6 bits: "</span>)</span><br><span class="line">lens = len(instr)</span><br><span class="line">rig = list(int(i) <span class="keyword">for</span> i <span class="keyword">in</span> instr)</span><br><span class="line">res = [<span class="number">0</span>]*lens</span><br><span class="line"></span><br><span class="line">print(<span class="string">"Reading First 6 bits: "</span> + str(rig))</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">6</span>):</span><br><span class="line">	res[i] = (<span class="number">1</span>*rig[<span class="number">0</span>]+<span class="number">1</span>*rig[<span class="number">5</span>])%<span class="number">2</span></span><br><span class="line">	print(res[i])</span><br><span class="line">	rig2 = rig.pop(<span class="number">0</span>)</span><br><span class="line">	rig = rig + [res[i]]</span><br><span class="line"></span><br><span class="line">print(<span class="string">"The Next 6 bits is: "</span> + str(res))</span><br></pre></td></tr></table></figure>
+<p>运行效果：</p>
+<p><img src="6.png" alt="automne"></p>
+<p>使用python的lfsr典型实现代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lfsr</span><span class="params">(R,mask)</span>:</span></span><br><span class="line">    output = (R &lt;&lt; <span class="number">1</span>) &amp; <span class="number">0xffffff</span></span><br><span class="line">    i=(R&amp;mask)&amp;<span class="number">0xffffff</span></span><br><span class="line">    lastbit=<span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> i!=<span class="number">0</span>:</span><br><span class="line">        lastbit^=(i&amp;<span class="number">1</span>)</span><br><span class="line">        i=i&gt;&gt;<span class="number">1</span></span><br><span class="line">    output^=lastbit</span><br><span class="line">    <span class="keyword">return</span> (output,lastbit)</span><br></pre></td></tr></table></figure>
+<p>其中R表示某时刻的初始状态，mask表示抽头序列。</p>
+<p>举个例子，使用下面的代码就可以一次性地求出上面的lfsr接下来的12bit数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lfsr</span><span class="params">(R,mask)</span>:</span></span><br><span class="line">    output = (R &lt;&lt; <span class="number">1</span>) &amp; <span class="number">0xffffff</span></span><br><span class="line">    i=(R&amp;mask)&amp;<span class="number">0xffffff</span></span><br><span class="line">    lastbit=<span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> i!=<span class="number">0</span>:</span><br><span class="line">        lastbit^=(i&amp;<span class="number">1</span>)</span><br><span class="line">        i=i&gt;&gt;<span class="number">1</span></span><br><span class="line">    output^=lastbit</span><br><span class="line">    <span class="keyword">return</span> (output,lastbit)</span><br><span class="line"></span><br><span class="line"><span class="comment">#R = 0b101011</span></span><br><span class="line">R = <span class="number">0b001101</span> <span class="comment">#初始状态</span></span><br><span class="line">mask = <span class="number">0b100001</span> <span class="comment">#抽头序列</span></span><br><span class="line"></span><br><span class="line">stream = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">12</span>):</span><br><span class="line">	(R,lastbit) = lfsr(R,mask)</span><br><span class="line">	stream.append(str(lastbit))</span><br><span class="line">	<span class="keyword">print</span> lastbit</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> <span class="string">""</span>.join(stream)</span><br></pre></td></tr></table></figure>
+<p>运行后发现和上面的输出内容是一样的</p>
+<p><img src="7.png" alt="automne"></p>
+<h3 id="逆向LFSR数据"><a href="#逆向LFSR数据" class="headerlink" title="逆向LFSR数据"></a>逆向LFSR数据</h3><p>上面的例子，101011 <strong>001101</strong>输出的比特流为<strong>110110</strong> 100100，现在如果知道了抽头序列，那么尝试从110110的输出求解其前6位的比特流（初始状态），这就是逆向lfsr的过程。</p>
+<p>python代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lfsr_inv</span><span class="params">(R,mask)</span>:</span></span><br><span class="line">	str=bin(R)[<span class="number">2</span>:].zfill(<span class="number">6</span>)</span><br><span class="line">	<span class="comment">#print str</span></span><br><span class="line">	new=str[<span class="number">-1</span>:]+str[:<span class="number">-1</span>]</span><br><span class="line">	<span class="comment">#print new</span></span><br><span class="line">	new=int(new,<span class="number">2</span>)                    <span class="comment">#R循环右移一位得到new</span></span><br><span class="line">	i = (new &amp; mask) &amp; <span class="number">0xffffffff</span></span><br><span class="line">	lastbit = <span class="number">0</span></span><br><span class="line">	<span class="keyword">while</span> i != <span class="number">0</span>:</span><br><span class="line">		lastbit ^= (i &amp; <span class="number">1</span>)</span><br><span class="line">		i = i &gt;&gt; <span class="number">1</span></span><br><span class="line">	<span class="keyword">return</span> R&gt;&gt;<span class="number">1</span> | lastbit&lt;&lt;<span class="number">5</span>         <span class="comment">#最高位用lastbit填充</span></span><br><span class="line"></span><br><span class="line">mask = <span class="number">0b100001</span> <span class="comment">#抽头序列</span></span><br><span class="line">c = <span class="number">0b110110</span> <span class="comment">#输出比特流</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">6</span>):</span><br><span class="line">	c = lfsr_inv(c,mask)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> bin(c)[<span class="number">2</span>:].zfill(<span class="number">6</span>)</span><br></pre></td></tr></table></figure>
+<p>运行后，就可以得到前一状态的比特流</p>
+<p><img src="8.png" alt="automne"></p>
+<p>基于此，看一下2018年的oldstreamgame赛题。</p>
+<p>题目源码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">flag = <span class="string">"flag&#123;xxxxxxxxxxxxxxxx&#125;"</span></span><br><span class="line"><span class="keyword">assert</span> flag.startswith(<span class="string">"flag&#123;"</span>)</span><br><span class="line"><span class="keyword">assert</span> flag.endswith(<span class="string">"&#125;"</span>)</span><br><span class="line"><span class="keyword">assert</span> len(flag)==<span class="number">14</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lfsr</span><span class="params">(R,mask)</span>:</span></span><br><span class="line">    output = (R &lt;&lt; <span class="number">1</span>) &amp; <span class="number">0xffffffff</span></span><br><span class="line">    i=(R&amp;mask)&amp;<span class="number">0xffffffff</span></span><br><span class="line">    lastbit=<span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> i!=<span class="number">0</span>:</span><br><span class="line">        lastbit^=(i&amp;<span class="number">1</span>)</span><br><span class="line">        i=i&gt;&gt;<span class="number">1</span></span><br><span class="line">    output^=lastbit</span><br><span class="line">    <span class="keyword">return</span> (output,lastbit)</span><br><span class="line"></span><br><span class="line">R=int(flag[<span class="number">5</span>:<span class="number">-1</span>],<span class="number">16</span>)</span><br><span class="line">mask = <span class="number">0b10100100000010000000100010010100</span></span><br><span class="line"></span><br><span class="line">f=open(<span class="string">"key"</span>,<span class="string">"w"</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">100</span>):</span><br><span class="line">    tmp=<span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">8</span>):</span><br><span class="line">        (R,out)=lfsr(R,mask)</span><br><span class="line">        tmp=(tmp &lt;&lt; <span class="number">1</span>)^out</span><br><span class="line">    f.write(chr(tmp))</span><br><span class="line">f.close()</span><br></pre></td></tr></table></figure>
+<p>从代码里可以看到，将lfsr生成的lastbit每8位一组组成一个byte，然后生成100个byte输出到key文件里，根据上面的逆向函数，可以写出下面的脚本，由抽头序列的32位构造响应的脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> libnum</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lfsr_inv</span><span class="params">(R,mask)</span>:</span></span><br><span class="line">	str=bin(R)[<span class="number">2</span>:].zfill(<span class="number">32</span>)</span><br><span class="line">	<span class="comment">#print str</span></span><br><span class="line">	new=str[<span class="number">-1</span>:]+str[:<span class="number">-1</span>]</span><br><span class="line">	<span class="comment">#print new</span></span><br><span class="line">	new=int(new,<span class="number">2</span>)                    <span class="comment">#R循环右移一位得到new</span></span><br><span class="line">	i = (new &amp; mask) &amp; <span class="number">0xffffffff</span></span><br><span class="line">	lastbit = <span class="number">0</span></span><br><span class="line">	<span class="keyword">while</span> i != <span class="number">0</span>:</span><br><span class="line">		lastbit ^= (i &amp; <span class="number">1</span>)</span><br><span class="line">		i = i &gt;&gt; <span class="number">1</span></span><br><span class="line">	<span class="keyword">return</span> R&gt;&gt;<span class="number">1</span> | lastbit&lt;&lt;<span class="number">31</span>         <span class="comment">#最高位用lastbit填充</span></span><br><span class="line"></span><br><span class="line">mask = <span class="number">0b10100100000010000000100010010100</span></span><br><span class="line"><span class="comment">#c = 0b00100000111111011110111011111000</span></span><br><span class="line"></span><br><span class="line">data = open(<span class="string">'key'</span>).read()</span><br><span class="line">data = data[:<span class="number">4</span>] <span class="comment">#取4bytes对应32bits</span></span><br><span class="line">c = libnum.s2n(data)</span><br><span class="line"><span class="comment">#print c</span></span><br><span class="line"><span class="keyword">print</span> bin(c)[<span class="number">2</span>:].zfill(<span class="number">32</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">32</span>):</span><br><span class="line">	c = lfsr_inv(c,mask)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> bin(c)[<span class="number">2</span>:].zfill(<span class="number">32</span>)</span><br><span class="line"><span class="keyword">print</span> hex(c)</span><br></pre></td></tr></table></figure>
+<p>运行可得到初始状态（flag）：</p>
+<p><img src="9.png" alt="automne"></p>
+<p>可以看到单个的LFSR是不安全的，但是在实际应用中，一般是多个LFSR之间基于某种非线性运算，从而使得破解变得非常复杂。</p>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/05/19/LFSR-in-Crypro-Conclusion/">https://ce-automne.github.io/2019/05/19/LFSR-in-Crypro-Conclusion/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/05/19/LFSR-in-Crypro-Conclusion/">May 19th 2019, 5:30:00 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a 2017 href="/2019/05/18/CSAW-CTF-2017-BabyCrypt-WriteUp/" title="CSAW" ctf babycrypt writeup>
+                    <div class="prevTitle">CSAW CTF 2017 BabyCrypt WriteUp</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:rainydusk4ctf@tom.com" class="iconfont-archer email" title="email"></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/ce-automne" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">本站总访问量PV: <span id="busuanzi_value_site_pv">次 </span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#已知明文攻击"><span class="toc-number">1.</span> <span class="toc-text">已知明文攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#逆向LFSR数据"><span class="toc-number">2.</span> <span class="toc-text">逆向LFSR数据</span></a></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 27
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span><a class="archive-post-title" href="/2019/05/19/LFSR-in-Crypro-Conclusion/">LFSR in Crypro Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CSAW-CTF-2017-BabyCrypt-WriteUp/">CSAW CTF 2017 BabyCrypt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CTF-313-2019-Angle-of-Approach-WriteUp/">CTF 313 2019 Angle of Approach WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/05</span><a class="archive-post-title" href="/2019/05/05/UUT-CTF-2019-SolveTheCrypto-WriteUp/">UUTCTF 2019 Solve the Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/SECCON-CTF-2017-VerySmooth-WriteUp/">SECCONCTF 2017 Very Smooth WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/">Plaid CTF 2019  Project Eulernt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/25</span><a class="archive-post-title" href="/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/">TG:HACK CTF 2019  UnSolved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/23</span><a class="archive-post-title" href="/2019/04/23/ASIS-CTF-2019-ADeliciousSoup-WriteUp/">ASIS CTF 2019 A delicious soup WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/21</span><a class="archive-post-title" href="/2019/04/21/TGHACK-CTF-2019-Solved-WriteUp/">TG:HACK CTF 2019  Solved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/19</span><a class="archive-post-title" href="/2019/04/19/Radar-CTF-2019-Crypto-WriteUp/">RadarCTF 2019  Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/18</span><a class="archive-post-title" href="/2019/04/18/HackZone-CTF-2019-Mess-WriteUp/">HackZone CTF 2019 MeSS WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-zer0lfsr-WriteUp/">0CTF 2019 zer0lfsr WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-babyrsa-WriteUp/">0CTF 2019  babyrsa WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/27</span><a class="archive-post-title" href="/2019/03/27/CONFidence -CTF-2019-The Lottery -WriteUp/">CONFidence CTF 2019 The Lottery WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span><a class="archive-post-title" href="/2019/03/21/MySQL-Blind-Injection-Scripts/">MySQL Blind Injection Scripts</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span><a class="archive-post-title" href="/2019/03/14/TAMU-CTF-2019-LocalNews-WriteUp/">TAMU CTF 2019 LocalNews WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/12</span><a class="archive-post-title" href="/2019/03/12/BSidesSF-CTF-2019-GoodLuks-WriteUp/">BSidesSF CTF 2019 GoodLuks WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/10</span><a class="archive-post-title" href="/2019/03/10/BSidesSF-CTF-2019-WeatherCompanion-WriteUp/">BSidesSF CTF 2019 WeatherCompanion WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/07</span><a class="archive-post-title" href="/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/">BSidesSF CTF 2019 Sequel WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/05</span><a class="archive-post-title" href="/2019/03/05/BSidesSF-CTF-2017-FlagStore-WriteUp/">BSidesSF CTF 2017 FlagStore WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/03</span><a class="archive-post-title" href="/2019/03/03/BSidesSF-CTF-2017-Pinlock-WriteUp/">BSidesSF CTF 2017 Pinlock WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span><a class="archive-post-title" href="/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/">BSidesSF CTF 2018 PasswordVault WriteUp</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/23</span><a class="archive-post-title" href="/2018/12/23/XMAS-CTF-2018-ChristmasGame-WriteUp/">XMAS CTF 2018 ChristmasGame WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/14</span><a class="archive-post-title" href="/2018/12/14/Otter-CTF-2018-Forensics-WriteUp-Part2/">OtterCTF 2018 Forensics WriteUp Part 2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span><a class="archive-post-title" href="/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/">OtterCTF 2018 Forensics WriteUp Part 1</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span><a class="archive-post-title" href="/2018/09/19/CSAW-CTF-2018-SSO-WriteUp/">CSAW CTF 2018 SSO WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/23</span><a class="archive-post-title" href="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/">WhiteHat Grand Prix 2018 Misc02 WriteUp</a>
+        </li>
+    
+    </ul></div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="lfsr"><span class="iconfont-archer">&#xe606;</span>lfsr</span>
+    
+        <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
+    
+        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
+    
+        <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
+    
+        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
+    
+        <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
+    
+        <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
+    
+        <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
+    
+        <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
+    
+        <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
+    
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
+    
+        <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
+    
+        <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
+    
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+    
+        <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsatool"><span class="iconfont-archer">&#xe606;</span>rsatool</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssl"><span class="iconfont-archer">&#xe606;</span>ssl</span>
+    
+        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+    
+        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+    
+        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
+    
+        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
+    
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+    
+        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
+    
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+    
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+    
+        <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssti"><span class="iconfont-archer">&#xe606;</span>ssti</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
+    
+        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
+    
+        <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
+    
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+    
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+    
+        <span class="sidebar-tag-name" data-tags="010 editor"><span class="iconfont-archer">&#xe606;</span>010 editor</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br>
+    1、请确保node版本大于6.2<br>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="Crypto"><span class="iconfont-archer">&#xe60a;</span>Crypto</span>
+    
+        <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
+    
+        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Automne"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
