@@ -392,7 +392,7 @@
 <p><img src="2.png" alt="automne"></p>
 <p>所以只要遍历ascii码，和message对比即可得到flag。</p>
 <p>主要考察脚本的编写，使用pwntools，但是在做比较的时候，务必注意将得到的输出用strip()处理</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#encoding=utf-8</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = remote(&quot;crypto.hsctf.com&quot;,8111)</span><br><span class="line">s = p.recvline_contains(&quot;secret&quot;)[-106:]</span><br><span class="line">print &quot;secret message: &quot; + s</span><br><span class="line">flag = &quot;&quot;</span><br><span class="line">j = 0</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">	for i in range(33,127):</span><br><span class="line">		#p.recvuntil(&apos;encrypt: &apos;)</span><br><span class="line">		p.sendline(flag+chr(i))</span><br><span class="line">		p.recvuntil(&apos;Encrypted: &apos;)</span><br><span class="line">		r =  p.recvline()</span><br><span class="line">		#print flag+chr(i)</span><br><span class="line">		#print r</span><br><span class="line">		#print s[j:j+2]</span><br><span class="line">		if s[j:j+2] == r.strip()[-2:]:</span><br><span class="line">			print &quot;Gotta.&quot;</span><br><span class="line">			flag += chr(i)</span><br><span class="line">			print flag</span><br><span class="line">			j += 2</span><br><span class="line">			print j</span><br><span class="line">			if j == 104:</span><br><span class="line">				print &quot;solved!&quot;</span><br><span class="line">				break</span><br><span class="line">print flag</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">p = remote(<span class="string">"crypto.hsctf.com"</span>,<span class="number">8111</span>)</span><br><span class="line">s = p.recvline_contains(<span class="string">"secret"</span>)[<span class="number">-106</span>:]</span><br><span class="line"><span class="keyword">print</span> <span class="string">"secret message: "</span> + s</span><br><span class="line">flag = <span class="string">""</span></span><br><span class="line">j = <span class="number">0</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">	<span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">33</span>,<span class="number">127</span>):</span><br><span class="line">		<span class="comment">#p.recvuntil('encrypt: ')</span></span><br><span class="line">		p.sendline(flag+chr(i))</span><br><span class="line">		p.recvuntil(<span class="string">'Encrypted: '</span>)</span><br><span class="line">		r =  p.recvline()</span><br><span class="line">		<span class="comment">#print flag+chr(i)</span></span><br><span class="line">		<span class="comment">#print r</span></span><br><span class="line">		<span class="comment">#print s[j:j+2]</span></span><br><span class="line">		<span class="keyword">if</span> s[j:j+<span class="number">2</span>] == r.strip()[<span class="number">-2</span>:]:</span><br><span class="line">			<span class="keyword">print</span> <span class="string">"Gotta."</span></span><br><span class="line">			flag += chr(i)</span><br><span class="line">			<span class="keyword">print</span> flag</span><br><span class="line">			j += <span class="number">2</span></span><br><span class="line">			<span class="keyword">print</span> j</span><br><span class="line">			<span class="keyword">if</span> j == <span class="number">104</span>:</span><br><span class="line">				<span class="keyword">print</span> <span class="string">"solved!"</span></span><br><span class="line">				<span class="keyword">break</span></span><br><span class="line"><span class="keyword">print</span> flag</span><br></pre></td></tr></table></figure>
 <p>运行一段时间得到flag：</p>
 <p><img src="3.png" alt="automne"></p>
 
@@ -537,14 +537,6 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
@@ -1103,37 +1095,37 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+    
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
+    
         <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
     
         <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
-    
-        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
-    
-        <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
-    
-        <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
-    
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
         <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
     
         <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
     
-        <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
+        <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
+    
+        <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
         <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
@@ -1141,7 +1133,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
-        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
+        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+    
+        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1153,11 +1147,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
     
-        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
     
-        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
-        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
@@ -1165,13 +1159,7 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
-    
-        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
-    
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
-    
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
         <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
@@ -1179,11 +1167,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
-        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
-    
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
+        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
+    
         <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
+    
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+    
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="010 editor"><span class="iconfont-archer">&#xe606;</span>010 editor</span>
     
@@ -1224,9 +1216,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
-    
         <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
+    
+        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     
