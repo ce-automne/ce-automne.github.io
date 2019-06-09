@@ -15,7 +15,7 @@
     <meta name="description" content>
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Automne&#39;s Shadow</title>
+    <title>HSCTF 2019 SuperSecureSystem WriteUp · Automne&#39;s Shadow</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -70,6 +70,8 @@
 
     <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
@@ -194,6 +196,8 @@
 </head>
 
     
+        <body class="post-body">
+    
     
 <header class="header">
 
@@ -201,27 +205,83 @@
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
     
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">HSCTF 2019 SuperSecureSystem WriteUp</a>
+            </div>
+    </div>
+    
     <a class="home-link" href="/">Automne's Shadow.</a>
 </header>
     <div class="wrapper">
-        <div class="site-intro" style>
+        <div class="site-intro" style="height:50vh;">
     
     <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/)"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
+            
+            HSCTF 2019 SuperSecureSystem WriteUp
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
+            
+            <!-- 404 -->
+            
         </p>
         <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="pwntools">pwntools</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/06/06</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
         
     </div>
 </div>
@@ -322,299 +382,59 @@
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main index-page">
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/">
-            
-                <span>BSidesSF CTF 2019 Sequel WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Web</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/03/07</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="sqli">sqli</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="sqlite">sqlite</a>
-    
-</div>
-            
-        </div>
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Crypto</strong><br><a id="more"></a></p>
+<p>打个酱油做了下。</p>
+<p>题目如下，还是蛮多人做出来的。</p>
+<p><img src="1.png" alt="automne"></p>
+<p>连接之后，会提供一段super secret message，但是每次连接这段message都不同。由于flag的格式是hsctf{}，输入hsctf{可以看到就是这段super secret message的前面部分的内容</p>
+<p><img src="2.png" alt="automne"></p>
+<p>所以只要遍历ascii码，和message对比即可得到flag。</p>
+<p>主要考察脚本的编写，使用pwntools，但是在做比较的时候，务必注意将得到的输出用strip()处理</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">#encoding=utf-8</span><br><span class="line"></span><br><span class="line">from pwn import *</span><br><span class="line"></span><br><span class="line">p = remote(&quot;crypto.hsctf.com&quot;,8111)</span><br><span class="line">s = p.recvline_contains(&quot;secret&quot;)[-106:]</span><br><span class="line">print &quot;secret message: &quot; + s</span><br><span class="line">flag = &quot;&quot;</span><br><span class="line">j = 0</span><br><span class="line"></span><br><span class="line">while True:</span><br><span class="line">	for i in range(33,127):</span><br><span class="line">		#p.recvuntil(&apos;encrypt: &apos;)</span><br><span class="line">		p.sendline(flag+chr(i))</span><br><span class="line">		p.recvuntil(&apos;Encrypted: &apos;)</span><br><span class="line">		r =  p.recvline()</span><br><span class="line">		#print flag+chr(i)</span><br><span class="line">		#print r</span><br><span class="line">		#print s[j:j+2]</span><br><span class="line">		if s[j:j+2] == r.strip()[-2:]:</span><br><span class="line">			print &quot;Gotta.&quot;</span><br><span class="line">			flag += chr(i)</span><br><span class="line">			print flag</span><br><span class="line">			j += 2</span><br><span class="line">			print j</span><br><span class="line">			if j == 104:</span><br><span class="line">				print &quot;solved!&quot;</span><br><span class="line">				break</span><br><span class="line">print flag</span><br></pre></td></tr></table></figure>
+<p>运行一段时间得到flag：</p>
+<p><img src="3.png" alt="automne"></p>
+
     </article>
+    <!-- license  -->
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/03/05/BSidesSF-CTF-2017-FlagStore-WriteUp/">
-            
-                <span>BSidesSF CTF 2017 FlagStore WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Android</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/03/05</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="reverse">reverse</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="broadcastreceiver">broadcastreceiver</a>
-    
-</div>
-            
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/06/06/HSCTF-2019-SuperSecureSystem-WriteUp/">https://ce-automne.github.io/2019/06/06/HSCTF-2019-SuperSecureSystem-WriteUp/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/06/06/HSCTF-2019-SuperSecureSystem-WriteUp/">June 6th 2019, 9:30:00 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/03/03/BSidesSF-CTF-2017-Pinlock-WriteUp/">
-            
-                <span>BSidesSF CTF 2017 Pinlock WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Android</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/03/03</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="reverse">reverse</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="sha-1">sha-1</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/">
-            
-                <span>BSidesSF CTF 2018 PasswordVault WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Android</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/02/24</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="reverse">reverse</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="fat">fat</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="git">git</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/12/23/XMAS-CTF-2018-ChristmasGame-WriteUp/">
-            
-                <span>XMAS CTF 2018 ChristmasGame WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Misc</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/12/23</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="pwntools">pwntools</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="nim game">nim game</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/12/14/Otter-CTF-2018-Forensics-WriteUp-Part2/">
-            
-                <span>OtterCTF 2018 Forensics WriteUp Part 2</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Forensics</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/12/14</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="volatility">volatility</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="malware">malware</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="codereflect">codereflect</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/">
-            
-                <span>OtterCTF 2018 Forensics WriteUp Part 1</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Forensics</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/12/13</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="volatility">volatility</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="yara plugin">yara plugin</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/09/19/CSAW-CTF-2018-SSO-WriteUp/">
-            
-                <span>CSAW CTF 2018 SSO WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Web</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/09/19</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="sso">sso</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="oauth 2.0">oauth 2.0</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/">
-            
-                <span>WhiteHat Grand Prix 2018 Misc02 WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Misc</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2018/08/23</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags=".iso">.iso</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="gpg">gpg</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="outguess">outguess</a>
-    
-</div>
-            
-        </div>
-    </article>
     
     <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2019/05/23/CBC-Bit-Flipping-Attack-Conclusion/" title="CBC" bit-flipping attack conclusion>
+                    <div class="prevTitle">CBC Bit-Flipping Attack Conclusion</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
     
-    <nav class="page-nav">
-        <a class="extend prev" rel="prev" href="/archives/page/2/">&#60; PREV</a><a class="page-number" href="/archives/">1</a><a class="page-number" href="/archives/page/2/">2</a><span class="page-number current">3</span>
-    </nav>
     
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
 </main>
             <!-- profile -->
             
@@ -688,6 +508,24 @@
 </footer>
     </div>
     <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        
+    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -1424,6 +1262,8 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>
