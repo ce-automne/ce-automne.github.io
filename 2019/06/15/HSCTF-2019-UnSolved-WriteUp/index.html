@@ -1,0 +1,1355 @@
+<!DOCTYPE html>
+<html>
+    <!-- title -->
+
+
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Automne">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Automne">
+    <meta name="keywords" content="Hexo | Automne">
+    <meta name="description" content>
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>HSCTF 2019 UnSolved WriteUp · Automne&#39;s Shadow</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s 1;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href="/assets/favicon2.ico">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">HSCTF 2019 UnSolved WriteUp</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href="/">Automne's Shadow.</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="height:50vh;">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            HSCTF 2019 UnSolved WriteUp
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="rsa">rsa</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="zsteg">zsteg</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="base58">base58</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/06/15</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Crypto</strong><br><a id="more"></a></p>
+<p>挑出部分题目学习学习。</p>
+<h3 id="A-Lost-Cause"><a href="#A-Lost-Cause" class="headerlink" title="A Lost Cause"></a>A Lost Cause</h3><p><img src="1.png" alt="automne"></p>
+<p>从题目中知道CGULKVIPFRGDOOCSJTRRVMORCQDZG是通过特殊的caesar密码加密，而且每相邻的两位中，后1位都比前1位少移位1次。</p>
+<p>首先看一下普通的凯撒密码的加解密脚本：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">#encoding=utf-8</span><br><span class="line"></span><br><span class="line">cipher = &quot;wklvlvohrq&quot;</span><br><span class="line"></span><br><span class="line">for k in xrange(26):</span><br><span class="line">	cipherList = list(cipher)</span><br><span class="line">	plainList = cipherList</span><br><span class="line">	i = 0</span><br><span class="line">	while i &lt; len(cipherList):</span><br><span class="line">		if ord(cipherList[i]) &gt;= 97+k:</span><br><span class="line">			plainList[i] = chr(ord(cipherList[i]) - k)</span><br><span class="line">		else:</span><br><span class="line">			plainList[i] = chr(ord(cipherList[i]) + 26 - k)</span><br><span class="line">		i = i+1</span><br><span class="line">	print &quot;shift &quot; + str(k) + &quot; rounds: &quot; + &quot;&quot;.join(plainList)</span><br></pre></td></tr></table></figure>
+<p>对于这题的移位脚本，参考<a href="https://medium.com/@sbasu7241/hsctf-6-ctf-writeups-a807f0b25ae4" target="_blank" rel="noopener">https://medium.com/@sbasu7241/hsctf-6-ctf-writeups-a807f0b25ae4</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line">LETTERS = <span class="string">'ABCDEFGHIJKLMNOPQRSTUVWXYZ'</span></span><br><span class="line">message = <span class="string">'CGULKVIPFRGDOOCSJTRRVMORCQDZG'</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> key <span class="keyword">in</span> range(len(LETTERS)):</span><br><span class="line">    temp = key</span><br><span class="line">    translated = <span class="string">''</span></span><br><span class="line">    <span class="keyword">for</span> symbol <span class="keyword">in</span> message:</span><br><span class="line">        <span class="keyword">if</span> symbol <span class="keyword">in</span> LETTERS:</span><br><span class="line">            num = LETTERS.find(symbol)</span><br><span class="line">            num = num - temp</span><br><span class="line">            <span class="comment">#print("symbol is %c and key is %d and num is %d" % (symbol,temp,num))</span></span><br><span class="line">            <span class="keyword">if</span> num &lt; <span class="number">0</span>:</span><br><span class="line">                num = num + len(LETTERS)</span><br><span class="line">            translated = translated + LETTERS[num]</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            translated = translated + symbol</span><br><span class="line">        temp = temp<span class="number">-1</span></span><br><span class="line">        <span class="keyword">if</span>(temp&lt;<span class="number">0</span>): </span><br><span class="line">            temp = <span class="number">25</span></span><br><span class="line">    print(<span class="string">'Hacking key #%s: %s'</span> % (key, translated.lower()))</span><br></pre></td></tr></table></figure>
+<p>运行后即可得到可读的字符串：glassesareusefuldonotlosethem</p>
+<p><img src="2.png" alt="automne"></p>
+<h3 id="Massive-RSA"><a href="#Massive-RSA" class="headerlink" title="Massive RSA"></a>Massive RSA</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">n = 950687172821200540428729809153981241192606941085199889710006512529799315561656564788637203101376144614649190146776378362001933636271697777317137481911233025291081331157135314582760768668046936978951230131371278628451555794052066356238840168982528971519323334381994143826200392654688774136120844941887558297071490087973944885778003973836311019785751636542119444349041852180595146239058424861988708991060298944680661305392492285898022705075814390941667822309754536610263449507491311215196067928669134842614154655850281748314529232542980764185554607592605321212081871630106290126123668106453941684604069442637972979374182617204123679546880646955063471680804611387541602675808433185504968764805413712115090234016146947180827040328391684056285942239977920347896230959546196177226139807640271414022569186565510341302134143539867133746492544472279859740722443892721076576952182274117616122050429733446090321598356954337536610713395670667775788540830077914016236382546944507664840405622352934380411525395863579062612404875578114927946272686172750421522119335879522375883064090902859635110578120928185659759792150776022992518497479844711483878613494426215867980856381040745252296584054718251345106582780587533445417441424957999212662923937862802426711722066998062574441680275377501049078991123518677027512513302350533057609106549686502083785061647562269181863107725160293272971931807381453849850066056697913028167183570392948696346480930400320904644898839942228059188904225142187444604612121676565893284697317106343998167640380023972222033520190994951064491572372368101650142992876761420785551386138148283615194775971673577063363049929945959258097086463812469068598955485574579363616634109593903116561526921965491646400040600138481505369027344295330767163087489333402201631708610718911106905154471963379233672543874307197342217544783263700843246351822145605839955798639016346308363889766574606793652730311687899415585873892778899179927359964882217066947566799298173326850382334054179474389651499891117938361854701587568363867264590395711833275763832842002504433841816245069655064326325306033334336469743800464944131049874472540605264250854258280373869113420817955012823462838351481855289027030577957168468047751024562853260494808998446682723835213272609799649864902376137320638444968430858790173696935815430513690803796736064125183005539073920032869713201073105497655763097638587404309062750746064609677994654409535743453776560694719663801069746654445359756195253816544699551</span><br><span class="line">e = 65537</span><br><span class="line">c = 358031506752691557002311547479988375196982422041486602674622689505841503255891193495423484852537391230787811575487947331018616578066891850752360030033666964406349205662189685086812466246139857474435922486026421639388596443953295273675167564381889788905773472245885677132773617051291379731995063989611049809121305468803148551770792609803351375571069366930457307762595216806633327492195442616272627113423143562166655122764898972565860928147259322712805600875994388377208017608434714747741249858321487547543201109467214209112271771033615033493406609653861223917338109193262445432032609161395100024272041503554476490575517100959892951805088735483927048625195799936311280172779052715645263075391841840633949032397082918665057115947698884582406130793211266028238396814146117158924884049679536261009188784571232730683037831940224049822081316216826346444136538278601803972530054219050666898301540575647763640218206611889707353810593843233814867745903144987805142815936160730054575462147126944741419094810558325854901931279755547624294325463528887326262902481099025253153222985717157272371423956465138892784879439141174797253720403065191378958340033965895823856879711180993895832306970105743588207727415495184380531676665121800713201192348940665501790550763379781627493441276077597720109700408848080221149485596419299548121287851605588246207568970548444975309457244824469026820421430723018384050095117420646392648577894835705672984626936461419833136418809219064810002991383584690376016818146065548853387107821627387061145659169570667682815001659475702299150425968489723185023734605402721950322618778361500790860436305553373620345189103147000675410970964950319723908599010461359668359916257252524290941929329344189971893558606572573665758188839754783710992996790764297302297263058216442742649741478512564068171266181773137060969745593802381540073397960444915230200708170859754559500051431883110028690791716906470624666328560717322458030544811229295722551849062570074938188113143167107247887066194761639893865268761243061406701905009155852073538976526544132556878584303616835564050808296190660548444328286965504238451837563164333849009829715536534194161169283679744857703254399005457897171205489516009277290637116063165415762387507832317759826809621649619867791323227812339615334304473447955432417706078131565118376536807024099950882628684498106652639816295352225305807407640318163257501701063937626962730520365319344478183221104445194534512033852645130826246778909064441514943</span><br></pre></td></tr></table></figure>
+<p>n太大了，无法分离，有一种情况就是当n恰好是素数的时候，就不需要分离n求p和q，紧接着再求n的欧拉函数phi。</p>
+<p>当n为素数时，直接求n的phi，而且phi = n -1</p>
+<p>于是直接sage一把梭</p>
+<p><img src="3.png" alt="automne"></p>
+<p>然后将得到的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">47244410076143981866591386704077548019736553793508799601164638053789194220413</span><br></pre></td></tr></table></figure>
+<p>转Hex再转Ascii即可得到flag：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hsctf&#123;forg0t_t0_mult1ply_prim3s&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Really-Secure-Algorithm"><a href="#Really-Secure-Algorithm" class="headerlink" title="Really Secure Algorithm"></a>Really Secure Algorithm</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">n = 263267198123727104271550205341958556303174876064032565857792727663848160746900434003334094378461840454433227578735680279553650400052510227283214433685655389241738968354222022240447121539162931116186488081274412377377863765060659624492965287622808692749117314129201849562443565726131685574812838404826685772784018356022327187718875291322282817197153362298286311745185044256353269081114504160345675620425507611498834298188117790948858958927324322729589237022927318641658527526339949064156992164883005731437748282518738478979873117409239854040895815331355928887403604759009882738848259473325879750260720986636810762489517585226347851473734040531823667025962249586099400648241100437388872231055432689235806576775408121773865595903729724074502829922897576209606754695074134609</span><br><span class="line">e = 65537</span><br><span class="line">c = 63730750663034420186054203696069279764587723426304400672168802689236894414173435574483861036285304923175308990970626739416195244195549995430401827434818046984872271300851807150225874311165602381589988405416304964847452307525883351225541615576599793984531868515708574409281711313769662949003103013799762173274319885217020434609677019589956037159254692138098542595148862209162217974360672409463898048108702225525424962923062427384889851578644031591358064552906800570492514371562100724091169894418230725012261656940082835040737854122792213175137748786146901908965502442703781479786905292956846018910885453170712237452652785768243138215686333746130607279614237568018186440315574405008206846139370637386144872550749882260458201528561992116159466686768832642982965722508678847</span><br></pre></td></tr></table></figure>
+<p>这里的n是可以分离的，使用yafu处理后得到两个一样的因子</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">16225510719965861964299051658340559066224635411075742500953901749924501886090804067406052688894869028683583501052917637552385089084807531319036985272636554557876754514524927502408114799014949174520357440885167280739363628642463479075654764698947461583766215118582826142179234382923872619079721726020446020581078274482268162477580369246821166693123724514271177264591824616458410293414647</span><br></pre></td></tr></table></figure>
+<p><img src="4.png" alt="automne"></p>
+<p>对于平方数的情况，要求其欧拉函数phi，计算公式如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">n = p * p, phi(n) = p * (p-1)</span><br></pre></td></tr></table></figure>
+<p>计算方法同上，即可求出flag：</p>
+<p>hsctf{square_number_time}</p>
+<h3 id="Welcome-to-Crypto-Land"><a href="#Welcome-to-Crypto-Land" class="headerlink" title="Welcome to Crypto Land"></a>Welcome to Crypto Land</h3><p>给了一段密文字符串</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">KZ6UaztNnau6z39oMHUu8UTvdmq1bhob3CcEFdWXRfxJqdUAiNep4pkvkAZUSn9CvEvPNT5r2zt6JPg9bVBPYuTW4xr8v2PuPxVuCT6MLJWDJp84</span><br></pre></td></tr></table></figure>
+<p>这是一段base58编码的字符串</p>
+<p><a href="https://gchq.github.io/CyberChef/#recipe=From_Base58(&#39;123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz&#39;,true)&amp;input=S1o2VWF6dE5uYXU2ejM5b01IVXU4VVR2ZG1xMWJob2IzQ2NFRmRXWFJmeEpxZFVBaU5lcDRwa3ZrQVpVU245Q3ZFdlBOVDVyMnp0NkpQZzliVkJQWXVUVzR4cjh2MlB1UHhWdUNUNk1MSldESnA4NA" target="_blank" rel="noopener">https://gchq.github.io/CyberChef/#recipe=From_Base58(&#39;123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz&#39;,true)&amp;input=S1o2VWF6dE5uYXU2ejM5b01IVXU4VVR2ZG1xMWJob2IzQ2NFRmRXWFJmeEpxZFVBaU5lcDRwa3ZrQVpVU245Q3ZFdlBOVDVyMnp0NkpQZzliVkJQWXVUVzR4cjh2MlB1UHhWdUNUNk1MSldESnA4NA</a></p>
+<p>直接解密即可</p>
+<p><img src="5.png" alt="automne"></p>
+<h3 id="Double-Trouble"><a href="#Double-Trouble" class="headerlink" title="Double Trouble"></a>Double Trouble</h3><p>主要考察LSB隐写</p>
+<p>两张基本相同的PNG图片</p>
+<p><a href="koala.png">koala.png</a></p>
+<p><a href="koala2.png">koala2.png</a></p>
+<p>首先安装zsteg，该工具可用于识别LSB隐写的数据，某种程度上比stegsolve手工选然后查看好用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pem install zsteg</span><br></pre></td></tr></table></figure>
+<p>得到LSB隐写的信息</p>
+<p><img src="6.png" alt="automne"></p>
+<p>访问上面的网址得到</p>
+<p><a href="hmmm.txt">hmmm.txt</a></p>
+<p>查看该文件发现这是AES加密的，而且密钥key在上图中是“whatdowehavehereJo”</p>
+<p><img src="7.png" alt="automne"></p>
+<p>然后使用gpg -d来解密不可行，考虑到这是AES的key，一般为16位</p>
+<p>所以密钥为whatdowehavehere</p>
+<p>解密成功，得到flag：</p>
+<p><img src="8.png" alt="automne"></p>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/06/15/HSCTF-2019-UnSolved-WriteUp/">https://ce-automne.github.io/2019/06/15/HSCTF-2019-UnSolved-WriteUp/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/06/15/HSCTF-2019-UnSolved-WriteUp/">June 15th 2019, 11:50:00 am</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a 2019 href="/2019/06/06/HSCTF-2019-SuperSecureSystem-WriteUp/" title="HSCTF" supersecuresystem writeup>
+                    <div class="prevTitle">HSCTF 2019 SuperSecureSystem WriteUp</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:rainydusk4ctf@tom.com" class="iconfont-archer email" title="email"></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/ce-automne" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">本站总访问量PV: <span id="busuanzi_value_site_pv">次 </span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#A-Lost-Cause"><span class="toc-number">1.</span> <span class="toc-text">A Lost Cause</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Massive-RSA"><span class="toc-number">2.</span> <span class="toc-text">Massive RSA</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Really-Secure-Algorithm"><span class="toc-number">3.</span> <span class="toc-text">Really Secure Algorithm</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Welcome-to-Crypto-Land"><span class="toc-number">4.</span> <span class="toc-text">Welcome to Crypto Land</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Double-Trouble"><span class="toc-number">5.</span> <span class="toc-text">Double Trouble</span></a></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 30
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span><a class="archive-post-title" href="/2019/06/15/HSCTF-2019-UnSolved-WriteUp/">HSCTF 2019 UnSolved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/06</span><a class="archive-post-title" href="/2019/06/06/HSCTF-2019-SuperSecureSystem-WriteUp/">HSCTF 2019 SuperSecureSystem WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span><a class="archive-post-title" href="/2019/05/23/CBC-Bit-Flipping-Attack-Conclusion/">CBC Bit-Flipping Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span><a class="archive-post-title" href="/2019/05/19/LFSR-in-Crypro-Conclusion/">LFSR in Crypro Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CSAW-CTF-2017-BabyCrypt-WriteUp/">CSAW CTF 2017 BabyCrypt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CTF-313-2019-Angle-of-Approach-WriteUp/">CTF 313 2019 Angle of Approach WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/05</span><a class="archive-post-title" href="/2019/05/05/UUT-CTF-2019-SolveTheCrypto-WriteUp/">UUTCTF 2019 Solve the Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/SECCON-CTF-2017-VerySmooth-WriteUp/">SECCONCTF 2017 Very Smooth WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/">Plaid CTF 2019  Project Eulernt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/25</span><a class="archive-post-title" href="/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/">TG:HACK CTF 2019  UnSolved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/23</span><a class="archive-post-title" href="/2019/04/23/ASIS-CTF-2019-ADeliciousSoup-WriteUp/">ASIS CTF 2019 A delicious soup WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/21</span><a class="archive-post-title" href="/2019/04/21/TGHACK-CTF-2019-Solved-WriteUp/">TG:HACK CTF 2019  Solved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/19</span><a class="archive-post-title" href="/2019/04/19/Radar-CTF-2019-Crypto-WriteUp/">RadarCTF 2019  Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/18</span><a class="archive-post-title" href="/2019/04/18/HackZone-CTF-2019-Mess-WriteUp/">HackZone CTF 2019 MeSS WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-zer0lfsr-WriteUp/">0CTF 2019 zer0lfsr WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-babyrsa-WriteUp/">0CTF 2019  babyrsa WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/27</span><a class="archive-post-title" href="/2019/03/27/CONFidence -CTF-2019-The Lottery -WriteUp/">CONFidence CTF 2019 The Lottery WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span><a class="archive-post-title" href="/2019/03/21/MySQL-Blind-Injection-Scripts/">MySQL Blind Injection Scripts</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span><a class="archive-post-title" href="/2019/03/14/TAMU-CTF-2019-LocalNews-WriteUp/">TAMU CTF 2019 LocalNews WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/12</span><a class="archive-post-title" href="/2019/03/12/BSidesSF-CTF-2019-GoodLuks-WriteUp/">BSidesSF CTF 2019 GoodLuks WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/10</span><a class="archive-post-title" href="/2019/03/10/BSidesSF-CTF-2019-WeatherCompanion-WriteUp/">BSidesSF CTF 2019 WeatherCompanion WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/07</span><a class="archive-post-title" href="/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/">BSidesSF CTF 2019 Sequel WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/05</span><a class="archive-post-title" href="/2019/03/05/BSidesSF-CTF-2017-FlagStore-WriteUp/">BSidesSF CTF 2017 FlagStore WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/03</span><a class="archive-post-title" href="/2019/03/03/BSidesSF-CTF-2017-Pinlock-WriteUp/">BSidesSF CTF 2017 Pinlock WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span><a class="archive-post-title" href="/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/">BSidesSF CTF 2018 PasswordVault WriteUp</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/23</span><a class="archive-post-title" href="/2018/12/23/XMAS-CTF-2018-ChristmasGame-WriteUp/">XMAS CTF 2018 ChristmasGame WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/14</span><a class="archive-post-title" href="/2018/12/14/Otter-CTF-2018-Forensics-WriteUp-Part2/">OtterCTF 2018 Forensics WriteUp Part 2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span><a class="archive-post-title" href="/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/">OtterCTF 2018 Forensics WriteUp Part 1</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span><a class="archive-post-title" href="/2018/09/19/CSAW-CTF-2018-SSO-WriteUp/">CSAW CTF 2018 SSO WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/23</span><a class="archive-post-title" href="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/">WhiteHat Grand Prix 2018 Misc02 WriteUp</a>
+        </li>
+    
+    </ul></div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="lfsr"><span class="iconfont-archer">&#xe606;</span>lfsr</span>
+    
+        <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
+    
+        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
+    
+        <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
+    
+        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
+    
+        <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
+    
+        <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
+    
+        <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
+    
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
+    
+        <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+    
+        <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
+    
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
+    
+        <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
+    
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+    
+        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+    
+        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+    
+        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
+    
+        <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsatool"><span class="iconfont-archer">&#xe606;</span>rsatool</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssl"><span class="iconfont-archer">&#xe606;</span>ssl</span>
+    
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
+    
+        <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
+    
+        <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssti"><span class="iconfont-archer">&#xe606;</span>ssti</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
+    
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+    
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+    
+        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
+    
+        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
+    
+        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
+    
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
+    
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+    
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+    
+        <span class="sidebar-tag-name" data-tags="010 editor"><span class="iconfont-archer">&#xe606;</span>010 editor</span>
+    
+        <span class="sidebar-tag-name" data-tags="zsteg"><span class="iconfont-archer">&#xe606;</span>zsteg</span>
+    
+        <span class="sidebar-tag-name" data-tags="base58"><span class="iconfont-archer">&#xe606;</span>base58</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br>
+    1、请确保node版本大于6.2<br>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="Crypto"><span class="iconfont-archer">&#xe60a;</span>Crypto</span>
+    
+        <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
+    
+        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
+    
+        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Automne"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
