@@ -408,7 +408,7 @@
 <p>剩下的40字节长度就是hv_hex的长度了。</p>
 <p>当然这些长度也可以直接修改源码打印出来。</p>
 <p>接着看代码中获取flag的关键逻辑</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">info = &#123;&#125;</span><br><span class="line">		<span class="keyword">for</span> _ <span class="keyword">in</span> cookie.split(<span class="string">b";"</span>):</span><br><span class="line">			k, v = _.split(<span class="string">b":"</span>)</span><br><span class="line">			info[k] = v</span><br><span class="line">		<span class="keyword">if</span> info[<span class="string">b"admin"</span>] == <span class="string">b"1"</span>:</span><br><span class="line">			<span class="keyword">with</span> open(<span class="string">"flag"</span>) <span class="keyword">as</span> f:</span><br><span class="line">				flag = f.read()</span><br><span class="line">				print(<span class="string">"Your flag: %s"</span> %flag)</span><br></pre></td></tr></table></figure>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">info = &#123;&#125;</span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> cookie.split(<span class="string">b";"</span>):</span><br><span class="line">    k, v = _.split(<span class="string">b":"</span>)</span><br><span class="line">    info[k] = v</span><br><span class="line">    <span class="keyword">if</span> info[<span class="string">b"admin"</span>] == <span class="string">b"1"</span>:</span><br><span class="line">        <span class="keyword">with</span> open(<span class="string">"flag"</span>) <span class="keyword">as</span> f:</span><br><span class="line">            flag = f.read()</span><br><span class="line">            print(<span class="string">"Your flag: %s"</span> %flag)</span><br></pre></td></tr></table></figure>
 <p>可以看到要求cookie中的admin:1,但是cookie的最前面已经写死了admin:0，这一点可以使用下面的方式绕过</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">admin:<span class="number">0</span>;username:admin;password:admin;admin:<span class="number">1</span></span><br></pre></td></tr></table></figure>
 <p>但是username和password的形式限制只允许输入字母</p>
@@ -561,14 +561,6 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
@@ -1195,17 +1187,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
     
-        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
+        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
         <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
-        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
-    
-        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
-    
-        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
     
         <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
     
@@ -1217,7 +1203,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
-        <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
@@ -1225,13 +1215,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
     
         <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
     
         <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
     
@@ -1241,8 +1233,6 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
-        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
-    
         <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
     
         <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
@@ -1251,19 +1241,21 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
+        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
+    
         <span class="sidebar-tag-name" data-tags="padding oracle attack"><span class="iconfont-archer">&#xe606;</span>padding oracle attack</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
         <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
     
-        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
-    
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
         <span class="sidebar-tag-name" data-tags="rsatool"><span class="iconfont-archer">&#xe606;</span>rsatool</span>
     
         <span class="sidebar-tag-name" data-tags="ssl"><span class="iconfont-archer">&#xe606;</span>ssl</span>
+    
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
         <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
     
@@ -1275,15 +1267,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+    
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+    
         <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
         <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
     
         <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
-    
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
-    
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
