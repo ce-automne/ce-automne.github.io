@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+<html>
+    <!-- title -->
+
+
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Automne">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Automne">
+    <meta name="keywords" content="Hexo | Automne">
+    <meta name="description" content>
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>ISITDTU CTF 2019 WriteUp Part2 · Automne&#39;s Shadow</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s 1;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href="/assets/favicon2.ico">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">ISITDTU CTF 2019 WriteUp Part2</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href="/">Automne's Shadow.</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="height:50vh;">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            ISITDTU CTF 2019 WriteUp Part2
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="fermat">fermat</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="multi-primes">multi-primes</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="prng">prng</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/07/05</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Crypto</strong><br><a id="more"></a></p>
+<h2 id="Easy-RSA-2"><a href="#Easy-RSA-2" class="headerlink" title="Easy_RSA_2"></a>Easy_RSA_2</h2><p>题目给出的python脚本内容如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"></span><br><span class="line">flag = <span class="string">'##################################'</span></span><br><span class="line">p1 = getPrime(<span class="number">512</span>)</span><br><span class="line">p2 = gmpy2.next_prime(p1)</span><br><span class="line">q1 = getPrime(<span class="number">512</span>)</span><br><span class="line">q2 = gmpy2.next_prime(q1)</span><br><span class="line">n = p1*p2*q1*q2</span><br><span class="line">e = <span class="number">65537</span></span><br><span class="line">phi = (p1<span class="number">-1</span>)*(p2<span class="number">-1</span>)*(q1<span class="number">-1</span>)*(q2<span class="number">-1</span>)</span><br><span class="line">d = gmpy2.invert(e,phi)</span><br><span class="line">c = pow(bytes_to_long(flag),e,n)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> pow(p1+q2,<span class="number">65537</span>,n)</span><br><span class="line"><span class="comment">#5043622010330564722783560796388733110223192234657313797979729183216316602247790170027393145104828283812158304519218370476380897023249898720267053051908498011845198383126598688185743313040451851234309071530873683667360872515868401870834371902623509762498919172464493397284930232415029297203698778851121422456149280629701148108649396642433199634388011535777204188207597427548981195309015900421249473588077922607729093939587454170211363784480831197764238579460361668878037335596700513382133341370374840639374005225742007557272153800433699784092511039693877686425832957477808359462507401596842526527374816943302475357302</span></span><br><span class="line"><span class="keyword">print</span> pow(p2+q1,<span class="number">65537</span>,n)</span><br><span class="line"><span class="comment">#7919283184559406259028604751155413696993375814336862337694645459367829841130544291770103966362177145582007048754925168845793555136985754996486596987205043932984314934297789456823769422776642272151478021108135062833657996366160688598742804847633068533451034898357435150319123770512604358033881809960916484049603490477616900480883862825416570459592254659007024761917196293369565486538943942938968226701375668351560376904094935919442322484791587819687743780031411339960372463937311578960714219580981945254129150844798674023932645363519148439092971133029751088847668041720574694350298717079140377388740434213791727288722</span></span><br><span class="line"><span class="keyword">print</span> n </span><br><span class="line"><span class="comment">#8573641536164485111081609341110540574423426701587222458588002464807917555910942077276167528046769327390058096169685188870928286845342631974847171845103806710768418462668311621275704636581042137915505959767806384415314024549489538717607173007829067492516776714817262226691787436227002924225311861164296655909746846329870548266285498682510415418053656271623482202491805513797215793596385014264449282551352796096361524482384994633912515104414237252657058698433260597636367614328512751722615849959987780969423318207123668118325176544879335267439096589035064596631756303300860315257404427016819145298919974287174103934503</span></span><br><span class="line"><span class="keyword">print</span> c </span><br><span class="line"><span class="comment">#8436043641135865531308468859210199431445831063674810351906331674115825605849862045115409554309732867926457428348729196827592921108183774070414343257409618631078896543782150761081732376735501920417229787663210936174854000594130785353102718054331606096192133481536724402629697019651921188121029927710787682993814748802295545306899075962041017278877203965796981792702098381465051289581518257202127401748725944229037078896857591660248467597356051123218945757343652461844056927461929195427880969904210166880623689090977714615839624798930450630919330253477634839161931755642681718034910946900928731231093352169252474939674</span></span><br></pre></td></tr></table></figure>
+<p>getPrime(512)表示随机返回一个512bit的prime number(质数)</p>
+<p>gmpy2.next_prime(p1)表示返回下一个大于p1的质数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">p1 = getPrime(<span class="number">512</span>)</span><br><span class="line">p2 = gmpy2.next_prime(p1)</span><br></pre></td></tr></table></figure>
+<p>由此可见，p1和p2比较接近</p>
+<p>同理q1和q2也比较接近</p>
+<p>又因为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">n = p1*p2*q1*q2</span><br></pre></td></tr></table></figure>
+<p>可以理解为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">n = (p1*q2)*(q1*p2)</span><br><span class="line">  = (p1*q1)*(q2*p2)</span><br></pre></td></tr></table></figure>
+<p>那么n就可以使用fermat attack去分解</p>
+<p>将RsaCtfTool里的fermat.py添加参数，就可以求出分解后的因子</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Source - http://stackoverflow.com/a/20465181</span></span><br><span class="line"><span class="keyword">from</span> gmpy2 <span class="keyword">import</span> isqrt</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fermat</span><span class="params">(n)</span>:</span></span><br><span class="line">    a = isqrt(n)</span><br><span class="line">    b2 = a*a - n</span><br><span class="line">    b = isqrt(n)</span><br><span class="line">    count = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> b*b != b2:</span><br><span class="line">        a = a + <span class="number">1</span></span><br><span class="line">        b2 = a*a - n</span><br><span class="line">        b = isqrt(b2)</span><br><span class="line">        count += <span class="number">1</span></span><br><span class="line">    p = a+b</span><br><span class="line">    q = a-b</span><br><span class="line">    <span class="keyword">assert</span> n == p * q</span><br><span class="line">    <span class="keyword">return</span> p, q</span><br><span class="line"></span><br><span class="line">n = <span class="number">8573641536164485111081609341110540574423426701587222458588002464807917555910942077276167528046769327390058096169685188870928286845342631974847171845103806710768418462668311621275704636581042137915505959767806384415314024549489538717607173007829067492516776714817262226691787436227002924225311861164296655909746846329870548266285498682510415418053656271623482202491805513797215793596385014264449282551352796096361524482384994633912515104414237252657058698433260597636367614328512751722615849959987780969423318207123668118325176544879335267439096589035064596631756303300860315257404427016819145298919974287174103934503</span></span><br><span class="line"><span class="keyword">print</span> fermat(n)</span><br></pre></td></tr></table></figure>
+<p>运行结果如下</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(mpz(92593960581478990492272892082797582837598460722110672289472622026362327649808629839901870926342611079306340852878894165246912369940368199994436453135377198629507140256023102013131493810077402487620597574150419252484604398426042348936643985371724093575122287222535733709825807203222224632574777263054682547849L), mpz(92593960581478990492272892082797582837598460722110672289472622026362327649808629839901870926342611079306340852878894165246912369940368199994436453135375408481531310003733935540422655297910944762679239039783193372674051452613244254750117673971732027355424665752849172881712190463569600293779394868475158854447L))</span><br></pre></td></tr></table></figure>
+<p>但是这里存在4个质数（multi-primes）</p>
+<p>可以修改fermat的代码，尝试得到两组满足条件的质数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fermat_factorization</span><span class="params">(n)</span>:</span></span><br><span class="line">    factor_list = []</span><br><span class="line">    gmpy2.get_context().precision = <span class="number">2048</span></span><br><span class="line">    a = int(gmpy2.sqrt(n))</span><br><span class="line"></span><br><span class="line">    a2 = a * a</span><br><span class="line">    b2 = gmpy2.sub(a2, n)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        a += <span class="number">1</span></span><br><span class="line">        b2 = a * a - n</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> gmpy2.is_square(b2):</span><br><span class="line">            b2 = gmpy2.mpz(b2)</span><br><span class="line">            gmpy2.get_context().precision = <span class="number">2048</span></span><br><span class="line">            b = int(gmpy2.sqrt(b2))</span><br><span class="line">            factor_list.append([a + b, a - b])</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> len(factor_list) == <span class="number">2</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> factor_list</span><br><span class="line"></span><br><span class="line">n = <span class="number">8573641536164485111081609341110540574423426701587222458588002464807917555910942077276167528046769327390058096169685188870928286845342631974847171845103806710768418462668311621275704636581042137915505959767806384415314024549489538717607173007829067492516776714817262226691787436227002924225311861164296655909746846329870548266285498682510415418053656271623482202491805513797215793596385014264449282551352796096361524482384994633912515104414237252657058698433260597636367614328512751722615849959987780969423318207123668118325176544879335267439096589035064596631756303300860315257404427016819145298919974287174103934503</span></span><br><span class="line"><span class="keyword">print</span> fermat_factorization(n)</span><br></pre></td></tr></table></figure>
+<p>运行得到结果，可以看到有2组数据，4个质数</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[[92593960581478990492272892082797582837598460722110672289472622026362327649808629839901870926342611079306340852878894165246912369940368199994436453135377198629507140256023102013131493810077402487620597574150419252484604398426042348936643985371724093575122287222535733709825807203222224632574777263054682547849L, 92593960581478990492272892082797582837598460722110672289472622026362327649808629839901870926342611079306340852878894165246912369940368199994436453135375408481531310003733935540422655297910944762679239039783193372674051452613244254750117673971732027355424665752849172881712190463569600293779394868475158854447L],</span><br><span class="line">[92593960581478990492272892082797582837598460722110672289472622026362327649808629839901870926342611079306340852878894165246912369940368199994436453135380738930065081697951287140042893321203653899791236620373028885001354525656928787903118347895059813547629304512431677110164891730095638508629167931628303931903L, 92593960581478990492272892082797582837598460722110672289472622026362327649808629839901870926342611079306340852878894165246912369940368199994436453135371868180973368561805750413511255786784693350508599993560583740157301325382357815783643311448396307382917648462953229481373105936696186417725004199901537674201L]]</span><br></pre></td></tr></table></figure>
+<p>标记为：[X1,Y1]，[X2,Y2]</p>
+<p>又根据</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">n = p1*p2*q1*q2</span><br><span class="line">  = p1*q1 * p2*q2 = X1 * Y1</span><br><span class="line">  = p1*q2 * p2*q1 = X2 * Y2</span><br></pre></td></tr></table></figure>
+<p>那么通过 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">p1*q1 和 p1*q2</span><br></pre></td></tr></table></figure>
+<p>就可以使用最大公约数(GCD)求得p1，然后q1也可以求得</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">p1 = GCD(X1,X2)</span><br><span class="line">q1 = X1/p1</span><br><span class="line">p2 = GCD(Y1,Y2)</span><br><span class="line">q2 = Y1/p2</span><br></pre></td></tr></table></figure>
+<p>代码参考<a href="https://github.com/pcw109550/write-up/tree/master/2019/ISITDTU/Easy_RSA_2" target="_blank" rel="noopener">https://github.com/pcw109550/write-up/tree/master/2019/ISITDTU/Easy_RSA_2</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> GCD, inverse, long_to_bytes <span class="keyword">as</span> l2b</span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">fermat_factorization</span><span class="params">(n)</span>:</span></span><br><span class="line">    factor_list = []</span><br><span class="line">    gmpy2.get_context().precision = <span class="number">2048</span></span><br><span class="line">    a = int(gmpy2.sqrt(n))</span><br><span class="line"></span><br><span class="line">    a2 = a * a</span><br><span class="line">    b2 = gmpy2.sub(a2, n)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        a += <span class="number">1</span></span><br><span class="line">        b2 = a * a - n</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> gmpy2.is_square(b2):</span><br><span class="line">            b2 = gmpy2.mpz(b2)</span><br><span class="line">            gmpy2.get_context().precision = <span class="number">2048</span></span><br><span class="line">            b = int(gmpy2.sqrt(b2))</span><br><span class="line">            factor_list.append([a + b, a - b])</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> len(factor_list) == <span class="number">2</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> factor_list</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    c = <span class="number">8436043641135865531308468859210199431445831063674810351906331674115825605849862045115409554309732867926457428348729196827592921108183774070414343257409618631078896543782150761081732376735501920417229787663210936174854000594130785353102718054331606096192133481536724402629697019651921188121029927710787682993814748802295545306899075962041017278877203965796981792702098381465051289581518257202127401748725944229037078896857591660248467597356051123218945757343652461844056927461929195427880969904210166880623689090977714615839624798930450630919330253477634839161931755642681718034910946900928731231093352169252474939674</span></span><br><span class="line">    e = <span class="number">65537</span></span><br><span class="line">    n =<span class="number">8573641536164485111081609341110540574423426701587222458588002464807917555910942077276167528046769327390058096169685188870928286845342631974847171845103806710768418462668311621275704636581042137915505959767806384415314024549489538717607173007829067492516776714817262226691787436227002924225311861164296655909746846329870548266285498682510415418053656271623482202491805513797215793596385014264449282551352796096361524482384994633912515104414237252657058698433260597636367614328512751722615849959987780969423318207123668118325176544879335267439096589035064596631756303300860315257404427016819145298919974287174103934503</span></span><br><span class="line">    factor_list = fermat_factorization(n)</span><br><span class="line">    <span class="keyword">print</span> factor_list</span><br><span class="line">    [X1, Y1] = factor_list[<span class="number">0</span>]</span><br><span class="line">    [X2, Y2] = factor_list[<span class="number">1</span>]</span><br><span class="line">    <span class="keyword">assert</span> X1 * Y1 == n</span><br><span class="line">    <span class="keyword">assert</span> X2 * Y2 == n</span><br><span class="line"></span><br><span class="line">    <span class="comment">#p1 = GCD(X1, X2)</span></span><br><span class="line">    <span class="comment">#p2 = X1 / p1</span></span><br><span class="line">    <span class="comment">#q1 = GCD(Y1, Y2)</span></span><br><span class="line">    <span class="comment">#q2 = Y1 / q1</span></span><br><span class="line"></span><br><span class="line">    p1 = GCD(X1,X2)</span><br><span class="line">    q1 = X1/p1</span><br><span class="line">    p2 = GCD(Y1,Y2)</span><br><span class="line">    q2 = Y1/p2</span><br><span class="line"></span><br><span class="line">    phi = (p1 - <span class="number">1</span>) * (q1 - <span class="number">1</span>) * (p2 - <span class="number">1</span>) * (q2 - <span class="number">1</span>)</span><br><span class="line">    d = inverse(e, phi)</span><br><span class="line">    flag = l2b(pow(c, d, n))</span><br><span class="line"></span><br><span class="line">    print(flag)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+<p>运行后得到flag</p>
+<p><img src="1.png" alt="automne"></p>
+<h3 id="decrypt-to-me"><a href="#decrypt-to-me" class="headerlink" title="decrypt to me"></a>decrypt to me</h3><p>题目源码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_prg_bit</span><span class="params">(n)</span>:</span></span><br><span class="line">    state = n</span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        last_bit = state &amp; <span class="number">1</span></span><br><span class="line">        <span class="keyword">yield</span> last_bit</span><br><span class="line">        middle_bit = state &gt;&gt; len(bin(n)[<span class="number">2</span>:])//<span class="number">2</span> &amp; <span class="number">1</span></span><br><span class="line">        state = (state &gt;&gt; <span class="number">1</span>) | ((last_bit ^ middle_bit) &lt;&lt; (len(bin(n)[<span class="number">2</span>:])<span class="number">-1</span>))</span><br><span class="line">flag = <span class="string">'###########'</span></span><br><span class="line">enc = <span class="string">"OKQI+f9R+tHEJJGcfko7Ahy2AuL9c8hgtYT2k9Ig0QyXUvsj1B9VIGUZVPAP2EVD8VmJBZbF9e17"</span></span><br><span class="line">flag_bin_text = bin(int(binascii.hexlify(flag), <span class="number">16</span>))[<span class="number">2</span>:]</span><br><span class="line">prg =  generate_prg_bit(len(flag_bin_text))</span><br><span class="line">ctext = []</span><br><span class="line">flag_bits = [int(i) <span class="keyword">for</span> i <span class="keyword">in</span> flag_bin_text]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(flag_bits)):</span><br><span class="line">    ctext.append(flag_bits[i] ^ next(prg))  </span><br><span class="line">ciphertext = <span class="string">'0b'</span> + <span class="string">''</span>.join(map(str, ctext))</span><br><span class="line">n = int(ciphertext, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">print</span> binascii.unhexlify(<span class="string">'%x'</span> % n).encode(<span class="string">'base64'</span>)</span><br></pre></td></tr></table></figure>
+<p>经过测试发现，len(flag_bin_text)和len(ciphertext)-2的值一样</p>
+<p>于是可以由密文推导出伪随机数生成器 generate_prg_bit(n)的种子n</p>
+<p>在测试过程中，可以发现需要在二进制数据前添加0才能保证前后长度一致</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_prg_bit</span><span class="params">(n)</span>:</span></span><br><span class="line">    state = n</span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        last_bit = state &amp; <span class="number">1</span></span><br><span class="line">        <span class="comment">#print last_bit</span></span><br><span class="line">        <span class="keyword">yield</span> last_bit</span><br><span class="line">        middle_bit = state &gt;&gt; len(bin(n)[<span class="number">2</span>:])//<span class="number">2</span> &amp; <span class="number">1</span></span><br><span class="line">        state = (state &gt;&gt; <span class="number">1</span>) | ((last_bit ^ middle_bit) &lt;&lt; (len(bin(n)[<span class="number">2</span>:])<span class="number">-1</span>))</span><br><span class="line">flag = <span class="string">'ISITDTU&#123;B'</span></span><br><span class="line"><span class="keyword">print</span> len(flag)</span><br><span class="line">enc = <span class="string">"OK9yn2BczcGa"</span></span><br><span class="line">flag_bin_text = bin(int(binascii.hexlify(flag), <span class="number">16</span>))[<span class="number">2</span>:]</span><br><span class="line"><span class="keyword">print</span> len(flag_bin_text)</span><br><span class="line">prg =  generate_prg_bit(len(flag_bin_text))</span><br><span class="line">ctext = []</span><br><span class="line">flag_bits = [int(i) <span class="keyword">for</span> i <span class="keyword">in</span> flag_bin_text]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(flag_bits)):</span><br><span class="line">    ctext.append(flag_bits[i] ^ next(prg))  </span><br><span class="line">ciphertext = <span class="string">'0b'</span> + <span class="string">''</span>.join(map(str, ctext))</span><br><span class="line">n = int(ciphertext, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">print</span> ciphertext</span><br><span class="line"><span class="keyword">print</span> len(ciphertext)<span class="number">-2</span></span><br><span class="line"><span class="keyword">print</span> binascii.unhexlify(<span class="string">'%x'</span> % n).encode(<span class="string">'base64'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> bin(int(binascii.hexlify(enc.decode(<span class="string">'base64'</span>)), <span class="number">16</span>))</span><br><span class="line">ciphertext2 = bin(int(binascii.hexlify(enc.decode(<span class="string">'base64'</span>)), <span class="number">16</span>))[<span class="number">2</span>:]</span><br><span class="line"><span class="keyword">print</span> len(ciphertext2)</span><br><span class="line">n2 = int(ciphertext2, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">print</span> binascii.unhexlify(<span class="string">'%x'</span> % n2).encode(<span class="string">'base64'</span>)</span><br></pre></td></tr></table></figure>
+<p>运行效果如下图，可以看得比较直观</p>
+<p><img src="2.png" alt="automne"></p>
+<p>由此可以得到准确的长度值</p>
+<p>最终的脚本，参考<a href="https://github.com/pcw109550/write-up/blob/master/2019/ISITDTU/decrypt_to_me/solve.py" target="_blank" rel="noopener">https://github.com/pcw109550/write-up/blob/master/2019/ISITDTU/decrypt_to_me/solve.py</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> binascii</span><br><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> long_to_bytes <span class="keyword">as</span> l2b, bytes_to_long <span class="keyword">as</span> b2l</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_prg_bit</span><span class="params">(n)</span>:</span></span><br><span class="line">    state = n</span><br><span class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">        last_bit = state &amp; <span class="number">1</span></span><br><span class="line">        <span class="keyword">yield</span> last_bit</span><br><span class="line">        middle_bit = state &gt;&gt; len(bin(n)[<span class="number">2</span>:])//<span class="number">2</span> &amp; <span class="number">1</span></span><br><span class="line">        state = (state &gt;&gt; <span class="number">1</span>) | ((last_bit ^ middle_bit) &lt;&lt; (len(bin(n)[<span class="number">2</span>:])<span class="number">-1</span>))</span><br><span class="line">flag = <span class="string">'###########'</span></span><br><span class="line">enc = <span class="string">"OKQI+f9R+tHEJJGcfko7Ahy2AuL9c8hgtYT2k9Ig0QyXUvsj1B9VIGUZVPAP2EVD8VmJBZbF9e17"</span></span><br><span class="line">flag_bin_text = bin(int(binascii.hexlify(flag), <span class="number">16</span>))[<span class="number">2</span>:]</span><br><span class="line">prg =  generate_prg_bit(len(flag_bin_text))</span><br><span class="line">ctext = []</span><br><span class="line">flag_bits = [int(i) <span class="keyword">for</span> i <span class="keyword">in</span> flag_bin_text]</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(len(flag_bits)):</span><br><span class="line">    ctext.append(flag_bits[i] ^ next(prg))  </span><br><span class="line">ciphertext = <span class="string">'0b'</span> + <span class="string">''</span>.join(map(str, ctext))</span><br><span class="line">n = int(ciphertext, <span class="number">2</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> bin(int(binascii.hexlify(enc.decode(<span class="string">'base64'</span>)), <span class="number">16</span>))</span><br><span class="line">ciphertext2 = bin(int(binascii.hexlify(enc.decode(<span class="string">'base64'</span>)), <span class="number">16</span>))[<span class="number">2</span>:]</span><br><span class="line"><span class="keyword">print</span> len(ciphertext2)</span><br><span class="line">n2 = int(ciphertext2, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">print</span> binascii.unhexlify(<span class="string">'%x'</span> % n2).encode(<span class="string">'base64'</span>)</span><br><span class="line">ciphertext3 = <span class="string">'0'</span>+ciphertext2</span><br><span class="line"><span class="keyword">print</span> ciphertext3</span><br><span class="line">prg = generate_prg_bit(len(ciphertext3))</span><br><span class="line">pt = <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> e <span class="keyword">in</span> ciphertext3:</span><br><span class="line">    pt += str(next(prg) ^ int(e))</span><br><span class="line">flag =  l2b(int(pt,<span class="number">2</span>))</span><br><span class="line"><span class="keyword">print</span> flag</span><br></pre></td></tr></table></figure>
+<p>运行得到flag</p>
+<p><img src="3.png" alt="automne"></p>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/07/05/ISITDTU-CTF-2019-WriteUp-Part2/">https://ce-automne.github.io/2019/07/05/ISITDTU-CTF-2019-WriteUp-Part2/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/07/05/ISITDTU-CTF-2019-WriteUp-Part2/">July 5th 2019, 11:00:00 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a 2019 href="/2019/07/02/ISITDTU-CTF-2019-WriteUp/" title="ISITDTU" ctf writeup>
+                    <div class="prevTitle">ISITDTU CTF 2019 WriteUp</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:rainydusk4ctf@tom.com" class="iconfont-archer email" title="email"></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/ce-automne" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">本站总访问量PV: <span id="busuanzi_value_site_pv">次 </span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Easy-RSA-2"><span class="toc-number">1.</span> <span class="toc-text">Easy_RSA_2</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#decrypt-to-me"><span class="toc-number">1.1.</span> <span class="toc-text">decrypt to me</span></a></li></ol></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 35
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/05</span><a class="archive-post-title" href="/2019/07/05/ISITDTU-CTF-2019-WriteUp-Part2/">ISITDTU CTF 2019 WriteUp Part2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/02</span><a class="archive-post-title" href="/2019/07/02/ISITDTU-CTF-2019-WriteUp/">ISITDTU CTF 2019 WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/01</span><a class="archive-post-title" href="/2019/07/01/RCTF-2019-BabyCrypto-WriteUp/">RCTF 2019 BabyCrypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/26</span><a class="archive-post-title" href="/2019/06/26/Hash-Length-Extension-Attack-Conclusion/">Hash Length Extension Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/23</span><a class="archive-post-title" href="/2019/06/23/CBC-Padding-Oracle-Attack-Conclusion/">CBC Padding Oracle Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span><a class="archive-post-title" href="/2019/06/15/HSCTF-2019-UnSolved-WriteUp/">HSCTF 2019 UnSolved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/06</span><a class="archive-post-title" href="/2019/06/06/HSCTF-2019-SuperSecureSystem-WriteUp/">HSCTF 2019 SuperSecureSystem WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span><a class="archive-post-title" href="/2019/05/23/CBC-Bit-Flipping-Attack-Conclusion/">CBC Bit-Flipping Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span><a class="archive-post-title" href="/2019/05/19/LFSR-in-Crypto-Conclusion/">LFSR in Crypto Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CSAW-CTF-2017-BabyCrypt-WriteUp/">CSAW CTF 2017 BabyCrypt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CTF-313-2019-Angle-of-Approach-WriteUp/">CTF 313 2019 Angle of Approach WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/05</span><a class="archive-post-title" href="/2019/05/05/UUT-CTF-2019-SolveTheCrypto-WriteUp/">UUTCTF 2019 Solve the Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/SECCON-CTF-2017-VerySmooth-WriteUp/">SECCONCTF 2017 Very Smooth WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/">Plaid CTF 2019  Project Eulernt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/25</span><a class="archive-post-title" href="/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/">TG:HACK CTF 2019  UnSolved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/23</span><a class="archive-post-title" href="/2019/04/23/ASIS-CTF-2019-ADeliciousSoup-WriteUp/">ASIS CTF 2019 A delicious soup WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/21</span><a class="archive-post-title" href="/2019/04/21/TGHACK-CTF-2019-Solved-WriteUp/">TG:HACK CTF 2019  Solved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/19</span><a class="archive-post-title" href="/2019/04/19/Radar-CTF-2019-Crypto-WriteUp/">RadarCTF 2019  Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/18</span><a class="archive-post-title" href="/2019/04/18/HackZone-CTF-2019-Mess-WriteUp/">HackZone CTF 2019 MeSS WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-zer0lfsr-WriteUp/">0CTF 2019 zer0lfsr WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-babyrsa-WriteUp/">0CTF 2019  babyrsa WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/27</span><a class="archive-post-title" href="/2019/03/27/CONFidence -CTF-2019-The Lottery -WriteUp/">CONFidence CTF 2019 The Lottery WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span><a class="archive-post-title" href="/2019/03/21/MySQL-Blind-Injection-Scripts/">MySQL Blind Injection Scripts</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span><a class="archive-post-title" href="/2019/03/14/TAMU-CTF-2019-LocalNews-WriteUp/">TAMU CTF 2019 LocalNews WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/12</span><a class="archive-post-title" href="/2019/03/12/BSidesSF-CTF-2019-GoodLuks-WriteUp/">BSidesSF CTF 2019 GoodLuks WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/10</span><a class="archive-post-title" href="/2019/03/10/BSidesSF-CTF-2019-WeatherCompanion-WriteUp/">BSidesSF CTF 2019 WeatherCompanion WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/07</span><a class="archive-post-title" href="/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/">BSidesSF CTF 2019 Sequel WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/05</span><a class="archive-post-title" href="/2019/03/05/BSidesSF-CTF-2017-FlagStore-WriteUp/">BSidesSF CTF 2017 FlagStore WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/03</span><a class="archive-post-title" href="/2019/03/03/BSidesSF-CTF-2017-Pinlock-WriteUp/">BSidesSF CTF 2017 Pinlock WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span><a class="archive-post-title" href="/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/">BSidesSF CTF 2018 PasswordVault WriteUp</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/23</span><a class="archive-post-title" href="/2018/12/23/XMAS-CTF-2018-ChristmasGame-WriteUp/">XMAS CTF 2018 ChristmasGame WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/14</span><a class="archive-post-title" href="/2018/12/14/Otter-CTF-2018-Forensics-WriteUp-Part2/">OtterCTF 2018 Forensics WriteUp Part 2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span><a class="archive-post-title" href="/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/">OtterCTF 2018 Forensics WriteUp Part 1</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span><a class="archive-post-title" href="/2018/09/19/CSAW-CTF-2018-SSO-WriteUp/">CSAW CTF 2018 SSO WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/23</span><a class="archive-post-title" href="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/">WhiteHat Grand Prix 2018 Misc02 WriteUp</a>
+        </li>
+    
+    </ul></div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
+    
+        <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
+    
+        <span class="sidebar-tag-name" data-tags="lfsr"><span class="iconfont-archer">&#xe606;</span>lfsr</span>
+    
+        <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
+    
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+    
+        <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
+    
+        <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
+    
+        <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
+    
+        <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
+    
+        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
+    
+        <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
+    
+        <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="hashpumpy"><span class="iconfont-archer">&#xe606;</span>hashpumpy</span>
+    
+        <span class="sidebar-tag-name" data-tags="sourceleakhacker"><span class="iconfont-archer">&#xe606;</span>sourceleakhacker</span>
+    
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
+    
+        <span class="sidebar-tag-name" data-tags="inet_aton"><span class="iconfont-archer">&#xe606;</span>inet_aton</span>
+    
+        <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
+    
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+    
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
+    
+        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+    
+        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+    
+        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
+    
+        <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
+    
+        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
+    
+        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
+    
+        <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsatool"><span class="iconfont-archer">&#xe606;</span>rsatool</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssl"><span class="iconfont-archer">&#xe606;</span>ssl</span>
+    
+        <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssti"><span class="iconfont-archer">&#xe606;</span>ssti</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
+    
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+    
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+    
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+    
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+    
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+    
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
+    
+        <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
+    
+        <span class="sidebar-tag-name" data-tags="zsteg"><span class="iconfont-archer">&#xe606;</span>zsteg</span>
+    
+        <span class="sidebar-tag-name" data-tags="base58"><span class="iconfont-archer">&#xe606;</span>base58</span>
+    
+        <span class="sidebar-tag-name" data-tags="fermat"><span class="iconfont-archer">&#xe606;</span>fermat</span>
+    
+        <span class="sidebar-tag-name" data-tags="multi-primes"><span class="iconfont-archer">&#xe606;</span>multi-primes</span>
+    
+        <span class="sidebar-tag-name" data-tags="prng"><span class="iconfont-archer">&#xe606;</span>prng</span>
+    
+        <span class="sidebar-tag-name" data-tags="010 editor"><span class="iconfont-archer">&#xe606;</span>010 editor</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br>
+    1、请确保node版本大于6.2<br>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="Crypto"><span class="iconfont-archer">&#xe60a;</span>Crypto</span>
+    
+        <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
+    
+        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
+    
+        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Automne"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
