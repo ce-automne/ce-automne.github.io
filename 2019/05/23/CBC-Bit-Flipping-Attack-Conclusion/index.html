@@ -424,6 +424,11 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"><span class="keyword">from</span> os <span class="keyword">import</span> urandom</span><br><span class="line"></span><br><span class="line">key = urandom(<span class="number">16</span>)</span><br><span class="line">iv = urandom(<span class="number">16</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">padding</span><span class="params">(string)</span>:</span></span><br><span class="line">    l = len(string)</span><br><span class="line">    blocksize = <span class="number">16</span></span><br><span class="line">    padlen = blocksize - (l % blocksize)</span><br><span class="line">    padbyte = hex(padlen).replace(<span class="string">"0x"</span>, <span class="string">""</span>)</span><br><span class="line">    <span class="keyword">if</span> len(padbyte) != <span class="number">2</span>:</span><br><span class="line">        padbyte = <span class="string">"0"</span> + padbyte</span><br><span class="line">    string = string.encode(<span class="string">"hex"</span>) + padlen*padbyte</span><br><span class="line">    string = string.decode(<span class="string">"hex"</span>)</span><br><span class="line">    <span class="keyword">return</span> string</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(payload)</span>:</span></span><br><span class="line">    obj = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> xrange(len(payload)):</span><br><span class="line">        <span class="keyword">if</span> payload[i] == <span class="string">";"</span> <span class="keyword">or</span> payload[i] == <span class="string">"="</span>:</span><br><span class="line">            payload = payload.replace(payload[i], <span class="string">"?"</span>)</span><br><span class="line">    str1 = <span class="string">"comment1=cooking%20MCs;userdata="</span> + payload + <span class="string">";comment2=%20like%20a%20pound%20of%20bacon"</span></span><br><span class="line">    str1 = padding(str1)</span><br><span class="line">    ciphertext = obj.encrypt(str1)</span><br><span class="line">    <span class="keyword">return</span> ciphertext</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decrypt</span><span class="params">(ciphertext)</span>:</span></span><br><span class="line">    obj1 = AES.new(key,AES.MODE_CBC,iv)</span><br><span class="line">    plaintext = obj1.decrypt(ciphertext)</span><br><span class="line">    <span class="keyword">if</span> <span class="string">";admin=true;"</span> <span class="keyword">in</span> plaintext:</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"Logged in as admin"</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"You need to be admin to get the access!"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Exploit using the Bit Flipping Attack!</span></span><br><span class="line">cipher_list = []</span><br><span class="line">payload = <span class="string">";admin=true;"</span></span><br><span class="line">ciphertext = encrypt(payload)</span><br><span class="line"></span><br><span class="line">i = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> i*<span class="number">16</span> &lt;= len(ciphertext):</span><br><span class="line">    cipher_list.append(ciphertext[i*<span class="number">16</span>: <span class="number">16</span> + (i*<span class="number">16</span>)])</span><br><span class="line">    i += <span class="number">1</span></span><br><span class="line">cipher_list.remove(cipher_list[<span class="number">6</span>])</span><br><span class="line"></span><br><span class="line">attack_on_block = cipher_list[<span class="number">1</span>]</span><br><span class="line">list1 = list(attack_on_block)</span><br><span class="line">list1[<span class="number">0</span>] = chr(ord(list1[<span class="number">0</span>]) ^ ord(<span class="string">"?"</span>) ^ ord(<span class="string">";"</span>))</span><br><span class="line">list1[<span class="number">6</span>] = chr(ord(list1[<span class="number">6</span>]) ^ ord(<span class="string">"?"</span>) ^ ord(<span class="string">"="</span>))</span><br><span class="line">list1[<span class="number">11</span>] = chr(ord(list1[<span class="number">11</span>]) ^ ord(<span class="string">"?"</span>) ^ ord(<span class="string">";"</span>))</span><br><span class="line">cipher_list[<span class="number">1</span>] = <span class="string">''</span>.join(list1)</span><br><span class="line">ciphertext = <span class="string">''</span>.join(cipher_list)</span><br><span class="line"></span><br><span class="line">decrypt(ciphertext)</span><br></pre></td></tr></table></figure>
 <p>运行后发现成功翻转了密文为预期的;admin=true;</p>
 <p><img src="7.png" alt="automne"></p>
+<p><strong>2019.7.14更新</strong></p>
+<p>重写上面的代码，使之易于理解</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"><span class="keyword">from</span> os <span class="keyword">import</span> urandom</span><br><span class="line"></span><br><span class="line">key = urandom(<span class="number">16</span>)</span><br><span class="line">iv = urandom(<span class="number">16</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">padding</span><span class="params">(string)</span>:</span></span><br><span class="line">    l = len(string)</span><br><span class="line">    blocksize = <span class="number">16</span></span><br><span class="line">    padlen = blocksize - (l % blocksize)</span><br><span class="line">    padbyte = hex(padlen).replace(<span class="string">"0x"</span>, <span class="string">""</span>)</span><br><span class="line">    <span class="keyword">if</span> len(padbyte) != <span class="number">2</span>:</span><br><span class="line">        padbyte = <span class="string">"0"</span> + padbyte</span><br><span class="line">    string = string.encode(<span class="string">"hex"</span>) + padlen*padbyte</span><br><span class="line">    string = string.decode(<span class="string">"hex"</span>)</span><br><span class="line">    <span class="keyword">return</span> string</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(payload)</span>:</span></span><br><span class="line">    obj = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> xrange(len(payload)):</span><br><span class="line">        <span class="keyword">if</span> payload[i] == <span class="string">";"</span> <span class="keyword">or</span> payload[i] == <span class="string">"="</span>:</span><br><span class="line">            payload = payload.replace(payload[i], <span class="string">"?"</span>)</span><br><span class="line">    str1 = <span class="string">"comment1=cooking%20MCs;userdata="</span> + payload + <span class="string">";comment2=%20like%20a%20pound%20of%20bacon"</span></span><br><span class="line">    str1 = padding(str1)</span><br><span class="line">    ciphertext = obj.encrypt(str1)</span><br><span class="line">    <span class="keyword">return</span> ciphertext</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decrypt</span><span class="params">(ciphertext)</span>:</span></span><br><span class="line">    obj1 = AES.new(key,AES.MODE_CBC,iv)</span><br><span class="line">    plaintext = obj1.decrypt(ciphertext)</span><br><span class="line">    <span class="keyword">print</span> plaintext</span><br><span class="line">    <span class="keyword">if</span> <span class="string">";admin=true;"</span> <span class="keyword">in</span> plaintext:</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"Logged in as admin"</span></span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        <span class="keyword">print</span> <span class="string">"You need to be admin to get the access!"</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># Exploit using the Bit Flipping Attack!</span></span><br><span class="line">cipher_list = []</span><br><span class="line">payload = <span class="string">";admin=true;"</span></span><br><span class="line">ciphertext = encrypt(payload)</span><br><span class="line"><span class="keyword">print</span> ciphertext</span><br><span class="line"></span><br><span class="line">theBlock = ciphertext[<span class="number">16</span>:<span class="number">32</span>]</span><br><span class="line"></span><br><span class="line">newBlock0 = chr(ord(theBlock[<span class="number">0</span>])^ord(<span class="string">"?"</span>)^ord(<span class="string">";"</span>))</span><br><span class="line">newBlock6 = chr(ord(theBlock[<span class="number">6</span>])^ord(<span class="string">"?"</span>)^ord(<span class="string">"="</span>))</span><br><span class="line">newBlock11 = chr(ord(theBlock[<span class="number">11</span>])^ord(<span class="string">"?"</span>)^ord(<span class="string">";"</span>))</span><br><span class="line"></span><br><span class="line">ciphertext_new = ciphertext[:<span class="number">16</span>]+newBlock0+ciphertext[<span class="number">17</span>:<span class="number">22</span>]+newBlock6+ciphertext[<span class="number">23</span>:<span class="number">27</span>]+newBlock11+ciphertext[<span class="number">28</span>:]</span><br><span class="line"></span><br><span class="line">decrypt(ciphertext_new)</span><br></pre></td></tr></table></figure>
+<p>运行效果：</p>
+<p><img src="8.png" alt="automne"></p>
 
     </article>
     <!-- license  -->
@@ -1073,9 +1078,10 @@ top:50vh;
     
     
     
+    
     <div class="total-and-search">
         <div class="total-archive">
-        Total : 36
+        Total : 37
         </div>
         <!-- search  -->
         
@@ -1088,6 +1094,11 @@ top:50vh;
     
     <div class="archive-year"> 2019 </div>
     <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/14</span><a class="archive-post-title" href="/2019/07/14/XMAN-CTF-Crypto-WriteUp/">XMAN CTF Crypto WriteUp</a>
+        </li>
     
     
         <li class="archive-post-item">
@@ -1291,13 +1302,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
-    
-        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
     
@@ -1305,27 +1312,31 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
+        <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
+    
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
         <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
     
         <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
-        <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
     
-        <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
+    
+        <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
     
         <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
     
         <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
     
         <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
-    
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="hashpumpy"><span class="iconfont-archer">&#xe606;</span>hashpumpy</span>
     
@@ -1337,21 +1348,19 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
         <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
-    
-        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1373,15 +1382,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
-        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
-    
         <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
         <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
     
         <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
         <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
+    
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
         <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
     
