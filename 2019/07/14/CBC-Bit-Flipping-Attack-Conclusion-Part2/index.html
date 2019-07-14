@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html>
+    <!-- title -->
+
+
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Automne">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Automne">
+    <meta name="keywords" content="Hexo | Automne">
+    <meta name="description" content>
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>CBC Bit-Flipping Attack Conclusion Part2 · Automne&#39;s Shadow</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s 1;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href="/assets/favicon2.ico">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">CBC Bit-Flipping Attack Conclusion Part2</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href="/">Automne's Shadow.</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="height:50vh;">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            CBC Bit-Flipping Attack Conclusion Part2
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="cbc">cbc</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/07/14</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Crypto</strong><br><a id="more"></a></p>
+<p>之前对CBC的字节翻转攻击做过总结，但是理解不够深刻，这篇文章将结合实例在脚本层面进行分析总结。</p>
+<p>测试发现，当服务器使用的python版本不同，对应的利用代码也有所不同。</p>
+<h2 id="python2"><a href="#python2" class="headerlink" title="python2"></a>python2</h2><p>实例参考<a href="https://dr3dd.gitlab.io/cryptography/2019/01/10/simple-AES-CBC-bit-flipping-attack/" target="_blank" rel="noopener">https://dr3dd.gitlab.io/cryptography/2019/01/10/simple-AES-CBC-bit-flipping-attack/</a>并做了一点修改</p>
+<p>代码特点： </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.encode('hex'),	.decode('hex'),</span><br></pre></td></tr></table></figure>
+<p>运行前先安装代码库</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m pip install pycryptodome</span><br></pre></td></tr></table></figure>
+<p>服务端代码，运行脚本</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">socat -T60 TCP-LISTEN:10088,reuseaddr,fork EXEC:"python -u c3.py"</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">from Crypto.Cipher import AES</span><br><span class="line">from Crypto.Util.Padding import pad,unpad</span><br><span class="line">from Crypto.Random import get_random_bytes</span><br><span class="line"></span><br><span class="line">greeting = &quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">         ___    ___   _        ___  _____   ___      _   ___  </span><br><span class="line"> _ __   / _ \  / _ \ | |__    / __\/__   \ / __\    / | / _ \ </span><br><span class="line">| &apos;_ \ | | | || | | || &apos;_ \  / /     / /\// _\_____ | || (_) |</span><br><span class="line">| | | || |_| || |_| || |_) |/ /___  / /  / / |_____|| | \__, |</span><br><span class="line">|_| |_| \___/  \___/ |_.__/ \____/  \/   \/         |_|   /_/ </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line"></span><br><span class="line">key = get_random_bytes(16)</span><br><span class="line">iv = get_random_bytes(16)</span><br><span class="line"></span><br><span class="line">flag = open(&apos;flag&apos;,&apos;rb&apos;).read().strip()</span><br><span class="line"></span><br><span class="line">def encrypt_data(data):</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CBC,iv)</span><br><span class="line">    enc = cipher.encrypt(pad(data,16,style=&apos;pkcs7&apos;))</span><br><span class="line">    return enc.encode(&apos;hex&apos;)</span><br><span class="line"></span><br><span class="line">def decrypt_data(encryptedParams):</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CBC,iv)</span><br><span class="line">    paddedParams = cipher.decrypt(encryptedParams.decode(&apos;hex&apos;))</span><br><span class="line">    return unpad(paddedParams,16,style=&apos;pkcs7&apos;)</span><br><span class="line"></span><br><span class="line">print(greeting)</span><br><span class="line">print(&apos;hey n00b!! you know how CBC bit flipping works?\nIf you flip the bit correctly i will reward you fl4g!&apos;)</span><br><span class="line">msg = &quot;adm1n=0&quot;</span><br><span class="line">print(&quot;Current Auth Message is : &quot; + msg)</span><br><span class="line">print(&quot;Encryption of auth Message in hex : &quot; + iv.encode(&apos;hex&apos;) + encrypt_data(msg))</span><br><span class="line">enc_msg = raw_input(&quot;Give me Encrypted msg in hex : &quot;)</span><br><span class="line">try:</span><br><span class="line">    final_dec_msg = decrypt_data(enc_msg)</span><br><span class="line"></span><br><span class="line">    if &quot;admin=1&quot; in final_dec_msg:</span><br><span class="line">        print(&apos;Whoa!! you got it!! Now its reward time!!&apos;)</span><br><span class="line">        print(flag)</span><br><span class="line">    else:</span><br><span class="line">        print(&apos;Try again you can do it!!&apos;)</span><br><span class="line">        exit()</span><br><span class="line">except:</span><br><span class="line">    print(&apos;bye bye!!&apos;)</span><br></pre></td></tr></table></figure>
+<p>注意下面的代码和判断条件admin=1有两处不同</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msg = <span class="string">"adm1n=0"</span></span><br></pre></td></tr></table></figure>
+<p>根据 CBC Bit-Flipping Attack的特点，只需翻转IV的对应位和adm1n=0的密文进行拼接</p>
+<p>利用脚本如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##python2.7</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> remote</span><br><span class="line"></span><br><span class="line">host = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">10088</span></span><br><span class="line"></span><br><span class="line">bs = <span class="number">16</span></span><br><span class="line"></span><br><span class="line">l = remote(host, port)</span><br><span class="line"></span><br><span class="line">cipher = l.recvline_contains(<span class="string">"Encryption of auth Message"</span>)[<span class="number">-64</span>:]</span><br><span class="line"></span><br><span class="line">print(<span class="string">"cipher: %s"</span> % cipher)</span><br><span class="line">original_data = cipher.decode(<span class="string">'hex'</span>)</span><br><span class="line"></span><br><span class="line">print(<span class="string">"original_data: %s"</span> % original_data)</span><br><span class="line"></span><br><span class="line">theBlock = original_data[:<span class="number">16</span>]</span><br><span class="line"></span><br><span class="line">print(<span class="string">"flipping cipher block: %s"</span> % theBlock)</span><br><span class="line"></span><br><span class="line">print(theBlock[<span class="number">3</span>])</span><br><span class="line">print(theBlock[<span class="number">6</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment">##bit flipping point</span></span><br><span class="line">theBit0 = chr(ord(theBlock[<span class="number">3</span>])^ord(<span class="string">"1"</span>)^ord(<span class="string">"i"</span>))</span><br><span class="line">theBit = chr(ord(theBlock[<span class="number">6</span>])^<span class="number">0</span>^<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">print(ord(theBlock[<span class="number">3</span>])^ord(<span class="string">"1"</span>)^ord(<span class="string">"i"</span>))</span><br><span class="line">print(ord(theBlock[<span class="number">6</span>])^<span class="number">0</span>^<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> theBit0</span><br><span class="line"><span class="keyword">print</span> theBit</span><br><span class="line"></span><br><span class="line">new_data = original_data[:<span class="number">3</span>] +theBit0 + original_data[<span class="number">4</span>:<span class="number">6</span>] + theBit + original_data[<span class="number">7</span>:]</span><br><span class="line">print(new_data)</span><br><span class="line"></span><br><span class="line">new_cookie = new_data.encode(<span class="string">'hex'</span>)</span><br><span class="line">print(new_cookie)</span><br><span class="line">l.send(new_cookie + <span class="string">'\n'</span>)</span><br><span class="line">l.recv()</span><br><span class="line">l.interactive()</span><br></pre></td></tr></table></figure>
+<p>注意下面字符和数字异或时的不同</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">theBit0 = chr(ord(theBlock[<span class="number">3</span>])^ord(<span class="string">"1"</span>)^ord(<span class="string">"i"</span>))</span><br><span class="line">theBit = chr(ord(theBlock[<span class="number">6</span>])^<span class="number">0</span>^<span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+<p>运行效果如下</p>
+<p><img src="1.png" alt="automne"></p>
+<p>同理，当服务端的msg为</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">msg = <span class="string">"abc1111111111111adm1n=0"</span></span><br></pre></td></tr></table></figure>
+<p>只需修改第一块密文block的对应位</p>
+<p>解密脚本如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##python2.7</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> remote</span><br><span class="line"></span><br><span class="line">host = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">10088</span></span><br><span class="line"></span><br><span class="line">bs = <span class="number">16</span></span><br><span class="line"></span><br><span class="line">l = remote(host, port)</span><br><span class="line"></span><br><span class="line">cipher = l.recvline_contains(<span class="string">"Encryption of auth Message"</span>)[<span class="number">-96</span>:]</span><br><span class="line"></span><br><span class="line">print(<span class="string">"cipher: %s"</span> % cipher)</span><br><span class="line">original_data = cipher.decode(<span class="string">'hex'</span>)</span><br><span class="line"></span><br><span class="line">print(<span class="string">"original_data: %s"</span> % original_data)</span><br><span class="line"></span><br><span class="line">theBlock = original_data[<span class="number">16</span>:<span class="number">32</span>]</span><br><span class="line"></span><br><span class="line">print(<span class="string">"flipping cipher block: %s"</span> % theBlock)</span><br><span class="line"></span><br><span class="line">print(theBlock[<span class="number">3</span>])</span><br><span class="line">print(theBlock[<span class="number">6</span>])</span><br><span class="line"></span><br><span class="line">theBit0 = chr(ord(theBlock[<span class="number">3</span>])^ord(<span class="string">"1"</span>)^ord(<span class="string">"i"</span>))</span><br><span class="line">theBit = chr(ord(theBlock[<span class="number">6</span>])^<span class="number">0</span>^<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">print(ord(theBlock[<span class="number">3</span>])^ord(<span class="string">"1"</span>)^ord(<span class="string">"i"</span>))</span><br><span class="line">print(ord(theBlock[<span class="number">6</span>])^<span class="number">0</span>^<span class="number">1</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> theBit0</span><br><span class="line"><span class="keyword">print</span> theBit</span><br><span class="line"></span><br><span class="line">new_data = original_data[:<span class="number">19</span>] + theBit0 + original_data[<span class="number">20</span>:<span class="number">22</span>] + theBit + original_data[<span class="number">23</span>:]</span><br><span class="line">print(new_data)</span><br><span class="line"></span><br><span class="line">new_cookie = new_data.encode(<span class="string">'hex'</span>)</span><br><span class="line">print(new_cookie)</span><br><span class="line">l.send(new_cookie + <span class="string">'\n'</span>)</span><br><span class="line">l.recv()</span><br><span class="line">l.interactive()</span><br></pre></td></tr></table></figure>
+<h2 id="python3"><a href="#python3" class="headerlink" title="python3"></a>python3</h2><p>以一道xman的题目为例，将其中的部分代码做了修改，省去了mac的部分，只关注字节翻转。</p>
+<p>代码特点：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bytes.fromhex(),	.hex()</span><br></pre></td></tr></table></figure>
+<p>修改后的服务端代码如下（python3运行）</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#coding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> string</span><br><span class="line"><span class="keyword">from</span> hashlib <span class="keyword">import</span> sha256</span><br><span class="line"><span class="keyword">import</span> socketserver</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"><span class="keyword">import</span> time</span><br><span class="line"></span><br><span class="line">secret = os.urandom(<span class="number">16</span>)</span><br><span class="line">admin_key = os.urandom(<span class="number">16</span>).hex()</span><br><span class="line">aes_key = os.urandom(<span class="number">16</span>)</span><br><span class="line">iv = os.urandom(AES.block_size)</span><br><span class="line"></span><br><span class="line">wel = <span class="string">b'Welcome, somebody\nyou can:\n1. login\n2. registe\n'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">process</span><span class="params">(socketserver.BaseRequestHandler)</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">justWaite</span><span class="params">(self)</span>:</span></span><br><span class="line">        time.sleep(<span class="number">3</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_pad</span><span class="params">(self, s)</span>:</span></span><br><span class="line">        s = bytes(s, <span class="string">'utf-8'</span>)</span><br><span class="line">        <span class="keyword">return</span> s + (<span class="number">16</span> - len(s) % <span class="number">16</span>) * bytes((<span class="number">16</span> - len(s) % <span class="number">16</span>, ))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_unpad</span><span class="params">(self, s)</span>:</span></span><br><span class="line">        <span class="keyword">return</span> s[<span class="number">0</span>:-s[<span class="number">-1</span>]].decode(<span class="string">'utf-8'</span>, <span class="string">'ignore'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(self, plain)</span>:</span></span><br><span class="line">        plain = self._pad(plain)</span><br><span class="line">        cipher = AES.new(aes_key, AES.MODE_CBC, iv)</span><br><span class="line">        ciphertext = iv + cipher.encrypt(plain)</span><br><span class="line">        <span class="keyword">return</span> ciphertext</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">decrypt</span><span class="params">(self, ciphertext)</span>:</span></span><br><span class="line">        cipher = AES.new(aes_key, AES.MODE_CBC, iv)</span><br><span class="line">        plain = cipher.decrypt(ciphertext[AES.block_size:])</span><br><span class="line">        <span class="keyword">return</span> self._unpad(plain)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">adminLogin</span><span class="params">(self, username)</span>:</span></span><br><span class="line">        self.request.send(<span class="string">b'1. pic1\n2. pic2\n3. flag\n'</span>)</span><br><span class="line">        c = self.request.recv(<span class="number">2</span>).decode(<span class="string">'utf-8'</span>)[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">if</span> c == <span class="string">'1'</span>:</span><br><span class="line">            self.request.send(bytes(<span class="string">'your gun:\n▄︻┻═┳一\n'</span>, <span class="string">'UTF-8'</span>))</span><br><span class="line">        <span class="keyword">elif</span> c == <span class="string">'2'</span>:</span><br><span class="line">            self.request.send(bytes(<span class="string">'your Tu Long Knife:\n━╋▇▇▇◤\n'</span>, <span class="string">'UTF-8'</span>))</span><br><span class="line">        <span class="keyword">elif</span> c == <span class="string">'3'</span>:</span><br><span class="line">            <span class="keyword">with</span> open(<span class="string">'flag'</span>) <span class="keyword">as</span> f:</span><br><span class="line">                flag = f.readline()</span><br><span class="line">                self.request.send(flag.encode(<span class="string">'utf-8'</span>) + <span class="string">b'\n'</span>)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.request.send(<span class="string">b'wrong num'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">userLogin</span><span class="params">(self, username)</span>:</span></span><br><span class="line">        self.request.send(<span class="string">b'1. pic1\n2. pic2\n'</span>)</span><br><span class="line">        c = self.request.recv(<span class="number">2</span>).decode(<span class="string">'utf-8'</span>)[<span class="number">0</span>]</span><br><span class="line">        <span class="keyword">if</span> c == <span class="string">'1'</span>:</span><br><span class="line">            self.request.send(bytes(<span class="string">'your gun:\n▄︻┻═┳一'</span>, <span class="string">'UTF-8'</span>))</span><br><span class="line">        <span class="keyword">elif</span> c == <span class="string">'2'</span>:</span><br><span class="line">            self.request.send(bytes(<span class="string">'your Tu Long Knife:\n━╋▇▇▇◤'</span>, <span class="string">'UTF-8'</span>))</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            self.request.send(<span class="string">b'wrong num'</span>)</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">handle</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="comment"># self.justWaite()</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">            self.isAdmin = <span class="keyword">False</span></span><br><span class="line">            self.request.send(wel)</span><br><span class="line">            wel_choice = self.request.recv(<span class="number">2</span>).decode(<span class="string">'utf-8'</span>)[<span class="number">0</span>]</span><br><span class="line">            <span class="keyword">if</span> wel_choice == <span class="string">'1'</span>:</span><br><span class="line">                self.request.send(<span class="string">b'input your cookie:&gt;&gt;'</span>)</span><br><span class="line">                cookie = self.request.recv(<span class="number">513</span>).decode(<span class="string">'utf-8'</span>)[:<span class="number">-1</span>]</span><br><span class="line">                msg = bytes.fromhex(cookie)</span><br><span class="line">                msg = self.decrypt(msg)</span><br><span class="line">                print(msg)</span><br><span class="line">                print(len(msg))</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(msg) - <span class="number">3</span>):</span><br><span class="line">                        <span class="keyword">if</span> msg[i:i + <span class="number">3</span>] == <span class="string">'un='</span>:</span><br><span class="line">                            username = msg[i + <span class="number">3</span>:]</span><br><span class="line">                            username = username.split(<span class="string">';'</span>)[<span class="number">0</span>]</span><br><span class="line">                            print(username)</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(msg) - <span class="number">3</span>):</span><br><span class="line">                        <span class="keyword">if</span> msg[i:i + <span class="number">3</span>] == <span class="string">'pw='</span>:</span><br><span class="line">                            passwd = msg[i + <span class="number">3</span>:]</span><br><span class="line">                            passwd = passwd.split(<span class="string">';'</span>)[<span class="number">0</span>]</span><br><span class="line">                            print(passwd)</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(msg) - <span class="number">8</span>):</span><br><span class="line">                        <span class="keyword">if</span> msg[i:i + <span class="number">8</span>] == <span class="string">'isAdmin='</span>:</span><br><span class="line">                            <span class="keyword">if</span> msg[i + <span class="number">8</span>:i + <span class="number">13</span>] == <span class="string">'True;'</span>:</span><br><span class="line">                                self.isAdmin = <span class="keyword">True</span></span><br><span class="line">                <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">                    print(<span class="string">'error detected\n'</span>)</span><br><span class="line">                    print(e)</span><br><span class="line"></span><br><span class="line">                self.request.send(<span class="string">b'input your password:&gt;&gt;'</span>)</span><br><span class="line">                pw_t = self.request.recv(<span class="number">37</span>).decode(<span class="string">'utf-8'</span>)[:<span class="number">-1</span>]</span><br><span class="line">                <span class="keyword">if</span> pw_t != passwd:</span><br><span class="line">                    self.request.send(<span class="string">b'wrong passwd!'</span>)</span><br><span class="line">                    <span class="keyword">break</span></span><br><span class="line">                self.request.send(<span class="string">b'welcome! %s\n'</span> %</span><br><span class="line">                                  (username.encode(<span class="string">'utf-8'</span>)))</span><br><span class="line">                <span class="keyword">if</span> self.isAdmin:</span><br><span class="line">                    self.adminLogin(username)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    self.userLogin(username)</span><br><span class="line"></span><br><span class="line">            <span class="keyword">elif</span> wel_choice == <span class="string">'2'</span>:</span><br><span class="line">                self.request.send(<span class="string">b'welcome! are you an admin?(Y/N)\n'</span>)</span><br><span class="line">                reg_c = self.request.recv(<span class="number">2</span>).decode(<span class="string">'utf-8'</span>)[<span class="number">0</span>]</span><br><span class="line">                <span class="keyword">if</span> reg_c == <span class="string">'Y'</span>:</span><br><span class="line">                    self.request.send(<span class="string">b'input admin key:&gt;&gt;'</span>)</span><br><span class="line">                    u_key = self.request.recv(<span class="number">33</span>).decode(<span class="string">'utf-8'</span>)[:<span class="number">-1</span>]</span><br><span class="line">                    <span class="keyword">if</span> u_key != admin_key:</span><br><span class="line">                        <span class="keyword">break</span></span><br><span class="line">                    <span class="keyword">else</span>:</span><br><span class="line">                        self.isAdmin = <span class="keyword">True</span></span><br><span class="line">                self.request.send(<span class="string">b'input your name:&gt;&gt;\n'</span>)</span><br><span class="line">                username = self.request.recv(<span class="number">37</span>).decode(<span class="string">'utf-8'</span>)[:<span class="number">-1</span>]</span><br><span class="line">                <span class="keyword">if</span> <span class="string">'admin'</span> <span class="keyword">in</span> username.lower():</span><br><span class="line">                    self.request.send(<span class="string">b'no admin in username\n'</span>)</span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                self.request.send(<span class="string">b'input your pw:&gt;&gt;\n'</span>)</span><br><span class="line">                passwd = self.request.recv(<span class="number">37</span>).decode(<span class="string">'utf-8'</span>)[:<span class="number">-1</span>]</span><br><span class="line">                <span class="keyword">if</span> <span class="string">'admin'</span> <span class="keyword">in</span> passwd.lower():</span><br><span class="line">                    self.request.send(<span class="string">b'no admin in password\n'</span>)</span><br><span class="line">                    <span class="keyword">continue</span></span><br><span class="line">                cookie = self.encrypt(</span><br><span class="line">                    <span class="string">'isAdmin=False'</span> + <span class="string">';pw='</span> + passwd + <span class="string">';un='</span> + username).hex()</span><br><span class="line">                self.request.send(<span class="string">b'your cookie:&gt;&gt;\n'</span> +</span><br><span class="line">                                  cookie.encode(<span class="string">'utf-8'</span>) + <span class="string">b'\n'</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">break</span></span><br><span class="line"></span><br><span class="line">        self.request.close()</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ThreadedServer</span><span class="params">(socketserver.ThreadingMixIn, socketserver.TCPServer)</span>:</span></span><br><span class="line">    <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    HOST, PORT = <span class="string">'0.0.0.0'</span>, <span class="number">10087</span></span><br><span class="line">    server = ThreadedServer((HOST, PORT), process)</span><br><span class="line">    server.allow_reuse_address = <span class="keyword">True</span></span><br><span class="line">    server.serve_forever()</span><br></pre></td></tr></table></figure>
+<p>代码中要求isAdmin=True;，但是加密的明文里默认值是isAdmin=False；，并且输入部分不允许有admin的大小写形式，所以需要做翻转。</p>
+<p>直接使用上面的方式去翻转是无效的，利用脚本如下，注意其中的xor自定义函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">##python3</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> remote</span><br><span class="line"></span><br><span class="line">host = <span class="string">'127.0.0.1'</span></span><br><span class="line">port = <span class="number">10087</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">xor</span><span class="params">(var, key)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> bytes(a ^ b <span class="keyword">for</span> a, b <span class="keyword">in</span> zip(var, key))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">bs = <span class="number">16</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">pad</span><span class="params">(s)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> s + (bs - len(s) % bs) * bytes((bs - len(s) % bs, ))</span><br><span class="line"></span><br><span class="line">l = remote(host, port)</span><br><span class="line"></span><br><span class="line">l.recv()</span><br><span class="line">l.send(<span class="string">'2\n'</span>)</span><br><span class="line">l.recv()</span><br><span class="line">l.send(<span class="string">'N\n'</span>)</span><br><span class="line">l.recv()</span><br><span class="line">username1 = <span class="string">'9999999990000000000000000'</span></span><br><span class="line">l.send(username1 + <span class="string">'\n'</span>)</span><br><span class="line">l.recv()</span><br><span class="line">passwd = <span class="string">'pw'</span></span><br><span class="line">l.send(passwd + <span class="string">'\n'</span>)</span><br><span class="line">l.recvline()</span><br><span class="line">cipher1 = l.recvline()[:<span class="number">-1</span>].decode(<span class="string">'utf-8'</span>)</span><br><span class="line">print(<span class="string">"cipher1: %s"</span> % cipher1)</span><br><span class="line">original_data = bytes.fromhex(cipher1)</span><br><span class="line">print(<span class="string">"cipher1 length: %s"</span> % len(cipher1))</span><br><span class="line">print(<span class="string">"original_data: %s"</span> % original_data)</span><br><span class="line"></span><br><span class="line">theBlock = original_data[<span class="number">-32</span>:<span class="number">-16</span>] <span class="comment">#modify this block</span></span><br><span class="line"></span><br><span class="line">print(<span class="string">"flipping cipher block: %s"</span> % theBlock)</span><br><span class="line"></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string"># 'isAdmin=False;pw  =pw;un=999999999   ;isrdmin=True;'</span></span><br><span class="line"><span class="string"># 'isAdmin=False;pw  =pw;un=aaaaaaisr   dmin=True;'</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">#print(theBlock[3])</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">theBit = chr(theBlock[3]^ord("r")^ord("A"))</span></span><br><span class="line"><span class="string">print(theBit)</span></span><br><span class="line"><span class="string">print(theBlock[3]^ord("r")^ord("A"))</span></span><br><span class="line"><span class="string">print(len(theBit))</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">new_data = original_data[:51] + bytes(theBit,encoding='utf-8') + original_data[52:]</span></span><br><span class="line"><span class="string">print(new_data)</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"></span><br><span class="line">print(xor(theBlock, <span class="number">16</span>*<span class="string">b'\x10'</span>))</span><br><span class="line"></span><br><span class="line"><span class="comment">#bit flipping point</span></span><br><span class="line">newblock = xor(xor(theBlock, <span class="number">16</span>*<span class="string">b'\x10'</span>), <span class="string">b'isAdmin=True;'</span>+<span class="number">3</span>*<span class="string">b'\x03'</span>)</span><br><span class="line">print(newblock)</span><br><span class="line"></span><br><span class="line">new_data = original_data[:<span class="number">-32</span>] + newblock + original_data[<span class="number">-16</span>:]</span><br><span class="line"></span><br><span class="line">new_cookie = new_data.hex()</span><br><span class="line">print(new_cookie)</span><br><span class="line">l.interactive()</span><br><span class="line">l.recv()</span><br><span class="line">l.send(<span class="string">'1\n'</span>)</span><br><span class="line">l.recv()</span><br><span class="line">l.send(new_cookie + <span class="string">'\n'</span>)</span><br><span class="line">l.recv()</span><br><span class="line">l.send(<span class="string">'pw\n'</span>)</span><br><span class="line"></span><br><span class="line">l.interactive()</span><br></pre></td></tr></table></figure>
+<p>pwntools本身对python3支持不友好，直接运行可能会报错，在python3里安装下面的适配版本即可</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python3 -m pip install git+https://github.com/arthaud/python3-pwntools.git</span><br></pre></td></tr></table></figure>
+<p>运行</p>
+<p><img src="2.png" alt="automne"></p>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/07/14/CBC-Bit-Flipping-Attack-Conclusion-Part2/">https://ce-automne.github.io/2019/07/14/CBC-Bit-Flipping-Attack-Conclusion-Part2/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/07/14/CBC-Bit-Flipping-Attack-Conclusion-Part2/">July 14th 2019, 7:48:00 am</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a 2019 href="/2019/07/05/ISITDTU-CTF-2019-WriteUp-Part2/" title="ISITDTU" ctf writeup part2>
+                    <div class="prevTitle">ISITDTU CTF 2019 WriteUp Part2</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:rainydusk4ctf@tom.com" class="iconfont-archer email" title="email"></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/ce-automne" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">本站总访问量PV: <span id="busuanzi_value_site_pv">次 </span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#python2"><span class="toc-number">1.</span> <span class="toc-text">python2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#python3"><span class="toc-number">2.</span> <span class="toc-text">python3</span></a></li></ol>
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 36
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/14</span><a class="archive-post-title" href="/2019/07/14/CBC-Bit-Flipping-Attack-Conclusion-Part2/">CBC Bit-Flipping Attack Conclusion Part2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/05</span><a class="archive-post-title" href="/2019/07/05/ISITDTU-CTF-2019-WriteUp-Part2/">ISITDTU CTF 2019 WriteUp Part2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/02</span><a class="archive-post-title" href="/2019/07/02/ISITDTU-CTF-2019-WriteUp/">ISITDTU CTF 2019 WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/01</span><a class="archive-post-title" href="/2019/07/01/RCTF-2019-BabyCrypto-WriteUp/">RCTF 2019 BabyCrypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/26</span><a class="archive-post-title" href="/2019/06/26/Hash-Length-Extension-Attack-Conclusion/">Hash Length Extension Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/23</span><a class="archive-post-title" href="/2019/06/23/CBC-Padding-Oracle-Attack-Conclusion/">CBC Padding Oracle Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span><a class="archive-post-title" href="/2019/06/15/HSCTF-2019-UnSolved-WriteUp/">HSCTF 2019 UnSolved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/06</span><a class="archive-post-title" href="/2019/06/06/HSCTF-2019-SuperSecureSystem-WriteUp/">HSCTF 2019 SuperSecureSystem WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span><a class="archive-post-title" href="/2019/05/23/CBC-Bit-Flipping-Attack-Conclusion/">CBC Bit-Flipping Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span><a class="archive-post-title" href="/2019/05/19/LFSR-in-Crypto-Conclusion/">LFSR in Crypto Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CSAW-CTF-2017-BabyCrypt-WriteUp/">CSAW CTF 2017 BabyCrypt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CTF-313-2019-Angle-of-Approach-WriteUp/">CTF 313 2019 Angle of Approach WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/05</span><a class="archive-post-title" href="/2019/05/05/UUT-CTF-2019-SolveTheCrypto-WriteUp/">UUTCTF 2019 Solve the Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/SECCON-CTF-2017-VerySmooth-WriteUp/">SECCONCTF 2017 Very Smooth WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/">Plaid CTF 2019  Project Eulernt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/25</span><a class="archive-post-title" href="/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/">TG:HACK CTF 2019  UnSolved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/23</span><a class="archive-post-title" href="/2019/04/23/ASIS-CTF-2019-ADeliciousSoup-WriteUp/">ASIS CTF 2019 A delicious soup WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/21</span><a class="archive-post-title" href="/2019/04/21/TGHACK-CTF-2019-Solved-WriteUp/">TG:HACK CTF 2019  Solved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/19</span><a class="archive-post-title" href="/2019/04/19/Radar-CTF-2019-Crypto-WriteUp/">RadarCTF 2019  Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/18</span><a class="archive-post-title" href="/2019/04/18/HackZone-CTF-2019-Mess-WriteUp/">HackZone CTF 2019 MeSS WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-zer0lfsr-WriteUp/">0CTF 2019 zer0lfsr WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-babyrsa-WriteUp/">0CTF 2019  babyrsa WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/27</span><a class="archive-post-title" href="/2019/03/27/CONFidence -CTF-2019-The Lottery -WriteUp/">CONFidence CTF 2019 The Lottery WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span><a class="archive-post-title" href="/2019/03/21/MySQL-Blind-Injection-Scripts/">MySQL Blind Injection Scripts</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span><a class="archive-post-title" href="/2019/03/14/TAMU-CTF-2019-LocalNews-WriteUp/">TAMU CTF 2019 LocalNews WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/12</span><a class="archive-post-title" href="/2019/03/12/BSidesSF-CTF-2019-GoodLuks-WriteUp/">BSidesSF CTF 2019 GoodLuks WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/10</span><a class="archive-post-title" href="/2019/03/10/BSidesSF-CTF-2019-WeatherCompanion-WriteUp/">BSidesSF CTF 2019 WeatherCompanion WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/07</span><a class="archive-post-title" href="/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/">BSidesSF CTF 2019 Sequel WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/05</span><a class="archive-post-title" href="/2019/03/05/BSidesSF-CTF-2017-FlagStore-WriteUp/">BSidesSF CTF 2017 FlagStore WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/03</span><a class="archive-post-title" href="/2019/03/03/BSidesSF-CTF-2017-Pinlock-WriteUp/">BSidesSF CTF 2017 Pinlock WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span><a class="archive-post-title" href="/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/">BSidesSF CTF 2018 PasswordVault WriteUp</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/23</span><a class="archive-post-title" href="/2018/12/23/XMAS-CTF-2018-ChristmasGame-WriteUp/">XMAS CTF 2018 ChristmasGame WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/14</span><a class="archive-post-title" href="/2018/12/14/Otter-CTF-2018-Forensics-WriteUp-Part2/">OtterCTF 2018 Forensics WriteUp Part 2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span><a class="archive-post-title" href="/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/">OtterCTF 2018 Forensics WriteUp Part 1</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span><a class="archive-post-title" href="/2018/09/19/CSAW-CTF-2018-SSO-WriteUp/">CSAW CTF 2018 SSO WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/23</span><a class="archive-post-title" href="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/">WhiteHat Grand Prix 2018 Misc02 WriteUp</a>
+        </li>
+    
+    </ul></div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
+    
+        <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
+    
+        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
+    
+        <span class="sidebar-tag-name" data-tags="lfsr"><span class="iconfont-archer">&#xe606;</span>lfsr</span>
+    
+        <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
+    
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
+    
+        <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
+    
+        <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
+    
+        <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
+    
+        <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
+    
+        <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
+    
+        <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+    
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="hashpumpy"><span class="iconfont-archer">&#xe606;</span>hashpumpy</span>
+    
+        <span class="sidebar-tag-name" data-tags="sourceleakhacker"><span class="iconfont-archer">&#xe606;</span>sourceleakhacker</span>
+    
+        <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
+    
+        <span class="sidebar-tag-name" data-tags="inet_aton"><span class="iconfont-archer">&#xe606;</span>inet_aton</span>
+    
+        <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
+    
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
+    
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+    
+        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+    
+        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+    
+        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
+    
+        <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
+    
+        <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsatool"><span class="iconfont-archer">&#xe606;</span>rsatool</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssl"><span class="iconfont-archer">&#xe606;</span>ssl</span>
+    
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+    
+        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
+    
+        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
+    
+        <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssti"><span class="iconfont-archer">&#xe606;</span>ssti</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
+    
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+    
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+    
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+    
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+    
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
+    
+        <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
+    
+        <span class="sidebar-tag-name" data-tags="zsteg"><span class="iconfont-archer">&#xe606;</span>zsteg</span>
+    
+        <span class="sidebar-tag-name" data-tags="base58"><span class="iconfont-archer">&#xe606;</span>base58</span>
+    
+        <span class="sidebar-tag-name" data-tags="fermat"><span class="iconfont-archer">&#xe606;</span>fermat</span>
+    
+        <span class="sidebar-tag-name" data-tags="multi-primes"><span class="iconfont-archer">&#xe606;</span>multi-primes</span>
+    
+        <span class="sidebar-tag-name" data-tags="prng"><span class="iconfont-archer">&#xe606;</span>prng</span>
+    
+        <span class="sidebar-tag-name" data-tags="010 editor"><span class="iconfont-archer">&#xe606;</span>010 editor</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br>
+    1、请确保node版本大于6.2<br>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="Crypto"><span class="iconfont-archer">&#xe60a;</span>Crypto</span>
+    
+        <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
+    
+        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Automne"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
