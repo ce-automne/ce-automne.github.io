@@ -15,7 +15,7 @@
     <meta name="description" content>
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Automne&#39;s Shadow</title>
+    <title>CBC MAC Forgery Conclusion · Automne&#39;s Shadow</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -70,6 +70,8 @@
 
     <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
@@ -194,6 +196,8 @@
 </head>
 
     
+        <body class="post-body">
+    
     
 <header class="header">
 
@@ -201,27 +205,83 @@
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
     
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">CBC MAC Forgery Conclusion</a>
+            </div>
+    </div>
+    
     <a class="home-link" href="/">Automne's Shadow.</a>
 </header>
     <div class="wrapper">
-        <div class="site-intro" style>
+        <div class="site-intro" style="height:50vh;">
     
     <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/)"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
+            
+            CBC MAC Forgery Conclusion
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
+            
+            <!-- 404 -->
+            
         </p>
         <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="MAC">MAC</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/07/20</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
         
     </div>
 </div>
@@ -322,324 +382,76 @@
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main index-page">
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/05/23/CBC-Bit-Flipping-Attack-Conclusion/">
-            
-                <span>CBC Bit-Flipping Attack Conclusion</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/05/23</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="cbc">cbc</a>
-    
-</div>
-            
-        </div>
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Crypto</strong><br><a id="more"></a></p>
+<p>与HMAC不同的是，CBC-MAC表示使用CBC模式计算消息认证码的一种方式，一般是将最后一组密文作为MAC返回。</p>
+<p>参考<a href="https://github.com/ashutosh1206/Crypton/tree/master/Message-Authentication-Code/CBC-MAC-Forgery" target="_blank" rel="noopener">https://github.com/ashutosh1206/Crypton/tree/master/Message-Authentication-Code/CBC-MAC-Forgery</a></p>
+<p>如下图所示</p>
+<p><img src="1.png" alt="automne"></p>
+<p>从图中可以看到，最终返回的MAC为Encrypt(y)，所以如果想要实现MAC的伪造，就需要得到两个相同的y</p>
+<p>P1表示第一组明文，P2表示第二组明文，C1表示第一组密文</p>
+<p>由上图可以得到下面的公式：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">y = Encrypt(P1 xor IV) xor P2</span><br><span class="line">  = C1 xor P2</span><br></pre></td></tr></table></figure>
+<p>如果明文分组P1只有一个block，那么MAC(P1) = C1</p>
+<p>如果在P1的基础上将明文分组增加到两个block，比如P1’ = P1 + P2，那么MAC(P1’) = Encrypt(MAC(P1) xor P2)，注意y = MAC(P1) xor P2</p>
+<p>假设我们现在想要得到一个明文Q1’和P1‘内容不同但是得到的MAC是一致。</p>
+<p>假设一个block的明文分组Q1对应的MAC为MAC(Q1)，为了得到相同的MAC，那么第二组的明文分组Q2 = MAC(Q1) xor y = MAC(Q1) xor MAC(P1) xor P2</p>
+<p>这样一来在Q1的基础上将明文分组增到到两个block，就得到了Q1’ = Q1 + Q2</p>
+<p>那么MAC(Q1’) = Encrypt(MAC(Q1) xor Q2) = Encrypt(MAC(Q1) xor MAC(Q1) xor MAC(P1) xor P2) = Encrypt(MAC(P1) xor P2) = MAC(P1’)</p>
+<p>可以看到，两个不同的分组，得到了相同的MAC，这就是CBC MAC Forgery</p>
+<p>这里有一个ECB-MAC的例子</p>
+<p>源码如下</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"><span class="keyword">from</span> Crypto.Util.strxor <span class="keyword">import</span> strxor</span><br><span class="line"><span class="keyword">from</span> binascii <span class="keyword">import</span> hexlify, unhexlify</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sign</span><span class="params">(key, message)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        ECB = AES.new(key, AES.MODE_ECB)</span><br><span class="line">        messageblocks = [message[i:i + <span class="number">16</span>] <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, len(message), <span class="number">16</span>)]</span><br><span class="line">        tag = ECB.encrypt(messageblocks[<span class="number">0</span>])</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,len(messageblocks)):</span><br><span class="line">            tag = ECB.encrypt(strxor(messageblocks[i], tag))</span><br><span class="line">        <span class="keyword">return</span> hexlify(tag)</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        print(<span class="string">"\nYou can't sign that way! No padding done here boy!"</span>)</span><br><span class="line">        exit()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line"></span><br><span class="line">    flag = <span class="string">"\nWhat? Nooooooooo!!! xiomara&#123;1_b0w_d0wn_70_y0u!&#125;"</span></span><br><span class="line">    key = <span class="string">b'YELLOW SUBMARINE'</span></span><br><span class="line">    print(<span class="string">"\nYou wanna challenge me? You trying to break my signing scheme? LOLLLLLL &gt;&lt;"</span>)</span><br><span class="line">    print(<span class="string">"Anyways, try hard for that boy!"</span>)</span><br><span class="line">    print(<span class="string">"Press 0 to get your message signed and 1 to submit a forgery...Pffff! Seriously?"</span>)</span><br><span class="line">    <span class="keyword">while</span>(<span class="keyword">True</span>):</span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            inp = raw_input(<span class="string">"\n"</span>)</span><br><span class="line">            <span class="keyword">if</span>(inp==<span class="string">"0"</span>):</span><br><span class="line">                hex_msg = raw_input(<span class="string">"\nGimme your hex encoded message\n"</span>)</span><br><span class="line">                msg = unhexlify(hex_msg)</span><br><span class="line">                hex_tag = sign(key, msg)</span><br><span class="line">                print(<span class="string">"\nThere you go! Here's my hex encoded tag!"</span>)</span><br><span class="line">                print(hex_tag)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                print(<span class="string">"\nOh! So, you are up for it?"</span>)</span><br><span class="line">                print(<span class="string">"\nAlright! Gimme just two different hex encoded messages that could sign to the same tag!"</span>)</span><br><span class="line">                msg1 = unhexlify(raw_input(<span class="string">"\nMessage #1: \n"</span>))</span><br><span class="line">                msg2 = unhexlify(raw_input(<span class="string">"\nMessage #2: \n"</span>))</span><br><span class="line">                <span class="keyword">if</span>(msg1 == msg2):</span><br><span class="line">                    print(<span class="string">"\nI am not fool boy! Get back and do the job like a grown up!"</span>)</span><br><span class="line">                    exit()</span><br><span class="line">                <span class="keyword">if</span>(msg1 != msg2 <span class="keyword">and</span> sign(key, msg1)==sign(key, msg2)):</span><br><span class="line">                    print(flag)</span><br><span class="line">                    exit()</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    print(<span class="string">"\nOops! They don't match! Told ya! Hard work my son...Better luck next time!"</span>)</span><br><span class="line">                    exit()</span><br><span class="line">        <span class="keyword">except</span>:</span><br><span class="line">            exit()</span><br></pre></td></tr></table></figure>
+<p>这道题目提供出来的代码也就是下面的关键签名代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">sign</span><span class="params">(key, message)</span>:</span></span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        ECB = AES.new(key, AES.MODE_ECB)</span><br><span class="line">        messageblocks = [message[i:i + <span class="number">16</span>] <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>, len(message), <span class="number">16</span>)]</span><br><span class="line">        tag = ECB.encrypt(messageblocks[<span class="number">0</span>])</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">1</span>,len(messageblocks)):</span><br><span class="line">            tag = ECB.encrypt(strxor(messageblocks[i], tag))</span><br><span class="line">        <span class="keyword">return</span> hexlify(tag)</span><br><span class="line">    <span class="keyword">except</span>:</span><br><span class="line">        print(<span class="string">"\nYou can't sign that way! No padding done here boy!"</span>)</span><br><span class="line">        exit()</span><br></pre></td></tr></table></figure>
+<p>同样的原理，当明文分组P1为16字节，一个分组时，根据ECB加密模式的特点，MAC1 = Encrypt(P1) = C1</p>
+<p>当明文分组P1‘为两个分组且P1’ = P1 + P2时，MAC2 = Encrypt(P2 xor MAC1) = Encrypt(P2 xor C1)</p>
+<p>于是当MAC1 = MAC2时，得到 P2 = P1 xor C1</p>
+<p>最终的代码为:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> Crypto.Util.strxor <span class="keyword">import</span> strxor</span><br><span class="line"></span><br><span class="line">s1 = <span class="string">"a"</span>*<span class="number">16</span></span><br><span class="line">s1hex = s1.encode(<span class="string">"hex"</span>)</span><br><span class="line"></span><br><span class="line">l = remote(<span class="string">"127.0.0.1"</span>,<span class="number">18000</span>)</span><br><span class="line"></span><br><span class="line">l.recv()</span><br><span class="line">l.sendline(<span class="string">"0"</span>)</span><br><span class="line">l.recv()</span><br><span class="line">l.sendline(s1hex)</span><br><span class="line">l.recvline()</span><br><span class="line">l.recvline()</span><br><span class="line"></span><br><span class="line">y = l.recvline().strip()</span><br><span class="line"><span class="keyword">print</span> y</span><br><span class="line"></span><br><span class="line">i3 = strxor(s1,y.decode(<span class="string">"hex"</span>))</span><br><span class="line"><span class="keyword">print</span> i3</span><br><span class="line"></span><br><span class="line">s2 = s1+i3</span><br><span class="line">s2hex = s2.encode(<span class="string">"hex"</span>)</span><br><span class="line"></span><br><span class="line">l.recv()</span><br><span class="line">l.sendline(<span class="string">"1"</span>)</span><br><span class="line">l.recv()</span><br><span class="line">l.sendline(s1hex)</span><br><span class="line">l.recv()</span><br><span class="line">l.sendline(s2hex)</span><br><span class="line">l.interactive()</span><br></pre></td></tr></table></figure>
+<p>得到flag为：</p>
+<p><img src="2.png" alt="automne"></p>
+
     </article>
+    <!-- license  -->
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/05/19/LFSR-in-Crypto-Conclusion/">
-            
-                <span>LFSR in Crypto Conclusion</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/05/19</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="lfsr">lfsr</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="z3">z3</a>
-    
-</div>
-            
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/07/20/CBC-MAC-Forgery-Conclusion/">https://ce-automne.github.io/2019/07/20/CBC-MAC-Forgery-Conclusion/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/07/20/CBC-MAC-Forgery-Conclusion/">July 20th 2019, 1:32:00 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/05/18/CSAW-CTF-2017-BabyCrypt-WriteUp/">
-            
-                <span>CSAW CTF 2017 BabyCrypt WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/05/18</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="ecb">ecb</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="socat">socat</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/05/18/CTF-313-2019-Angle-of-Approach-WriteUp/">
-            
-                <span>CTF 313 2019 Angle of Approach WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Forensics</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/05/18</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="z3">z3</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="010 editor">010 editor</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/05/05/UUT-CTF-2019-SolveTheCrypto-WriteUp/">
-            
-                <span>UUTCTF 2019 Solve the Crypto WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/05/05</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="RsaCtfTool">RsaCtfTool</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="Hex">Hex</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/27/SECCON-CTF-2017-VerySmooth-WriteUp/">
-            
-                <span>SECCONCTF 2017 Very Smooth WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/27</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="primefac">primefac</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="rsatool">rsatool</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="ssl">ssl</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/">
-            
-                <span>Plaid CTF 2019  Project Eulernt WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/27</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="gmpy2">gmpy2</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/">
-            
-                <span>TG:HACK CTF 2019  UnSolved WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong> <strong>Web</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/25</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="flask">flask</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="ssti">ssti</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="ecc">ecc</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/23/ASIS-CTF-2019-ADeliciousSoup-WriteUp/">
-            
-                <span>ASIS CTF 2019 A delicious soup WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/23</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="python">python</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="reverse">reverse</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/04/21/TGHACK-CTF-2019-Solved-WriteUp/">
-            
-                <span>TG:HACK CTF 2019  Solved WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/04/21</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="AES">AES</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="tshark">tshark</a>
-    
-</div>
-            
-        </div>
-    </article>
     
     <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a href="/2019/07/14/XMAN-CTF-Crypto-WriteUp/" title="XMAN" ctf crypto writeup>
+                    <div class="prevTitle">XMAN CTF Crypto WriteUp</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
     
-    <nav class="page-nav">
-        <a class="extend prev" rel="prev" href="/archives/">&#60; PREV</a><a class="page-number" href="/archives/">1</a><span class="page-number current">2</span><a class="page-number" href="/archives/page/3/">3</a><a class="page-number" href="/archives/page/4/">4</a><a class="extend next" rel="next" href="/archives/page/3/">NEXT &#62;</a>
-    </nav>
     
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
 </main>
             <!-- profile -->
             
@@ -713,6 +525,24 @@
 </footer>
     </div>
     <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        
+    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -1671,6 +1501,8 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>
