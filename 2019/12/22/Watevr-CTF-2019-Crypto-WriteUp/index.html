@@ -15,7 +15,7 @@
     <meta name="description" content>
     <meta http-equiv="Cache-control" content="no-cache">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Automne&#39;s Shadow</title>
+    <title>watevr CTF 2019 Crypto WriteUp · Automne&#39;s Shadow</title>
     <style type="text/css">
     @font-face {
         font-family: 'Oswald-Regular';
@@ -70,6 +70,8 @@
 
     <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     
     <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
 /* This file is meant as a standalone workflow for
@@ -194,6 +196,8 @@
 </head>
 
     
+        <body class="post-body">
+    
     
 <header class="header">
 
@@ -201,27 +205,89 @@
     <div class="header-sidebar-menu">&#xe775;</div>
     <!-- post页的toggle banner  -->
     
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">watevr CTF 2019 Crypto WriteUp</a>
+            </div>
+    </div>
+    
     <a class="home-link" href="/">Automne's Shadow.</a>
 </header>
     <div class="wrapper">
-        <div class="site-intro" style>
+        <div class="site-intro" style="height:50vh;">
     
     <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
             
     <div class="site-intro-placeholder"></div>
-    <div class="site-intro-img" style="background-image: url(/)"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
     <div class="site-intro-meta">
         <!-- 标题  -->
         <h1 class="intro-title">
             <!-- 主页  -->
+            
+            watevr CTF 2019 Crypto WriteUp
+            <!-- 404 -->
             
         </h1>
         <!-- 副标题 -->
         <p class="intro-subtitle">
             <!-- 主页副标题  -->
             
+            
+            <!-- 404 -->
+            
         </p>
         <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="z3">z3</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="RsaCtfTool">RsaCtfTool</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="ecc">ecc</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="xor">xor</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2019/12/22</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
         
     </div>
 </div>
@@ -322,328 +388,62 @@
 </script>        
         <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
         <div class="container container-unloaded">
-            <main class="main index-page">
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/12/22/Watevr-CTF-2019-Crypto-WriteUp/">
-            
-                <span>watevr CTF 2019 Crypto WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/12/22</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="z3">z3</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="RsaCtfTool">RsaCtfTool</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="ecc">ecc</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="xor">xor</a>
-    
-</div>
-            
-        </div>
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Crypto</strong><br><a id="more"></a></p>
+<h2 id="Swedish-RSA"><a href="#Swedish-RSA" class="headerlink" title="Swedish RSA"></a><strong>Swedish RSA</strong></h2><p><img src="1.png" alt="automne"></p>
+<p>polynomial_rsa.sage:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">flag = bytearray(raw_input())</span><br><span class="line">flag = list(flag)</span><br><span class="line">length = len(flag)</span><br><span class="line">bits = 16</span><br><span class="line"></span><br><span class="line">## Prime for Finite Field.</span><br><span class="line">p = random_prime(2^bits-1, False, 2^(bits-1))</span><br><span class="line"></span><br><span class="line">file_out = open(&quot;downloads/polynomial_rsa.txt&quot;, &quot;w&quot;)</span><br><span class="line">file_out.write(&quot;Prime: &quot; + str(p) + &quot;\n&quot;)</span><br><span class="line"></span><br><span class="line">## Univariate Polynomial Ring in y over Finite Field of size p</span><br><span class="line">R.&lt;y&gt; = PolynomialRing(GF(p))</span><br><span class="line"></span><br><span class="line">## Analogous to the primes in Z</span><br><span class="line">def gen_irreducable_poly(deg):</span><br><span class="line">    while True:</span><br><span class="line">        out = R.random_element(degree=deg)</span><br><span class="line">        if out.is_irreducible():</span><br><span class="line">            return out</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">## Polynomial &quot;primes&quot;</span><br><span class="line">P = gen_irreducable_poly(ZZ.random_element(length, 2*length))</span><br><span class="line">Q = gen_irreducable_poly(ZZ.random_element(length, 2*length))</span><br><span class="line"></span><br><span class="line">## Public exponent key</span><br><span class="line">e = 65537</span><br><span class="line"></span><br><span class="line">## Modulus</span><br><span class="line">N = P*Q</span><br><span class="line">file_out.write(&quot;Modulus: &quot; + str(N) + &quot;\n&quot;)</span><br><span class="line"></span><br><span class="line">## Univariate Quotient Polynomial Ring in x over Finite Field of size 659 with modulus N(x)</span><br><span class="line">S.&lt;x&gt; = R.quotient(N)</span><br><span class="line"></span><br><span class="line">## Encrypt</span><br><span class="line">m = S(flag)</span><br><span class="line">print m</span><br><span class="line">c = m^e</span><br><span class="line"></span><br><span class="line">file_out.write(&quot;Ciphertext: &quot; + str(c))</span><br><span class="line">file_out.close()</span><br></pre></td></tr></table></figure>
+<p>polynomial_rsa.txt：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Prime: 43753</span><br><span class="line">Modulus: 34036*y^177 + 23068*y^176 + 13147*y^175 + 36344*y^174 + 10045*y^173 + 41049*y^172 + 17786*y^171 + 16601*y^170 + 7929*y^169 + 37570*y^168 + 990*y^167 + 9622*y^166 + 39273*y^165 + 35284*y^164 + 15632*y^163 + 18850*y^162 + 8800*y^161 + 33148*y^160 + 12147*y^159 + 40487*y^158 + 6407*y^157 + 34111*y^156 + 8446*y^155 + 21908*y^154 + 16812*y^153 + 40624*y^152 + 43506*y^151 + 39116*y^150 + 33011*y^149 + 23914*y^148 + 2210*y^147 + 23196*y^146 + 43359*y^145 + 34455*y^144 + 17684*y^143 + 25262*y^142 + 982*y^141 + 24015*y^140 + 27968*y^139 + 37463*y^138 + 10667*y^137 + 39519*y^136 + 31176*y^135 + 27520*y^134 + 32118*y^133 + 8333*y^132 + 38945*y^131 + 34713*y^130 + 1107*y^129 + 43604*y^128 + 4433*y^127 + 18110*y^126 + 17658*y^125 + 32354*y^124 + 3219*y^123 + 40238*y^122 + 10439*y^121 + 3669*y^120 + 8713*y^119 + 21027*y^118 + 29480*y^117 + 5477*y^116 + 24332*y^115 + 43480*y^114 + 33406*y^113 + 43121*y^112 + 1114*y^111 + 17198*y^110 + 22829*y^109 + 24424*y^108 + 16523*y^107 + 20424*y^106 + 36206*y^105 + 41849*y^104 + 3584*y^103 + 26500*y^102 + 31897*y^101 + 34640*y^100 + 27449*y^99 + 30962*y^98 + 41434*y^97 + 22125*y^96 + 24314*y^95 + 3944*y^94 + 18400*y^93 + 38476*y^92 + 28904*y^91 + 27936*y^90 + 41867*y^89 + 25573*y^88 + 25659*y^87 + 33443*y^86 + 18435*y^85 + 5934*y^84 + 38030*y^83 + 17563*y^82 + 24086*y^81 + 36782*y^80 + 20922*y^79 + 38933*y^78 + 23448*y^77 + 10599*y^76 + 7156*y^75 + 29044*y^74 + 23605*y^73 + 7657*y^72 + 28200*y^71 + 2431*y^70 + 3860*y^69 + 23259*y^68 + 14590*y^67 + 33631*y^66 + 15673*y^65 + 36049*y^64 + 29728*y^63 + 22413*y^62 + 18602*y^61 + 18557*y^60 + 23505*y^59 + 17642*y^58 + 12595*y^57 + 17255*y^56 + 15316*y^55 + 8948*y^54 + 38*y^53 + 40329*y^52 + 9823*y^51 + 5798*y^50 + 6379*y^49 + 8662*y^48 + 34640*y^47 + 38321*y^46 + 18760*y^45 + 13135*y^44 + 15926*y^43 + 34952*y^42 + 28940*y^41 + 13558*y^40 + 42579*y^39 + 38015*y^38 + 33788*y^37 + 12381*y^36 + 195*y^35 + 13709*y^34 + 31500*y^33 + 32994*y^32 + 30486*y^31 + 40414*y^30 + 2578*y^29 + 30525*y^28 + 43067*y^27 + 6195*y^26 + 36288*y^25 + 23236*y^24 + 21493*y^23 + 15808*y^22 + 34500*y^21 + 6390*y^20 + 42994*y^19 + 42151*y^18 + 19248*y^17 + 19291*y^16 + 8124*y^15 + 40161*y^14 + 24726*y^13 + 31874*y^12 + 30272*y^11 + 30761*y^10 + 2296*y^9 + 11017*y^8 + 16559*y^7 + 28949*y^6 + 40499*y^5 + 22377*y^4 + 33628*y^3 + 30598*y^2 + 4386*y + 23814</span><br><span class="line">Ciphertext: 5209*x^176 + 10881*x^175 + 31096*x^174 + 23354*x^173 + 28337*x^172 + 15982*x^171 + 13515*x^170 + 21641*x^169 + 10254*x^168 + 34588*x^167 + 27434*x^166 + 29552*x^165 + 7105*x^164 + 22604*x^163 + 41253*x^162 + 42675*x^161 + 21153*x^160 + 32838*x^159 + 34391*x^158 + 832*x^157 + 720*x^156 + 22883*x^155 + 19236*x^154 + 33772*x^153 + 5020*x^152 + 17943*x^151 + 26967*x^150 + 30847*x^149 + 10306*x^148 + 33966*x^147 + 43255*x^146 + 20342*x^145 + 4474*x^144 + 3490*x^143 + 38033*x^142 + 11224*x^141 + 30565*x^140 + 31967*x^139 + 32382*x^138 + 9759*x^137 + 1030*x^136 + 32122*x^135 + 42614*x^134 + 14280*x^133 + 16533*x^132 + 32676*x^131 + 43070*x^130 + 36009*x^129 + 28497*x^128 + 2940*x^127 + 9747*x^126 + 22758*x^125 + 16615*x^124 + 14086*x^123 + 13038*x^122 + 39603*x^121 + 36260*x^120 + 32502*x^119 + 17619*x^118 + 17700*x^117 + 15083*x^116 + 11311*x^115 + 36496*x^114 + 1300*x^113 + 13601*x^112 + 43425*x^111 + 10376*x^110 + 11551*x^109 + 13684*x^108 + 14955*x^107 + 6661*x^106 + 12674*x^105 + 21534*x^104 + 32132*x^103 + 34135*x^102 + 43684*x^101 + 837*x^100 + 29311*x^99 + 4849*x^98 + 26632*x^97 + 26662*x^96 + 10159*x^95 + 32657*x^94 + 12149*x^93 + 17858*x^92 + 35805*x^91 + 19391*x^90 + 30884*x^89 + 42039*x^88 + 17292*x^87 + 4694*x^86 + 1497*x^85 + 1744*x^84 + 31071*x^83 + 26246*x^82 + 24402*x^81 + 22068*x^80 + 39263*x^79 + 23703*x^78 + 21484*x^77 + 12241*x^76 + 28821*x^75 + 32886*x^74 + 43075*x^73 + 35741*x^72 + 19936*x^71 + 37219*x^70 + 33411*x^69 + 8301*x^68 + 12949*x^67 + 28611*x^66 + 42654*x^65 + 6910*x^64 + 18523*x^63 + 31144*x^62 + 21398*x^61 + 36298*x^60 + 27158*x^59 + 918*x^58 + 38601*x^57 + 4269*x^56 + 5699*x^55 + 36444*x^54 + 34791*x^53 + 37978*x^52 + 32481*x^51 + 8039*x^50 + 11012*x^49 + 11454*x^48 + 30450*x^47 + 1381*x^46 + 32403*x^45 + 8202*x^44 + 8404*x^43 + 37648*x^42 + 43696*x^41 + 34237*x^40 + 36490*x^39 + 41423*x^38 + 35792*x^37 + 36950*x^36 + 31086*x^35 + 38970*x^34 + 12439*x^33 + 7963*x^32 + 16150*x^31 + 11382*x^30 + 3038*x^29 + 20157*x^28 + 23531*x^27 + 32866*x^26 + 5428*x^25 + 21132*x^24 + 13443*x^23 + 28909*x^22 + 42716*x^21 + 6567*x^20 + 24744*x^19 + 8727*x^18 + 14895*x^17 + 28172*x^16 + 30903*x^15 + 26608*x^14 + 27314*x^13 + 42224*x^12 + 42551*x^11 + 37726*x^10 + 11203*x^9 + 36816*x^8 + 5537*x^7 + 20301*x^6 + 17591*x^5 + 41279*x^4 + 7999*x^3 + 33753*x^2 + 34551*x + 9659</span><br></pre></td></tr></table></figure>
+<p>可见这是多项式的RSA，我之前的WriteUp里有提到过：<a href="https://ce-automne.github.io/2019/04/11/0CTF-2019-babyrsa-WriteUp/">https://ce-automne.github.io/2019/04/11/0CTF-2019-babyrsa-WriteUp/</a></p>
+<p>但是这次还是没做出来。。。你说菜不菜</p>
+<p>其实思路差不多，主要有一点搞错了，就是求解phi的时候，没有考虑到GF(43753)对应的phi:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">phi = (43753**p.degree()-1)*(43753**q.degree()-1)</span><br></pre></td></tr></table></figure>
+<p>用sage来做：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">R.&lt;y&gt; = PolynomialRing(GF(<span class="number">43753</span>))</span><br><span class="line">n = R(<span class="string">'34036*y^177 + 23068*y^176 + 13147*y^175 + 36344*y^174 + 10045*y^173 + 41049*y^172 + 17786*y^171 + 16601*y^170 + 7929*y^169 + 37570*y^168 + 990*y^167 + 9622*y^166 + 39273*y^165 + 35284*y^164 + 15632*y^163 + 18850*y^162 + 8800*y^161 + 33148*y^160 + 12147*y^159 + 40487*y^158 + 6407*y^157 + 34111*y^156 + 8446*y^155 + 21908*y^154 + 16812*y^153 + 40624*y^152 + 43506*y^151 + 39116*y^150 + 33011*y^149 + 23914*y^148 + 2210*y^147 + 23196*y^146 + 43359*y^145 + 34455*y^144 + 17684*y^143 + 25262*y^142 + 982*y^141 + 24015*y^140 + 27968*y^139 + 37463*y^138 + 10667*y^137 + 39519*y^136 + 31176*y^135 + 27520*y^134 + 32118*y^133 + 8333*y^132 + 38945*y^131 + 34713*y^130 + 1107*y^129 + 43604*y^128 + 4433*y^127 + 18110*y^126 + 17658*y^125 + 32354*y^124 + 3219*y^123 + 40238*y^122 + 10439*y^121 + 3669*y^120 + 8713*y^119 + 21027*y^118 + 29480*y^117 + 5477*y^116 + 24332*y^115 + 43480*y^114 + 33406*y^113 + 43121*y^112 + 1114*y^111 + 17198*y^110 + 22829*y^109 + 24424*y^108 + 16523*y^107 + 20424*y^106 + 36206*y^105 + 41849*y^104 + 3584*y^103 + 26500*y^102 + 31897*y^101 + 34640*y^100 + 27449*y^99 + 30962*y^98 + 41434*y^97 + 22125*y^96 + 24314*y^95 + 3944*y^94 + 18400*y^93 + 38476*y^92 + 28904*y^91 + 27936*y^90 + 41867*y^89 + 25573*y^88 + 25659*y^87 + 33443*y^86 + 18435*y^85 + 5934*y^84 + 38030*y^83 + 17563*y^82 + 24086*y^81 + 36782*y^80 + 20922*y^79 + 38933*y^78 + 23448*y^77 + 10599*y^76 + 7156*y^75 + 29044*y^74 + 23605*y^73 + 7657*y^72 + 28200*y^71 + 2431*y^70 + 3860*y^69 + 23259*y^68 + 14590*y^67 + 33631*y^66 + 15673*y^65 + 36049*y^64 + 29728*y^63 + 22413*y^62 + 18602*y^61 + 18557*y^60 + 23505*y^59 + 17642*y^58 + 12595*y^57 + 17255*y^56 + 15316*y^55 + 8948*y^54 + 38*y^53 + 40329*y^52 + 9823*y^51 + 5798*y^50 + 6379*y^49 + 8662*y^48 + 34640*y^47 + 38321*y^46 + 18760*y^45 + 13135*y^44 + 15926*y^43 + 34952*y^42 + 28940*y^41 + 13558*y^40 + 42579*y^39 + 38015*y^38 + 33788*y^37 + 12381*y^36 + 195*y^35 + 13709*y^34 + 31500*y^33 + 32994*y^32 + 30486*y^31 + 40414*y^30 + 2578*y^29 + 30525*y^28 + 43067*y^27 + 6195*y^26 + 36288*y^25 + 23236*y^24 + 21493*y^23 + 15808*y^22 + 34500*y^21 + 6390*y^20 + 42994*y^19 + 42151*y^18 + 19248*y^17 + 19291*y^16 + 8124*y^15 + 40161*y^14 + 24726*y^13 + 31874*y^12 + 30272*y^11 + 30761*y^10 + 2296*y^9 + 11017*y^8 + 16559*y^7 + 28949*y^6 + 40499*y^5 + 22377*y^4 + 33628*y^3 + 30598*y^2 + 4386*y + 23814'</span>)</span><br><span class="line">p,q = n.factor()</span><br><span class="line">p,q = p[<span class="number">0</span>],q[<span class="number">0</span>]</span><br><span class="line">phi = (<span class="number">43753</span>**p.degree()<span class="number">-1</span>)*(<span class="number">43753</span>**q.degree()<span class="number">-1</span>)</span><br><span class="line">e = <span class="number">65537</span></span><br><span class="line">d = inverse_mod(e,phi)</span><br><span class="line">c = R(<span class="string">'5209*y^176 + 10881*y^175 + 31096*y^174 + 23354*y^173 + 28337*y^172 + 15982*y^171 + 13515*y^170 + 21641*y^169 + 10254*y^168 + 34588*y^167 + 27434*y^166 + 29552*y^165 + 7105*y^164 + 22604*y^163 + 41253*y^162 + 42675*y^161 + 21153*y^160 + 32838*y^159 + 34391*y^158 + 832*y^157 + 720*y^156 + 22883*y^155 + 19236*y^154 + 33772*y^153 + 5020*y^152 + 17943*y^151 + 26967*y^150 + 30847*y^149 + 10306*y^148 + 33966*y^147 + 43255*y^146 + 20342*y^145 + 4474*y^144 + 3490*y^143 + 38033*y^142 + 11224*y^141 + 30565*y^140 + 31967*y^139 + 32382*y^138 + 9759*y^137 + 1030*y^136 + 32122*y^135 + 42614*y^134 + 14280*y^133 + 16533*y^132 + 32676*y^131 + 43070*y^130 + 36009*y^129 + 28497*y^128 + 2940*y^127 + 9747*y^126 + 22758*y^125 + 16615*y^124 + 14086*y^123 + 13038*y^122 + 39603*y^121 + 36260*y^120 + 32502*y^119 + 17619*y^118 + 17700*y^117 + 15083*y^116 + 11311*y^115 + 36496*y^114 + 1300*y^113 + 13601*y^112 + 43425*y^111 + 10376*y^110 + 11551*y^109 + 13684*y^108 + 14955*y^107 + 6661*y^106 + 12674*y^105 + 21534*y^104 + 32132*y^103 + 34135*y^102 + 43684*y^101 + 837*y^100 + 29311*y^99 + 4849*y^98 + 26632*y^97 + 26662*y^96 + 10159*y^95 + 32657*y^94 + 12149*y^93 + 17858*y^92 + 35805*y^91 + 19391*y^90 + 30884*y^89 + 42039*y^88 + 17292*y^87 + 4694*y^86 + 1497*y^85 + 1744*y^84 + 31071*y^83 + 26246*y^82 + 24402*y^81 + 22068*y^80 + 39263*y^79 + 23703*y^78 + 21484*y^77 + 12241*y^76 + 28821*y^75 + 32886*y^74 + 43075*y^73 + 35741*y^72 + 19936*y^71 + 37219*y^70 + 33411*y^69 + 8301*y^68 + 12949*y^67 + 28611*y^66 + 42654*y^65 + 6910*y^64 + 18523*y^63 + 31144*y^62 + 21398*y^61 + 36298*y^60 + 27158*y^59 + 918*y^58 + 38601*y^57 + 4269*y^56 + 5699*y^55 + 36444*y^54 + 34791*y^53 + 37978*y^52 + 32481*y^51 + 8039*y^50 + 11012*y^49 + 11454*y^48 + 30450*y^47 + 1381*y^46 + 32403*y^45 + 8202*y^44 + 8404*y^43 + 37648*y^42 + 43696*y^41 + 34237*y^40 + 36490*y^39 + 41423*y^38 + 35792*y^37 + 36950*y^36 + 31086*y^35 + 38970*y^34 + 12439*y^33 + 7963*y^32 + 16150*y^31 + 11382*y^30 + 3038*y^29 + 20157*y^28 + 23531*y^27 + 32866*y^26 + 5428*y^25 + 21132*y^24 + 13443*y^23 + 28909*y^22 + 42716*y^21 + 6567*y^20 + 24744*y^19 + 8727*y^18 + 14895*y^17 + 28172*y^16 + 30903*y^15 + 26608*y^14 + 27314*y^13 + 42224*y^12 + 42551*y^11 + 37726*y^10 + 11203*y^9 + 36816*y^8 + 5537*y^7 + 20301*y^6 + 17591*y^5 + 41279*y^4 + 7999*y^3 + 33753*y^2 + 34551*y + 9659'</span>)</span><br><span class="line">m = pow(c,d,n)</span><br><span class="line">print(m)</span><br><span class="line">print(<span class="string">""</span>.join([chr(c) <span class="keyword">for</span> c <span class="keyword">in</span> m.list()]))</span><br></pre></td></tr></table></figure>
+<p>运行，即可得到flag</p>
+<p><img src="2.png" alt="automne"></p>
+
     </article>
+    <!-- license  -->
     
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/12/22/UTC-CTF-2019-Crypto-WriteUp/">
-            
-                <span>UTC CTF 2019 Crypto WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/12/22</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="RsaCtfTool">RsaCtfTool</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="ecc">ecc</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="xor">xor</a>
-    
-</div>
-            
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2019/12/22/Watevr-CTF-2019-Crypto-WriteUp/">https://ce-automne.github.io/2019/12/22/Watevr-CTF-2019-Crypto-WriteUp/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2019/12/22/Watevr-CTF-2019-Crypto-WriteUp/">December 22nd 2019, 7:50:00 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
         </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/12/07/RMI-&&-Fastjson-1.2.47-RCE-Review/">
-            
-                <span>RMI &amp;&amp; Fastjson 1.2.47 RCE Review</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Web</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/12/07</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="rmi">rmi</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="fastjson">fastjson</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="jndi">jndi</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/11/23/Weblogic-CVE-2019-2647-XXE-Vulnerability-Review/">
-            
-                <span>Weblogic CVE-2019-2647 XXE Vulnerability Review</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Web</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/11/23</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="weblogic">weblogic</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="xxe">xxe</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/11/16/Apache-Commons-Collections-Deserialization-Review/">
-            
-                <span>Apache Commons Collections Deserialization Review</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Web</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/11/16</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="deserialization">deserialization</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="reflect">reflect</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/11/09/RedPwnCTF-2019-blueprint-WriteUp/">
-            
-                <span>RedPwnCTF 2019 blueprint WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Web</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/11/09</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="javascript prototype pollution">javascript prototype pollution</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="nodejs">nodejs</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/07/25/HWCTF-Mobile-WriteUp/">
-            
-                <span>HWCTF Mobile WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Android</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/07/25</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="frida">frida</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="ndk">ndk</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/07/20/CBC-MAC-Forgery-Conclusion/">
-            
-                <span>CBC MAC Forgery Conclusion</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/07/20</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="MAC">MAC</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/07/14/XMAN-CTF-Crypto-WriteUp/">
-            
-                <span>XMAN CTF Crypto WriteUp</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/07/14</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="cbc">cbc</a>
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="hashpumpy">hashpumpy</a>
-    
-</div>
-            
-        </div>
-    </article>
-    
-    
-    
-    
-    
-    
-    <article class="index-post">
-        <a class="abstract-title" href="/2019/07/14/CBC-Bit-Flipping-Attack-Conclusion-Part2/">
-            
-                <span>CBC Bit-Flipping Attack Conclusion Part2</span>
-        </a>
-        <div class="abstract-content">
-            <p><strong>Crypto</strong><br>
-        </p></div>
-        <div class="abstract-post-meta">
-            <!-- date  -->
-            <div class="abstract-date">
-                <span class="abstract-calander iconfont-archer">&#xe676;</span><span class="abstract-time">2019/07/14</span>
-            </div>
-            <!-- tags  -->
-            
-            <div class="abstract-tags">
-    
-        <a class="post-tag" href="javascript:void(0);" data-tags="cbc">cbc</a>
-    
-</div>
-            
-        </div>
-    </article>
     
     <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a 2019 href="/2019/12/22/UTC-CTF-2019-Crypto-WriteUp/" title="UTC" ctf crypto writeup>
+                    <div class="prevTitle">UTC CTF 2019 Crypto WriteUp</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
     
-    <nav class="page-nav">
-        <span class="page-number current">1</span><a class="page-number" href="/archives/2019/page/2/">2</a><a class="page-number" href="/archives/2019/page/3/">3</a><a class="page-number" href="/archives/2019/page/4/">4</a><a class="extend next" rel="next" href="/archives/2019/page/2/">NEXT &#62;</a>
-    </nav>
     
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
 </main>
             <!-- profile -->
             
@@ -717,6 +517,24 @@
 </footer>
     </div>
     <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Swedish-RSA"><span class="toc-number">1.</span> <span class="toc-text">Swedish RSA</span></a></li></ol>
+    </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
     <div class="sidebar sidebar-hide">
@@ -1859,6 +1677,8 @@ jsonContent:
     
     </div>
     <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
      
     </body>
 </html>
