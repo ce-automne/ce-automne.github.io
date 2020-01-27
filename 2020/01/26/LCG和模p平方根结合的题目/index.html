@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html>
+    <!-- title -->
+
+
+
+
+<head><meta name="generator" content="Hexo 3.8.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="author" content="Automne">
+    <meta name="renderer" content="webkit">
+    <meta name="copyright" content="Automne">
+    <meta name="keywords" content="Hexo | Automne">
+    <meta name="description" content>
+    <meta http-equiv="Cache-control" content="no-cache">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>LCG和模p平方根结合的题目 · Automne&#39;s Shadow</title>
+    <style type="text/css">
+    @font-face {
+        font-family: 'Oswald-Regular';
+        src: url("/font/Oswald-Regular.ttf");
+    }
+
+    body {
+        margin: 0;
+    }
+
+    header,
+    footer,
+    .back-top,
+    .sidebar,
+    .container,
+    .site-intro-meta,
+    .toc-wrapper {
+        display: none;
+    }
+
+    .site-intro {
+        position: relative;
+        z-index: 3;
+        width: 100%;
+        /* height: 50vh; */
+        overflow: hidden;
+    }
+
+    .site-intro-placeholder {
+        position: absolute;
+        z-index: -2;
+        top: 0;
+        left: 0;
+        width: calc(100% + 300px);
+        height: 100%;
+        background: repeating-linear-gradient(-45deg, #444 0, #444 80px, #333 80px, #333 160px);
+        background-position: center center;
+        transform: translate3d(-226px, 0, 0);
+        animation: gradient-move 2.5s ease-out 0s 1;
+    }
+
+    @keyframes gradient-move {
+        0% {
+            transform: translate3d(-226px, 0, 0);
+        }
+        100% {
+            transform: translate3d(0, 0, 0);
+        }
+    }
+
+</style>
+
+    <link rel="preload" href="/css/style.css?v=20180721" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet" href="/css/mobile.css?v=20180721" media="(max-width: 980px)">
+    
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- /*! loadCSS. [c]2017 Filament Group, Inc. MIT License */
+/* This file is meant as a standalone workflow for
+- testing support for link[rel=preload]
+- enabling async CSS loading in browsers that do not support rel=preload
+- applying rel preload css once loaded, whether supported or not.
+*/ -->
+<script>
+(function( w ){
+	"use strict";
+	// rel=preload support test
+	if( !w.loadCSS ){
+		w.loadCSS = function(){};
+	}
+	// define on the loadCSS obj
+	var rp = loadCSS.relpreload = {};
+	// rel=preload feature support test
+	// runs once and returns a function for compat purposes
+	rp.support = (function(){
+		var ret;
+		try {
+			ret = w.document.createElement( "link" ).relList.supports( "preload" );
+		} catch (e) {
+			ret = false;
+		}
+		return function(){
+			return ret;
+		};
+	})();
+
+	// if preload isn't supported, get an asynchronous load by using a non-matching media attribute
+	// then change that media back to its intended value on load
+	rp.bindMediaToggle = function( link ){
+		// remember existing media attr for ultimate state, or default to 'all'
+		var finalMedia = link.media || "all";
+
+		function enableStylesheet(){
+			link.media = finalMedia;
+		}
+
+		// bind load handlers to enable media
+		if( link.addEventListener ){
+			link.addEventListener( "load", enableStylesheet );
+		} else if( link.attachEvent ){
+			link.attachEvent( "onload", enableStylesheet );
+		}
+
+		// Set rel and non-applicable media type to start an async request
+		// note: timeout allows this to happen async to let rendering continue in IE
+		setTimeout(function(){
+			link.rel = "stylesheet";
+			link.media = "only x";
+		});
+		// also enable media after 3 seconds,
+		// which will catch very old browsers (android 2.x, old firefox) that don't support onload on link
+		setTimeout( enableStylesheet, 3000 );
+	};
+
+	// loop through link elements in DOM
+	rp.poly = function(){
+		// double check this to prevent external calls from running
+		if( rp.support() ){
+			return;
+		}
+		var links = w.document.getElementsByTagName( "link" );
+		for( var i = 0; i < links.length; i++ ){
+			var link = links[ i ];
+			// qualify links to those with rel=preload and as=style attrs
+			if( link.rel === "preload" && link.getAttribute( "as" ) === "style" && !link.getAttribute( "data-loadcss" ) ){
+				// prevent rerunning on link
+				link.setAttribute( "data-loadcss", true );
+				// bind listeners to toggle media back
+				rp.bindMediaToggle( link );
+			}
+		}
+	};
+
+	// if unsupported, run the polyfill
+	if( !rp.support() ){
+		// run once at least
+		rp.poly();
+
+		// rerun poly on an interval until onload
+		var run = w.setInterval( rp.poly, 500 );
+		if( w.addEventListener ){
+			w.addEventListener( "load", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		} else if( w.attachEvent ){
+			w.attachEvent( "onload", function(){
+				rp.poly();
+				w.clearInterval( run );
+			} );
+		}
+	}
+
+
+	// commonjs
+	if( typeof exports !== "undefined" ){
+		exports.loadCSS = loadCSS;
+	}
+	else {
+		w.loadCSS = loadCSS;
+	}
+}( typeof global !== "undefined" ? global : this ) );
+</script>
+
+    <link rel="icon" href="/assets/favicon2.ico">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js" as="script">
+    <link rel="preload" href="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js" as="script">
+    <link rel="preload" href="/scripts/main.js" as="script">
+    <link rel="preload" as="font" href="/font/Oswald-Regular.ttf" crossorigin>
+    <link rel="preload" as="font" href="https://at.alicdn.com/t/font_327081_1dta1rlogw17zaor.woff" crossorigin>
+    
+    <!-- fancybox -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.2.5/jquery.fancybox.min.js" defer></script>
+    <!-- 百度统计  -->
+    
+    <!-- 谷歌统计  -->
+    
+</head>
+
+    
+        <body class="post-body">
+    
+    
+<header class="header">
+
+    <div class="read-progress"></div>
+    <div class="header-sidebar-menu">&#xe775;</div>
+    <!-- post页的toggle banner  -->
+    
+    <div class="banner">
+            <div class="blog-title">
+                <a href="/">Automne&#39;s Shadow.</a>
+            </div>
+            <div class="post-title">
+                <a href="#" class="post-name">LCG和模p平方根结合的题目</a>
+            </div>
+    </div>
+    
+    <a class="home-link" href="/">Automne's Shadow.</a>
+</header>
+    <div class="wrapper">
+        <div class="site-intro" style="height:50vh;">
+    
+    <!-- 主页  -->
+    
+    
+    <!-- 404页  -->
+            
+    <div class="site-intro-placeholder"></div>
+    <div class="site-intro-img" style="background-image: url(/intro/post-bg.jpg)"></div>
+    <div class="site-intro-meta">
+        <!-- 标题  -->
+        <h1 class="intro-title">
+            <!-- 主页  -->
+            
+            LCG和模p平方根结合的题目
+            <!-- 404 -->
+            
+        </h1>
+        <!-- 副标题 -->
+        <p class="intro-subtitle">
+            <!-- 主页副标题  -->
+            
+            
+            <!-- 404 -->
+            
+        </p>
+        <!-- 文章页meta -->
+        
+            <div class="post-intros">
+                <!-- 文章页标签  -->
+                
+                    <div class="post-intro-tags">
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="lcg">lcg</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="rabin">rabin</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="egcd">egcd</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="cipolla's algorithm">cipolla's algorithm</a>
+    
+</div>
+                
+                
+                    <div class="post-intro-read">
+                    </div>
+                
+                <div class="post-intro-meta">
+                    <span class="post-intro-calander iconfont-archer">&#xe676;</span>
+                    <span class="post-intro-time">2020/01/26</span>
+                    
+                    <span id="busuanzi_container_page_pv" class="busuanzi-pv">
+                        <span class="iconfont-archer">&#xe602;</span>
+                        <span id="busuanzi_value_page_pv"></span>
+                    </span>
+                    
+                    <span class="shareWrapper">
+                        <span class="iconfont-archer shareIcon">&#xe71d;</span>
+                        <span class="shareText">Share</span>
+                        <ul class="shareList">
+                            <li class="iconfont-archer share-qr" data-type="qr">&#xe75b;
+                                <div class="share-qrcode"></div>
+                            </li>
+                            <li class="iconfont-archer" data-type="weibo">&#xe619;</li>
+                            <li class="iconfont-archer" data-type="qzone">&#xe62e;</li>
+                            <li class="iconfont-archer" data-type="twitter">&#xe634;</li>
+                            <li class="iconfont-archer" data-type="facebook">&#xe67a;</li>
+                        </ul>
+                    </span>
+                </div>
+            </div>
+        
+    </div>
+</div>
+        <script>
+ 
+  // get user agent
+  var browser = {
+    versions: function () {
+      var u = window.navigator.userAgent;
+      return {
+        userAgent: u,
+        trident: u.indexOf('Trident') > -1, //IE内核
+        presto: u.indexOf('Presto') > -1, //opera内核
+        webKit: u.indexOf('AppleWebKit') > -1, //苹果、谷歌内核
+        gecko: u.indexOf('Gecko') > -1 && u.indexOf('KHTML') == -1, //火狐内核
+        mobile: !!u.match(/AppleWebKit.*Mobile.*/), //是否为移动终端
+        ios: !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/), //ios终端
+        android: u.indexOf('Android') > -1 || u.indexOf('Linux') > -1, //android终端或者uc浏览器
+        iPhone: u.indexOf('iPhone') > -1 || u.indexOf('Mac') > -1, //是否为iPhone或者安卓QQ浏览器
+        iPad: u.indexOf('iPad') > -1, //是否为iPad
+        webApp: u.indexOf('Safari') == -1, //是否为web应用程序，没有头部与底部
+        weixin: u.indexOf('MicroMessenger') == -1, //是否为微信浏览器
+        uc: u.indexOf('UCBrowser') > -1 //是否为android下的UC浏览器
+      };
+    }()
+  }
+  console.log("userAgent:" + browser.versions.userAgent);
+
+  // callback
+  function fontLoaded() {
+    console.log('font loaded');
+    if (document.getElementsByClassName('site-intro-meta')) {
+      document.getElementsByClassName('intro-title')[0].classList.add('intro-fade-in');
+      document.getElementsByClassName('intro-subtitle')[0].classList.add('intro-fade-in');
+      var postIntros = document.getElementsByClassName('post-intros')[0]
+      if (postIntros) {
+        postIntros.classList.add('post-fade-in');
+      }
+    }
+  }
+
+  // UC不支持跨域，所以直接显示
+  function asyncCb(){
+    if (browser.versions.uc) {
+      console.log("UCBrowser");
+      fontLoaded();
+    } else {
+      WebFont.load({
+        custom: {
+          families: ['Oswald-Regular']
+        },
+        loading: function () {  //所有字体开始加载
+          // console.log('loading');
+        },
+        active: function () {  //所有字体已渲染
+          fontLoaded();
+        },
+        inactive: function () { //字体预加载失败，无效字体或浏览器不支持加载
+          console.log('inactive: timeout');
+          fontLoaded();
+        },
+        timeout: 5000 // Set the timeout to two seconds
+      });
+    }
+  }
+
+  function asyncErr(){
+    console.warn('script load from CDN failed, will load local script')
+  }
+
+  // load webfont-loader async, and add callback function
+  function async(u, cb, err) {
+    var d = document, t = 'script',
+      o = d.createElement(t),
+      s = d.getElementsByTagName(t)[0];
+    o.src = u;
+    if (cb) { o.addEventListener('load', function (e) { cb(null, e); }, false); }
+    if (err) { o.addEventListener('error', function (e) { err(null, e); }, false); }
+    s.parentNode.insertBefore(o, s);
+  }
+
+  var asyncLoadWithFallBack = function(arr, success, reject) {
+      var currReject = function(){
+        reject()
+        arr.shift()
+        if(arr.length)
+          async(arr[0], success, currReject)
+        }
+
+      async(arr[0], success, currReject)
+  }
+
+  asyncLoadWithFallBack([
+    "https://cdn.jsdelivr.net/npm/webfontloader@1.6.28/webfontloader.min.js", 
+    "https://cdn.bootcss.com/webfont/1.6.28/webfontloader.js",
+    "/lib/webfontloader.min.js"
+  ], asyncCb, asyncErr)
+</script>        
+        <img class="loading" src="/assets/loading.svg" style="display: block; margin: 6rem auto 0 auto; width: 6rem; height: 6rem;" />
+        <div class="container container-unloaded">
+            <main class="main post-page">
+    <article class="article-entry">
+        <p><strong>Crypto</strong><br><a id="more"></a></p>
+<p>代码task.py</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> flag <span class="keyword">import</span> flag</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">state = bytes_to_long(flag.encode())</span><br><span class="line"></span><br><span class="line">p = getPrime(<span class="number">128</span>)</span><br><span class="line">q = getPrime(<span class="number">128</span>)</span><br><span class="line">m = p * q</span><br><span class="line">a, b = [getRandomRange(<span class="number">0</span>, m) <span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">2</span>)]</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> open(<span class="string">'output'</span>, <span class="string">'w'</span>) <span class="keyword">as</span> f:</span><br><span class="line">    f.write(str(m) + <span class="string">'\n'</span>)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">6</span>):</span><br><span class="line">        state = (a*state + b) % m</span><br><span class="line">        <span class="keyword">if</span> i &amp; <span class="number">1</span> == <span class="number">0</span>:</span><br><span class="line">            f.write(str(state) + <span class="string">'\n'</span>)</span><br></pre></td></tr></table></figure>
+<p>输出output</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">55584485421406970301254549526604327461056610434113867867423369210521481715933</span></span><br><span class="line"><span class="number">3693929062344887200388436902170299368192364992317574256526074702481265639773</span></span><br><span class="line"><span class="number">23589540966217424118104948577678311766405141841319921607964145788046048746955</span></span><br><span class="line"><span class="number">47328186237445429020074319580472604276783097851624136984720842711863174734878</span></span><br></pre></td></tr></table></figure>
+<p>代码比较简单易懂，这里有篇介绍LCG线性同余生成器的博文，LCG属于流密码的范畴。</p>
+<p><a href="https://zeroyu.xyz/2018/11/02/Cracking-LCG/" target="_blank" rel="noopener">https://zeroyu.xyz/2018/11/02/Cracking-LCG/</a></p>
+<p>不同的是，题目中给到的输出状态不是连续的输出，无法直接套用。</p>
+<p>假设初始state，也就是flag记为S0，于是有：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">S1 ≡ (S0*a + b) % m</span><br><span class="line"></span><br><span class="line">S2 ≡ (S1*a + b) % m</span><br><span class="line"></span><br><span class="line">S3 ≡ (S2*a + b) % m</span><br><span class="line"></span><br><span class="line">S4 ≡ (S3*a + b) % m</span><br><span class="line"></span><br><span class="line">S5 ≡ (S4*a + b) % m</span><br><span class="line"></span><br><span class="line">S6 ≡ (S5*a + b) % m</span><br></pre></td></tr></table></figure>
+<p>其中，S1，S3和S5是已知的，于是有：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S5-S3 ≡ (S3-S1)*a^2 % m</span><br></pre></td></tr></table></figure>
+<p>使用模逆运算计算a^2的值，注意模逆运算实际上使用算法是扩展欧几里得算法，关于欧几里得算法和扩展欧几里得算法可以参考下面的链接加深理解：</p>
+<p><a href="https://www.bilibili.com/video/av24248451?from=search&amp;seid=8600306360895299893" target="_blank" rel="noopener">https://www.bilibili.com/video/av24248451?from=search&amp;seid=8600306360895299893</a></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">egcd</span><span class="params">(a, b)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> a == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> (b, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        g, x, y = egcd(b % a, a)</span><br><span class="line">        <span class="keyword">return</span> (g, y - (b // a) * x, x)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">modinv</span><span class="params">(b, n)</span>:</span></span><br><span class="line">    g, x, _ = egcd(b, n)</span><br><span class="line">    <span class="keyword">if</span> g == <span class="number">1</span>:</span><br><span class="line">        <span class="keyword">return</span> x % n</span><br><span class="line">		</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">crack_unknown_multiplier</span><span class="params">(states, modulus)</span>:</span></span><br><span class="line">    multiplier = (states[<span class="number">2</span>] - states[<span class="number">1</span>]) * modinv(states[<span class="number">1</span>] - states[<span class="number">0</span>], modulus) % modulus</span><br><span class="line">    <span class="keyword">return</span> multiplier</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> crack_unknown_multiplier([<span class="number">3693929062344887200388436902170299368192364992317574256526074702481265639773</span>, <span class="number">23589540966217424118104948577678311766405141841319921607964145788046048746955</span>, <span class="number">47328186237445429020074319580472604276783097851624136984720842711863174734878</span>], <span class="number">55584485421406970301254549526604327461056610434113867867423369210521481715933</span>)</span><br></pre></td></tr></table></figure>
+<p>求得：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a^2 ≡ </span><br><span class="line"></span><br><span class="line">29895665113034070831270870121097218673769521820755738885706707818988524697486 % m</span><br></pre></td></tr></table></figure>
+<p>直接开方求a的值是不好使的。搜索模p平方根找到了计算模平方根的算法：Tonelli–Shanks算法，从这里找到了这个算法的python实现：<a href="https://rosettacode.org/wiki/Tonelli-Shanks_algorithm#Python" target="_blank" rel="noopener">https://rosettacode.org/wiki/Tonelli-Shanks_algorithm#Python</a></p>
+<p>但是直接带入</p>
+<p>29895665113034070831270870121097218673769521820755738885706707818988524697486和55584485421406970301254549526604327461056610434113867867423369210521481715933</p>
+<p>求解是报错的</p>
+<p><img src="1.png" alt="automne"></p>
+<p>看一下算法约束条件可以发现要求模数p是奇质数</p>
+<p><img src="2.png" alt="automne"></p>
+<p>调用sympy库查看，发现这里的p不是质数</p>
+<p><img src="3.png" alt="automne"></p>
+<p>使用yafu分解p得到质因子P和Q：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">P = 225198214939471987016766287890315801997</span><br><span class="line"></span><br><span class="line">Q = 246824715890162716916904917666448620689</span><br></pre></td></tr></table></figure>
+<p>既然p不是质数，那么上面的算法就不适用，根据Rabin加密系统（维基百科搜Rabin cryptosystem）的加解密算法，可以进行求解。该算法要求质因子P和Q满足模4余3的条件。</p>
+<p>但是这里的P和Q并不是模4余3的，尽管如此同样可以解，参考：<a href="https://xz.aliyun.com/t/5113" target="_blank" rel="noopener">https://xz.aliyun.com/t/5113</a></p>
+<p>a^2 ≡ </p>
+<p>29895665113034070831270870121097218673769521820755738885706707818988524697486 % m</p>
+<p>分解为两个同余式：</p>
+<p>a^2 ≡ </p>
+<p>29895665113034070831270870121097218673769521820755738885706707818988524697486 % 225198214939471987016766287890315801997</p>
+<p>a^2 ≡ </p>
+<p>29895665113034070831270870121097218673769521820755738885706707818988524697486 % 246824715890162716916904917666448620689</p>
+<p>这里的两个同余式里的模数都是质数，所以是可解的</p>
+<p> <img src="4.png" alt="automne"></p>
+<p>二次同余方程解法的通用算法可以参考Cipolla’s algorithm，和上面的Tonelli-Shanks algorithm都是解决x^2≡n mod p问题的，但是对于不同的约束条件求解效率不同。</p>
+<p><img src="5.png" alt="automne"></p>
+<p>通过Cipolla’s algorithm算法求出解之后，再使用中国剩余定理求解a的值，得到a的值之后，再根据LCG的特点:</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S3 ≡ ((S1*a+b)*a + b) % m = (S1*a^2 + (a+1)*b) % m</span><br></pre></td></tr></table></figure>
+<p>即 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(a+1)*b ≡ (S3-S1*a^2) % m</span><br></pre></td></tr></table></figure>
+<p>可求得b的值</p>
+<p>然后再通过 </p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">S1 ≡ (S0*a + b) % m =&gt; a*S0 ≡ (S1-b) % m</span><br></pre></td></tr></table></figure>
+<p>求得S0，也就是flag。</p>
+<p>于是最终的解题脚本：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> random <span class="keyword">import</span> randint</span><br><span class="line"><span class="keyword">from</span> libnum <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> gmpy2 <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">power</span><span class="params">(s1, s2, k1, k2, w, p)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> ((s1*k1+s2*k2*w)%p, (s1*k2+s2*k1)%p)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">Cipolla_algorithm</span><span class="params">(p, n)</span>:</span></span><br><span class="line">    a = randint(<span class="number">1</span>, p)</span><br><span class="line">    w = a ** <span class="number">2</span> - n</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> pow(w, (p<span class="number">-1</span>)/<span class="number">2</span>, p) !=p<span class="number">-1</span> :</span><br><span class="line">        a = randint(<span class="number">1</span>, p)</span><br><span class="line">        w = a ** <span class="number">2</span> - n</span><br><span class="line"></span><br><span class="line">    times = (p+<span class="number">1</span>)/<span class="number">2</span></span><br><span class="line"></span><br><span class="line">    k1 = <span class="number">1</span></span><br><span class="line">    k2 = <span class="number">0</span></span><br><span class="line"></span><br><span class="line">    first = <span class="keyword">True</span></span><br><span class="line"></span><br><span class="line">    sum1 = <span class="number">1</span></span><br><span class="line">    sum2 = <span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> times != <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">if</span> first:</span><br><span class="line">            k1, k2=power(k1, k2, a, <span class="number">1</span>, w, p)</span><br><span class="line">            first = <span class="keyword">False</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            k1, k2=power(k1, k2, k1, k2, w, p)</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> times &amp; <span class="number">1</span>:</span><br><span class="line">            sum1, sum2 = power(sum1, sum2, k1, k2, w, p)</span><br><span class="line">        times &gt;&gt;= <span class="number">1</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> sum1</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">CRT</span><span class="params">(c, n)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(n)):</span><br><span class="line">        <span class="keyword">for</span> j <span class="keyword">in</span> range(i + <span class="number">1</span>, len(n)):</span><br><span class="line">            <span class="keyword">assert</span> gcd(n[i], n[j]) == <span class="number">1</span></span><br><span class="line">    <span class="keyword">assert</span> len(c) == len(n)</span><br><span class="line"></span><br><span class="line">    N = reduce(<span class="keyword">lambda</span> a, b: a*b, n)</span><br><span class="line">    x = <span class="number">0</span></span><br><span class="line">    <span class="keyword">for</span> i, j <span class="keyword">in</span> zip(c, n):</span><br><span class="line">        N_i = N/j</span><br><span class="line">        N_i_1 = invert(N_i, j)</span><br><span class="line">        x+=i*N_i*N_i_1</span><br><span class="line">    <span class="keyword">return</span> x % N</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">egcd</span><span class="params">(a, b)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> a == <span class="number">0</span>:</span><br><span class="line">        <span class="keyword">return</span> (b, <span class="number">0</span>, <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        g, x, y = egcd(b % a, a)</span><br><span class="line">        <span class="keyword">return</span> (g, y - (b // a) * x, x)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">modinv</span><span class="params">(b, n)</span>:</span></span><br><span class="line">    g, x, _ = egcd(b, n)</span><br><span class="line">    <span class="keyword">if</span> g == <span class="number">1</span>:</span><br><span class="line">        <span class="keyword">return</span> x % n</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    p = <span class="number">225198214939471987016766287890315801997</span></span><br><span class="line">    q = <span class="number">246824715890162716916904917666448620689</span></span><br><span class="line">    n = p * q</span><br><span class="line">    c = <span class="number">29895665113034070831270870121097218673769521820755738885706707818988524697486</span></span><br><span class="line">    s1 = <span class="number">3693929062344887200388436902170299368192364992317574256526074702481265639773</span></span><br><span class="line">    s3 = <span class="number">23589540966217424118104948577678311766405141841319921607964145788046048746955</span></span><br><span class="line">    s5 = <span class="number">47328186237445429020074319580472604276783097851624136984720842711863174734878</span></span><br><span class="line"></span><br><span class="line">    get_x1 = Cipolla_algorithm(p, c)</span><br><span class="line">    get_x2 = Cipolla_algorithm(q, c)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">assert</span>  pow(get_x1, <span class="number">2</span>, p) == c % p</span><br><span class="line">    <span class="keyword">assert</span>  pow(get_x2, <span class="number">2</span>, q) == c % q</span><br><span class="line"></span><br><span class="line">    c11 = get_x1</span><br><span class="line">    c12 = p-get_x1</span><br><span class="line">    c21 = get_x2</span><br><span class="line">    c22 = q-get_x2</span><br><span class="line"></span><br><span class="line">    <span class="keyword">print</span> <span class="string">'possible a :'</span> + str(CRT([c11, c21], [p, q]))</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'possible a :'</span> + str(CRT([c11, c22], [p, q]))</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'possible a :'</span> + str(CRT([c12, c21], [p, q]))</span><br><span class="line">    <span class="keyword">print</span> <span class="string">'possible a :'</span> + str(CRT([c12, c22], [p, q]))</span><br><span class="line">    a = [int(CRT([c11, c21], [p, q])),int(CRT([c11, c22], [p, q])),int(CRT([c12, c21], [p, q])),int(CRT([c12, c22], [p, q]))]</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> a:</span><br><span class="line">        <span class="comment">#print i</span></span><br><span class="line">        b = (s3-s1*c) * modinv(i+<span class="number">1</span>,n) % n</span><br><span class="line">        <span class="comment">#print b</span></span><br><span class="line">        flag = (s1-b) * modinv(i,n) % n</span><br><span class="line">        <span class="keyword">print</span> long_to_bytes(flag)</span><br></pre></td></tr></table></figure>
+<p><img src="6.png" alt="automne"></p>
+
+    </article>
+    <!-- license  -->
+    
+        <div class="license-wrapper">
+            <p>原文作者: <a href="https://ce-automne.github.io">Automne</a>
+            </p><p>原文链接: <a href="https://ce-automne.github.io/2020/01/26/LCG和模p平方根结合的题目/">https://ce-automne.github.io/2020/01/26/LCG和模p平方根结合的题目/</a>
+            </p><p>发表日期: <a href="https://ce-automne.github.io/2020/01/26/LCG和模p平方根结合的题目/">January 26th 2020, 7:50:00 pm</a>
+            </p><p>版权声明: 本文采用<a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">知识共享署名-非商业性使用 4.0 国际许可协议</a>进行许可</p>
+        </div>
+    
+    <!-- paginator  -->
+    <ul class="post-paginator">
+        <li class="next">
+            
+        </li>
+        <li class="previous">
+            
+                <div class="prevSlogan">Previous Post</div>
+                <a 2019 href="/2019/12/22/Watevr-CTF-2019-Crypto-WriteUp/" title="watevr" ctf crypto writeup>
+                    <div class="prevTitle">watevr CTF 2019 Crypto WriteUp</div>
+                </a>
+            
+        </li>
+    </ul>
+    <!-- 评论插件 -->
+    <!-- 来必力City版安装代码 -->
+
+<!-- City版安装代码已完成 -->
+    
+    
+    <!--PC和WAP自适应版-->
+
+    <!--PC版-->
+
+
+    
+    
+
+    <!-- 评论 -->
+</main>
+            <!-- profile -->
+            
+        </div>
+        <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<footer class="footer footer-unloaded">
+    <!-- social  -->
+    
+    <div class="social">
+        
+    
+        
+            
+                <a href="mailto:rainydusk4ctf@tom.com" class="iconfont-archer email" title="email"></a>
+            
+        
+    
+        
+            
+                <a href="//github.com/ce-automne" class="iconfont-archer github" target="_blank" title="github"></a>
+            
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+        
+    
+
+    </div>
+    
+    <!-- powered by Hexo  -->
+    <div class="copyright">
+        <span id="hexo-power">Powered by <a href="https://hexo.io/" target="_blank">Hexo</a></span><span class="iconfont-archer power">&#xe635;</span><span id="theme-info">theme <a href="https://github.com/fi3ework/hexo-theme-archer" target="_blank">Archer</a></span>
+    </div>
+    <!-- 不蒜子  -->
+    
+    <div class="busuanzi-container">
+    
+     
+    <span id="busuanzi_container_site_pv">本站总访问量PV: <span id="busuanzi_value_site_pv">次 </span> :)</span>
+    
+    </div>
+    
+</footer>
+    </div>
+    <!-- toc -->
+    
+    <div class="toc-wrapper" style=
+    
+
+
+
+
+
+
+
+top:50vh;
+
+    >
+        <div class="toc-catalog">
+            <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
+        </div>
+        
+    </div>
+    
+    <div class="back-top iconfont-archer">&#xe639;</div>
+    <div class="sidebar sidebar-hide">
+    <ul class="sidebar-tabs sidebar-tabs-active-0">
+        <li class="sidebar-tab-archives"><span class="iconfont-archer">&#xe67d;</span><span class="tab-name">Archive</span></li>
+        <li class="sidebar-tab-tags"><span class="iconfont-archer">&#xe61b;</span><span class="tab-name">Tag</span></li>
+        <li class="sidebar-tab-categories"><span class="iconfont-archer">&#xe666;</span><span class="tab-name">Cate</span></li>
+    </ul>
+    <div class="sidebar-content sidebar-content-show-archive">
+          <div class="sidebar-panel-archives">
+    <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <div class="total-and-search">
+        <div class="total-archive">
+        Total : 46
+        </div>
+        <!-- search  -->
+        
+    </div>
+    
+    <div class="post-archive">
+    
+    
+    
+    
+    <div class="archive-year"> 2020 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">01/26</span><a class="archive-post-title" href="/2020/01/26/LCG和模p平方根结合的题目/">LCG和模p平方根结合的题目</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2019 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/22</span><a class="archive-post-title" href="/2019/12/22/Watevr-CTF-2019-Crypto-WriteUp/">watevr CTF 2019 Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/22</span><a class="archive-post-title" href="/2019/12/22/UTC-CTF-2019-Crypto-WriteUp/">UTC CTF 2019 Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/07</span><a class="archive-post-title" href="/2019/12/07/RMI-&&-Fastjson-1.2.47-RCE-Review/">RMI && Fastjson 1.2.47 RCE Review</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/23</span><a class="archive-post-title" href="/2019/11/23/Weblogic-CVE-2019-2647-XXE-Vulnerability-Review/">Weblogic CVE-2019-2647 XXE Vulnerability Review</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/16</span><a class="archive-post-title" href="/2019/11/16/Apache-Commons-Collections-Deserialization-Review/">Apache Commons Collections Deserialization Review</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">11/09</span><a class="archive-post-title" href="/2019/11/09/RedPwnCTF-2019-blueprint-WriteUp/">RedPwnCTF 2019 blueprint WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/25</span><a class="archive-post-title" href="/2019/07/25/HWCTF-Mobile-WriteUp/">HWCTF Mobile WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/20</span><a class="archive-post-title" href="/2019/07/20/CBC-MAC-Forgery-Conclusion/">CBC MAC Forgery Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/14</span><a class="archive-post-title" href="/2019/07/14/XMAN-CTF-Crypto-WriteUp/">XMAN CTF Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/14</span><a class="archive-post-title" href="/2019/07/14/CBC-Bit-Flipping-Attack-Conclusion-Part2/">CBC Bit-Flipping Attack Conclusion Part2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/05</span><a class="archive-post-title" href="/2019/07/05/ISITDTU-CTF-2019-WriteUp-Part2/">ISITDTU CTF 2019 WriteUp Part2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/02</span><a class="archive-post-title" href="/2019/07/02/ISITDTU-CTF-2019-WriteUp/">ISITDTU CTF 2019 WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">07/01</span><a class="archive-post-title" href="/2019/07/01/RCTF-2019-BabyCrypto-WriteUp/">RCTF 2019 BabyCrypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/26</span><a class="archive-post-title" href="/2019/06/26/Hash-Length-Extension-Attack-Conclusion/">Hash Length Extension Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/23</span><a class="archive-post-title" href="/2019/06/23/CBC-Padding-Oracle-Attack-Conclusion/">CBC Padding Oracle Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/15</span><a class="archive-post-title" href="/2019/06/15/HSCTF-2019-UnSolved-WriteUp/">HSCTF 2019 UnSolved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">06/06</span><a class="archive-post-title" href="/2019/06/06/HSCTF-2019-SuperSecureSystem-WriteUp/">HSCTF 2019 SuperSecureSystem WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/23</span><a class="archive-post-title" href="/2019/05/23/CBC-Bit-Flipping-Attack-Conclusion/">CBC Bit-Flipping Attack Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/19</span><a class="archive-post-title" href="/2019/05/19/LFSR-in-Crypto-Conclusion/">LFSR in Crypto Conclusion</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CSAW-CTF-2017-BabyCrypt-WriteUp/">CSAW CTF 2017 BabyCrypt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/18</span><a class="archive-post-title" href="/2019/05/18/CTF-313-2019-Angle-of-Approach-WriteUp/">CTF 313 2019 Angle of Approach WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">05/05</span><a class="archive-post-title" href="/2019/05/05/UUT-CTF-2019-SolveTheCrypto-WriteUp/">UUTCTF 2019 Solve the Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/SECCON-CTF-2017-VerySmooth-WriteUp/">SECCONCTF 2017 Very Smooth WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/27</span><a class="archive-post-title" href="/2019/04/27/Plaid-CTF-2019-Project Eulernt-WriteUp/">Plaid CTF 2019  Project Eulernt WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/25</span><a class="archive-post-title" href="/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/">TG:HACK CTF 2019  UnSolved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/23</span><a class="archive-post-title" href="/2019/04/23/ASIS-CTF-2019-ADeliciousSoup-WriteUp/">ASIS CTF 2019 A delicious soup WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/21</span><a class="archive-post-title" href="/2019/04/21/TGHACK-CTF-2019-Solved-WriteUp/">TG:HACK CTF 2019  Solved WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/19</span><a class="archive-post-title" href="/2019/04/19/Radar-CTF-2019-Crypto-WriteUp/">RadarCTF 2019  Crypto WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/18</span><a class="archive-post-title" href="/2019/04/18/HackZone-CTF-2019-Mess-WriteUp/">HackZone CTF 2019 MeSS WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-zer0lfsr-WriteUp/">0CTF 2019 zer0lfsr WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">04/11</span><a class="archive-post-title" href="/2019/04/11/0CTF-2019-babyrsa-WriteUp/">0CTF 2019  babyrsa WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/27</span><a class="archive-post-title" href="/2019/03/27/CONFidence -CTF-2019-The Lottery -WriteUp/">CONFidence CTF 2019 The Lottery WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/21</span><a class="archive-post-title" href="/2019/03/21/MySQL-Blind-Injection-Scripts/">MySQL Blind Injection Scripts</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/14</span><a class="archive-post-title" href="/2019/03/14/TAMU-CTF-2019-LocalNews-WriteUp/">TAMU CTF 2019 LocalNews WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/12</span><a class="archive-post-title" href="/2019/03/12/BSidesSF-CTF-2019-GoodLuks-WriteUp/">BSidesSF CTF 2019 GoodLuks WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/10</span><a class="archive-post-title" href="/2019/03/10/BSidesSF-CTF-2019-WeatherCompanion-WriteUp/">BSidesSF CTF 2019 WeatherCompanion WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/07</span><a class="archive-post-title" href="/2019/03/07/BSidesSF-CTF-2019-Sequel-WriteUp/">BSidesSF CTF 2019 Sequel WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/05</span><a class="archive-post-title" href="/2019/03/05/BSidesSF-CTF-2017-FlagStore-WriteUp/">BSidesSF CTF 2017 FlagStore WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">03/03</span><a class="archive-post-title" href="/2019/03/03/BSidesSF-CTF-2017-Pinlock-WriteUp/">BSidesSF CTF 2017 Pinlock WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">02/24</span><a class="archive-post-title" href="/2019/02/24/BSidesSF-CTF-2018-PassVault-WriteUp/">BSidesSF CTF 2018 PasswordVault WriteUp</a>
+        </li>
+    
+    
+    
+    
+    
+        </ul>
+    
+    <div class="archive-year"> 2018 </div>
+    <ul class="year-list">
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/23</span><a class="archive-post-title" href="/2018/12/23/XMAS-CTF-2018-ChristmasGame-WriteUp/">XMAS CTF 2018 ChristmasGame WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/14</span><a class="archive-post-title" href="/2018/12/14/Otter-CTF-2018-Forensics-WriteUp-Part2/">OtterCTF 2018 Forensics WriteUp Part 2</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">12/13</span><a class="archive-post-title" href="/2018/12/13/Otter-CTF-2018-Forensics-WriteUp-Part1/">OtterCTF 2018 Forensics WriteUp Part 1</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">09/19</span><a class="archive-post-title" href="/2018/09/19/CSAW-CTF-2018-SSO-WriteUp/">CSAW CTF 2018 SSO WriteUp</a>
+        </li>
+    
+    
+        <li class="archive-post-item">
+            <span class="archive-post-date">08/23</span><a class="archive-post-title" href="/2018/08/23/WhiteHat-Grand-Prix-2018-Misc02-WriteUp/">WhiteHat Grand Prix 2018 Misc02 WriteUp</a>
+        </li>
+    
+    </ul></div>
+  </div>
+        <div class="sidebar-panel-tags">
+    <div class="sidebar-tags-name">
+    
+        <span class="sidebar-tag-name" data-tags="lfsr"><span class="iconfont-archer">&#xe606;</span>lfsr</span>
+    
+        <span class="sidebar-tag-name" data-tags="z3"><span class="iconfont-archer">&#xe606;</span>z3</span>
+    
+        <span class="sidebar-tag-name" data-tags="python"><span class="iconfont-archer">&#xe606;</span>python</span>
+    
+        <span class="sidebar-tag-name" data-tags="reverse"><span class="iconfont-archer">&#xe606;</span>reverse</span>
+    
+        <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
+    
+        <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
+    
+        <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
+    
+        <span class="sidebar-tag-name" data-tags="luks"><span class="iconfont-archer">&#xe606;</span>luks</span>
+    
+        <span class="sidebar-tag-name" data-tags="hashcat"><span class="iconfont-archer">&#xe606;</span>hashcat</span>
+    
+        <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
+    
+        <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
+    
+        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+    
+        <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
+    
+        <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+    
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
+        <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
+    
+        <span class="sidebar-tag-name" data-tags="ndk"><span class="iconfont-archer">&#xe606;</span>ndk</span>
+    
+        <span class="sidebar-tag-name" data-tags="hashpumpy"><span class="iconfont-archer">&#xe606;</span>hashpumpy</span>
+    
+        <span class="sidebar-tag-name" data-tags="sourceleakhacker"><span class="iconfont-archer">&#xe606;</span>sourceleakhacker</span>
+    
+        <span class="sidebar-tag-name" data-tags="volatility"><span class="iconfont-archer">&#xe606;</span>volatility</span>
+    
+        <span class="sidebar-tag-name" data-tags="inet_aton"><span class="iconfont-archer">&#xe606;</span>inet_aton</span>
+    
+        <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
+    
+        <span class="sidebar-tag-name" data-tags="lcg"><span class="iconfont-archer">&#xe606;</span>lcg</span>
+    
+        <span class="sidebar-tag-name" data-tags="rabin"><span class="iconfont-archer">&#xe606;</span>rabin</span>
+    
+        <span class="sidebar-tag-name" data-tags="egcd"><span class="iconfont-archer">&#xe606;</span>egcd</span>
+    
+        <span class="sidebar-tag-name" data-tags="cipolla's algorithm"><span class="iconfont-archer">&#xe606;</span>cipolla's algorithm</span>
+    
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
+    
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
+    
+        <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
+    
+        <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
+    
+        <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
+    
+        <span class="sidebar-tag-name" data-tags="binary"><span class="iconfont-archer">&#xe606;</span>binary</span>
+    
+        <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
+    
+        <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
+    
+        <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
+    
+        <span class="sidebar-tag-name" data-tags="rsatool"><span class="iconfont-archer">&#xe606;</span>rsatool</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssl"><span class="iconfont-archer">&#xe606;</span>ssl</span>
+    
+        <span class="sidebar-tag-name" data-tags="AES"><span class="iconfont-archer">&#xe606;</span>AES</span>
+    
+        <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
+    
+        <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
+    
+        <span class="sidebar-tag-name" data-tags="ssti"><span class="iconfont-archer">&#xe606;</span>ssti</span>
+    
+        <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
+    
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+    
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+    
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+    
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+    
+        <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
+    
+        <span class="sidebar-tag-name" data-tags="sage"><span class="iconfont-archer">&#xe606;</span>sage</span>
+    
+        <span class="sidebar-tag-name" data-tags="google cloud sdk"><span class="iconfont-archer">&#xe606;</span>google cloud sdk</span>
+    
+        <span class="sidebar-tag-name" data-tags="zsteg"><span class="iconfont-archer">&#xe606;</span>zsteg</span>
+    
+        <span class="sidebar-tag-name" data-tags="base58"><span class="iconfont-archer">&#xe606;</span>base58</span>
+    
+        <span class="sidebar-tag-name" data-tags="fermat"><span class="iconfont-archer">&#xe606;</span>fermat</span>
+    
+        <span class="sidebar-tag-name" data-tags="multi-primes"><span class="iconfont-archer">&#xe606;</span>multi-primes</span>
+    
+        <span class="sidebar-tag-name" data-tags="prng"><span class="iconfont-archer">&#xe606;</span>prng</span>
+    
+        <span class="sidebar-tag-name" data-tags="rmi"><span class="iconfont-archer">&#xe606;</span>rmi</span>
+    
+        <span class="sidebar-tag-name" data-tags="fastjson"><span class="iconfont-archer">&#xe606;</span>fastjson</span>
+    
+        <span class="sidebar-tag-name" data-tags="jndi"><span class="iconfont-archer">&#xe606;</span>jndi</span>
+    
+        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
+    
+        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
+    
+        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
+    
+        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
+    
+        <span class="sidebar-tag-name" data-tags="reflect"><span class="iconfont-archer">&#xe606;</span>reflect</span>
+    
+        <span class="sidebar-tag-name" data-tags="010 editor"><span class="iconfont-archer">&#xe606;</span>010 editor</span>
+    
+        <span class="sidebar-tag-name" data-tags="gcd"><span class="iconfont-archer">&#xe606;</span>gcd</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-tags-empty">&#xe678;</div>
+    <div class="tag-load-fail" style="display: none; color: #ccc; font-size: 0.6rem;">
+    缺失模块。<br>
+    1、请确保node版本大于6.2<br>
+    2、在博客根目录（注意不是archer根目录）执行以下命令：<br>
+    <span style="color: #f75357; font-size: 1rem; line-height: 2rem;">npm i hexo-generator-json-content --save</span><br>
+    3、在根目录_config.yml里添加配置：
+    <pre style="color: #787878; font-size: 0.6rem;">
+jsonContent:
+  meta: false
+  pages: false
+  posts:
+    title: true
+    date: true
+    path: true
+    text: false
+    raw: false
+    content: false
+    slug: false
+    updated: false
+    comments: false
+    link: false
+    permalink: false
+    excerpt: false
+    categories: true
+    tags: true</pre>
+    </div> 
+    <div class="sidebar-tags-list"></div>
+</div>
+        <div class="sidebar-panel-categories">
+    <div class="sidebar-categories-name">
+    
+        <span class="sidebar-category-name" data-categories="Crypto"><span class="iconfont-archer">&#xe60a;</span>Crypto</span>
+    
+        <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
+    
+        <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
+    
+        <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
+    
+    </div>
+    <div class="iconfont-archer sidebar-categories-empty">&#xe678;</div>
+    <div class="sidebar-categories-list"></div>
+</div>
+    </div>
+</div> 
+    <script>
+    var siteMeta = {
+        root: "/",
+        author: "Automne"
+    }
+</script>
+    <!-- CDN failover -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script type="text/javascript">
+        if (typeof window.$ === 'undefined')
+        {
+            console.warn('jquery load from jsdelivr failed, will load local script')
+            document.write('<script src="/lib/jquery.min.js">\x3C/script>')
+        }
+    </script>
+    <script src="/scripts/main.js"></script>
+    <!-- algolia -->
+    
+    <!-- busuanzi  -->
+    
+    <script async src="//dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    
+    <!-- CNZZ  -->
+    
+    </div>
+    <!-- async load share.js -->
+    
+        <script src="/scripts/share.js" async></script>    
+     
+    </body>
+</html>
+
+
