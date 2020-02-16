@@ -193,6 +193,7 @@
     
     <!-- 谷歌统计  -->
     
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 </head>
 
     
@@ -386,13 +387,15 @@
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p><strong>Android</strong><br><a id="more"></a></p>
+        <p><strong>Android</strong></p>
+<a id="more"></a>
 <p>作为一名弱鸡Android选手，刚了几个月的密码学，插播一条Android题。</p>
 <p>使用JEB打开，可以看到给了AES-CBC加密后的密文，而且密文格式需要做一定处理，要求还原出明文。明文就是apk上要输入的密码。</p>
 <p><img src="1.png" alt="automne"></p>
 <p><img src="2.png" alt="automne"></p>
 <p>代码里调用了so库，可以使用frida进行hook，将生成的IV和key打印出来再进行解密。也可以使用Android Studio加载so文件进行分析。</p>
-<h3 id="Hook方式"><a href="#Hook方式" class="headerlink" title="Hook方式"></a>Hook方式</h3><p>这里需要注意，对于byte[]，直接再frida的js脚本里通过console.log打印将会返回Object对象，需要使用下面的方式打印IV。</p>
+<h3 id="hook方式"><a class="markdownIt-Anchor" href="#hook方式"></a> Hook方式</h3>
+<p>这里需要注意，对于byte[]，直接再frida的js脚本里通过console.log打印将会返回Object对象，需要使用下面的方式打印IV。</p>
 <p>js文件内容如下：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">setImmediate(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">    Java.perform(<span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">		</span><br><span class="line">    <span class="keyword">var</span> mc = Java.use(<span class="string">"com.zhuotong.zzsence"</span>);</span><br><span class="line">	<span class="keyword">var</span> mc2 = mc.$<span class="keyword">new</span>();</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"---------"</span>)</span><br><span class="line">	<span class="keyword">var</span> ret = mc2.generateIv();</span><br><span class="line">	</span><br><span class="line">	<span class="comment">//Handle byte[]</span></span><br><span class="line">    <span class="keyword">var</span> buffer = Java.array(<span class="string">'byte'</span>,ret);</span><br><span class="line">	<span class="built_in">console</span>.log(ret);</span><br><span class="line">	<span class="built_in">console</span>.log(buffer.length);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">var</span> result = [];</span><br><span class="line">	<span class="keyword">for</span>(<span class="keyword">var</span> i=<span class="number">0</span>;i&lt;buffer.length;++i)&#123;</span><br><span class="line">		result += buffer[i];</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">console</span>.log(result);</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"+++++++++"</span>);</span><br><span class="line">	<span class="built_in">console</span>.log(mc2.generatekey());</span><br><span class="line">	<span class="built_in">console</span>.log(<span class="string">"+++++++++"</span>);</span><br><span class="line">	&#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
 <p>Hook对应的apk后得到加密使用的IV和key值</p>
@@ -403,7 +406,8 @@
 <p>解密代码如下，注意这里的iv处理形式和解密使用的参数Cipher.DECRYPT_MODE：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">decrypt</span><span class="params">(<span class="keyword">byte</span>[] arg6)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line"></span><br><span class="line">    SecretKey key = handleKey(<span class="string">"ipapmpnpoptppppppppppppppppppp"</span>).a();</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">byte</span>[] iv = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">16</span>];</span><br><span class="line">    <span class="keyword">int</span>[] ivraw = <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">0</span>,<span class="number">2</span>,<span class="number">4</span>,<span class="number">6</span>,<span class="number">8</span>,<span class="number">10</span>,<span class="number">12</span>,<span class="number">14</span>,<span class="number">16</span>,<span class="number">18</span>,<span class="number">20</span>,<span class="number">22</span>,<span class="number">24</span>,<span class="number">26</span>,<span class="number">28</span>,<span class="number">30</span>&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">16</span>; ++i) &#123;</span><br><span class="line">        iv[i] = ((<span class="keyword">byte</span>) ivraw[i]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    Cipher cipher = Cipher.getInstance(<span class="string">"AES/CBC/PKCS5Padding"</span>);</span><br><span class="line"></span><br><span class="line">    cipher.init(Cipher.DECRYPT_MODE, key, <span class="keyword">new</span> IvParameterSpec(iv));</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> String(cipher.doFinal(arg6));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> zzsence.<span class="function">a <span class="title">handleKey</span><span class="params">(String arg4)</span> <span class="keyword">throws</span> NoSuchAlgorithmException, UnsupportedEncodingException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> zzsence().new a(<span class="keyword">new</span> SecretKeySpec(Arrays.copyOf(MessageDigest.getInstance(<span class="string">"SHA-1"</span>).digest(arg4.getBytes(<span class="string">"UTF-8"</span>)), <span class="number">16</span>), <span class="string">"AES"</span>));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>在Android Studio里调用decrypt(n)即可解出flag：flag{jsdg632t12}</p>
-<h3 id="加载SO方式"><a href="#加载SO方式" class="headerlink" title="加载SO方式"></a>加载SO方式</h3><p>首先创建一个com.zhuotong.easyctf2的工程，zzsence的代码基本参考反编译后的内容。</p>
+<h3 id="加载so方式"><a class="markdownIt-Anchor" href="#加载so方式"></a> 加载SO方式</h3>
+<p>首先创建一个com.zhuotong.easyctf2的工程，zzsence的代码基本参考反编译后的内容。</p>
 <p>并将libone.so放到app/main/jniLibs/armeabi-v7a下，如下图</p>
 <p><img src="4.png" alt="automne"></p>
 <p>注意zzsence.java里和so库相关的部分代码片段。</p>
@@ -550,7 +554,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Hook方式"><span class="toc-number">1.</span> <span class="toc-text">Hook方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#加载SO方式"><span class="toc-number">2.</span> <span class="toc-text">加载SO方式</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#hook方式"><span class="toc-number">1.</span> <span class="toc-text"> Hook方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#加载so方式"><span class="toc-number">2.</span> <span class="toc-text"> 加载SO方式</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
@@ -563,6 +567,62 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1566,15 +1626,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
@@ -1584,15 +1638,27 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
@@ -1608,15 +1674,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
         <span class="sidebar-tag-name" data-tags="spi"><span class="iconfont-archer">&#xe606;</span>spi</span>
     
         <span class="sidebar-tag-name" data-tags="snakeyaml"><span class="iconfont-archer">&#xe606;</span>snakeyaml</span>
     
         <span class="sidebar-tag-name" data-tags="ScriptEngineManager"><span class="iconfont-archer">&#xe606;</span>ScriptEngineManager</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="lcg"><span class="iconfont-archer">&#xe606;</span>lcg</span>
     
@@ -1626,23 +1692,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="cipolla's algorithm"><span class="iconfont-archer">&#xe606;</span>cipolla's algorithm</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
-    
-        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
-    
         <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
-        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
-    
-        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
@@ -1651,6 +1707,10 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
     
         <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
+    
+        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
+    
+        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1662,11 +1722,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
     
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
@@ -1674,9 +1732,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
@@ -1696,17 +1756,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="rsa lsb oracle"><span class="iconfont-archer">&#xe606;</span>rsa lsb oracle</span>
     
+        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
+    
+        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
+    
+        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
+    
         <span class="sidebar-tag-name" data-tags="rmi"><span class="iconfont-archer">&#xe606;</span>rmi</span>
     
         <span class="sidebar-tag-name" data-tags="fastjson"><span class="iconfont-archer">&#xe606;</span>fastjson</span>
     
         <span class="sidebar-tag-name" data-tags="jndi"><span class="iconfont-archer">&#xe606;</span>jndi</span>
-    
-        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
-    
-        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
-    
-        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
     
         <span class="sidebar-tag-name" data-tags="reflect"><span class="iconfont-archer">&#xe606;</span>reflect</span>
     
@@ -1751,9 +1811,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
-    
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     

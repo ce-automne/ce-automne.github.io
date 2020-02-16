@@ -193,6 +193,7 @@
     
     <!-- 谷歌统计  -->
     
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 </head>
 
     
@@ -386,57 +387,78 @@
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p><strong>Forensics</strong><br><a id="more"></a></p>
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>比较典型的内存取证、恶意软件分析的案例。</p>
-<p>首先提供了一个vmem的内存镜像，使用volatility进行分析。<br>确定其操作系统为Win7：</p>
+        <p><strong>Forensics</strong></p>
+<a id="more"></a>
+<h2 id="概述"><a class="markdownIt-Anchor" href="#概述"></a> 概述</h2>
+<p>比较典型的内存取证、恶意软件分析的案例。</p>
+<p>首先提供了一个vmem的内存镜像，使用volatility进行分析。<br>
+确定其操作系统为Win7：</p>
 <pre><code>volatility -f OtterCTF.vmem imageinfo
-</code></pre><p><img src="1.png" alt="automne"></p>
-<h2 id="一、获取默认用户的密码"><a href="#一、获取默认用户的密码" class="headerlink" title="一、获取默认用户的密码"></a>一、获取默认用户的密码</h2><p><img src="2.png" alt="automne"></p>
+</code></pre>
+<p><img src="1.png" alt="automne"></p>
+<h2 id="一-获取默认用户的密码"><a class="markdownIt-Anchor" href="#一-获取默认用户的密码"></a> 一、获取默认用户的密码</h2>
+<p><img src="2.png" alt="automne"></p>
 <p>两种常规操作方法：</p>
-<p>第一种方法：<br>首先使用hivelist获取到SYSTEM和SAM注册表项的虚拟地址</p>
+<p>第一种方法：<br>
+首先使用hivelist获取到SYSTEM和SAM注册表项的虚拟地址</p>
 <p><img src="3.png" alt="automne"></p>
 <p>接着使用hashdump将用户的NTLM哈希（最后一部分）显示出来进行破解。</p>
 <p><img src="4.png" alt="automne"></p>
 <p>当然，这里使用了cmd5在线破解或者john去破解都没有成功。</p>
-<p>第二种方法：<br>直接使用lsadump插件</p>
+<p>第二种方法：<br>
+直接使用lsadump插件</p>
 <p><img src="5.png" alt="automne"></p>
 <p>第一题：CTF{MortyIsReallyAnOtter}</p>
-<h2 id="二、获取PC名称和IP地址"><a href="#二、获取PC名称和IP地址" class="headerlink" title="二、获取PC名称和IP地址"></a>二、获取PC名称和IP地址</h2><p><img src="6.png" alt="automne"></p>
-<p>主机的IP地址可以通过netscan命令查询，在win7系统取证里。<br>诸如connections、connscan、sockets和socketscan，上述4个命令适用于Windows XP和2003系统。</p>
+<h2 id="二-获取pc名称和ip地址"><a class="markdownIt-Anchor" href="#二-获取pc名称和ip地址"></a> 二、获取PC名称和IP地址</h2>
+<p><img src="6.png" alt="automne"></p>
+<p>主机的IP地址可以通过netscan命令查询，在win7系统取证里。<br>
+诸如connections、connscan、sockets和socketscan，上述4个命令适用于Windows XP和2003系统。</p>
 <p><img src="7.png" alt="automne"></p>
 <p>从Local Address即可确定PC的IP地址为：192.168.202.131</p>
-<p>接着确定PC的主机名，这就需要从对应注册表项里进行读取，同样使用hivelist确定SYSTEM的虚拟地址，然后使用printkey打印数据。<br>注意这里读取的注册表项为：</p>
+<p>接着确定PC的主机名，这就需要从对应注册表项里进行读取，同样使用hivelist确定SYSTEM的虚拟地址，然后使用printkey打印数据。<br>
+注意这里读取的注册表项为：</p>
 <pre><code>ControlSet001\Control\ComputerName\ComputerName
-</code></pre><p><img src="8.png" alt="automne"></p>
+</code></pre>
+<p><img src="8.png" alt="automne"></p>
 <p>得到主机名为：WIN-LO6FAF3DTFE</p>
-<p>第二题：<br>CTF{192.168.202.131}<br>CTF{WIN-LO6FAF3DTFE}</p>
-<h2 id="三、获取游戏名称和服务器IP"><a href="#三、获取游戏名称和服务器IP" class="headerlink" title="三、获取游戏名称和服务器IP"></a>三、获取游戏名称和服务器IP</h2><p><img src="9.png" alt="automne"></p>
+<p>第二题：<br>
+CTF{192.168.202.131}<br>
+CTF{WIN-LO6FAF3DTFE}</p>
+<h2 id="三-获取游戏名称和服务器ip"><a class="markdownIt-Anchor" href="#三-获取游戏名称和服务器ip"></a> 三、获取游戏名称和服务器IP</h2>
+<p><img src="9.png" alt="automne"></p>
 <p>为了了解Rick玩了什么游戏，需要从命令行里看看有没有启动什么exe文件，使用cmdline命令，最终经过简单的过滤，发现LunarMS是一款比较老的游戏。</p>
 <p><img src="10.png" alt="automne"></p>
 <p>然后要获取对应的服务器IP地址，只需要查看刚才执行的netscan命令里的对应进程号，即708</p>
 <p><img src="11.png" alt="automne"></p>
 <p>服务器IP地址为：77.102.199.102</p>
-<p>第三题：<br>CTF{LunarMS}<br>CTF{77.102.199.102}</p>
-<h2 id="四、获取游戏账号"><a href="#四、获取游戏账号" class="headerlink" title="四、获取游戏账号"></a>四、获取游戏账号</h2><p><img src="12.png" alt="automne"></p>
+<p>第三题：<br>
+CTF{LunarMS}<br>
+CTF{77.102.199.102}</p>
+<h2 id="四-获取游戏账号"><a class="markdownIt-Anchor" href="#四-获取游戏账号"></a> 四、获取游戏账号</h2>
+<p><img src="12.png" alt="automne"></p>
 <p>既然是玩这个LunarMS的游戏，那么就用memdump把对应708进程的内存dump出来</p>
 <p><img src="13.png" alt="automne"></p>
 <p>Dump出来后再使用strings去搜索对应字符串Lunar-3</p>
 <p><img src="14.png" alt="automne"></p>
 <p>疑似账号：0tt3r8r33z3，提交成功。</p>
 <p>第四题：CTF{0tt3r8r33z3}</p>
-<h2 id="五、获取游戏角色名称"><a href="#五、获取游戏角色名称" class="headerlink" title="五、获取游戏角色名称"></a>五、获取游戏角色名称</h2><p><img src="15.png" alt="automne"></p>
+<h2 id="五-获取游戏角色名称"><a class="markdownIt-Anchor" href="#五-获取游戏角色名称"></a> 五、获取游戏角色名称</h2>
+<p><img src="15.png" alt="automne"></p>
 <p>使用strings搜索对应的签名显然没有奏效，一种思路是将上面dump出的708进程的文件使用二进制编辑软件打开，这里签名用到了正则，取最后一部分，搜索5a0c0000 hex串，结果有185个结果。</p>
 <p><img src="16.png" alt="automne"></p>
 <p>另一种思路是使用volatility里的yarascan，将要搜索的签名转换为对应的Yara rules：</p>
 <pre><code>/\x64(.{6,8})\x40\x06(.{18})\x5a\x0c\x00\x00/
-</code></pre><p><img src="17.png" alt="automne"></p>
+</code></pre>
+<p><img src="17.png" alt="automne"></p>
 <p>于是定位到了角色名称为M0rtyL0L</p>
 <p>第五题：CTF{M0rtyL0L}</p>
-<h2 id="六、获取邮箱密码"><a href="#六、获取邮箱密码" class="headerlink" title="六、获取邮箱密码"></a>六、获取邮箱密码</h2><p><img src="18.png" alt="automne"></p>
+<h2 id="六-获取邮箱密码"><a class="markdownIt-Anchor" href="#六-获取邮箱密码"></a> 六、获取邮箱密码</h2>
+<p><img src="18.png" alt="automne"></p>
 <p>从题目中可以get到Rick会使用Windows的剪贴板功能，volatility里有专门查看剪贴板内容的命令clipboard</p>
 <p><img src="19.png" alt="automne"></p>
 <p>第六题：CTF{M@il_Pr0vid0rs}</p>
-<h2 id="七、获取感染恶意软件名称"><a href="#七、获取感染恶意软件名称" class="headerlink" title="七、获取感染恶意软件名称"></a>七、获取感染恶意软件名称</h2><p><img src="20.png" alt="automne"></p>
+<h2 id="七-获取感染恶意软件名称"><a class="markdownIt-Anchor" href="#七-获取感染恶意软件名称"></a> 七、获取感染恶意软件名称</h2>
+<p><img src="20.png" alt="automne"></p>
 <p>首先使用pstree查看进程之间的关系</p>
 <p><img src="21.png" alt="automne"></p>
 <p>可以看到vmware-tray.exe是Rick And Morty的子进程，这就很奇怪了，因为vmware-tray.exe是vmware workstation的托盘程序，不可能是它的子进程。使用memdump将对应的3720进程导出尝试通过上传到virustotal里识别，但是文件太大。</p>
@@ -578,7 +600,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一、获取默认用户的密码"><span class="toc-number">2.</span> <span class="toc-text">一、获取默认用户的密码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二、获取PC名称和IP地址"><span class="toc-number">3.</span> <span class="toc-text">二、获取PC名称和IP地址</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三、获取游戏名称和服务器IP"><span class="toc-number">4.</span> <span class="toc-text">三、获取游戏名称和服务器IP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四、获取游戏账号"><span class="toc-number">5.</span> <span class="toc-text">四、获取游戏账号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五、获取游戏角色名称"><span class="toc-number">6.</span> <span class="toc-text">五、获取游戏角色名称</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#六、获取邮箱密码"><span class="toc-number">7.</span> <span class="toc-text">六、获取邮箱密码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#七、获取感染恶意软件名称"><span class="toc-number">8.</span> <span class="toc-text">七、获取感染恶意软件名称</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#概述"><span class="toc-number">1.</span> <span class="toc-text"> 概述</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#一-获取默认用户的密码"><span class="toc-number">2.</span> <span class="toc-text"> 一、获取默认用户的密码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#二-获取pc名称和ip地址"><span class="toc-number">3.</span> <span class="toc-text"> 二、获取PC名称和IP地址</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三-获取游戏名称和服务器ip"><span class="toc-number">4.</span> <span class="toc-text"> 三、获取游戏名称和服务器IP</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#四-获取游戏账号"><span class="toc-number">5.</span> <span class="toc-text"> 四、获取游戏账号</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#五-获取游戏角色名称"><span class="toc-number">6.</span> <span class="toc-text"> 五、获取游戏角色名称</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#六-获取邮箱密码"><span class="toc-number">7.</span> <span class="toc-text"> 六、获取邮箱密码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#七-获取感染恶意软件名称"><span class="toc-number">8.</span> <span class="toc-text"> 七、获取感染恶意软件名称</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
@@ -591,6 +613,62 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1594,15 +1672,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
@@ -1612,15 +1684,27 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
@@ -1636,15 +1720,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
         <span class="sidebar-tag-name" data-tags="spi"><span class="iconfont-archer">&#xe606;</span>spi</span>
     
         <span class="sidebar-tag-name" data-tags="snakeyaml"><span class="iconfont-archer">&#xe606;</span>snakeyaml</span>
     
         <span class="sidebar-tag-name" data-tags="ScriptEngineManager"><span class="iconfont-archer">&#xe606;</span>ScriptEngineManager</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="lcg"><span class="iconfont-archer">&#xe606;</span>lcg</span>
     
@@ -1654,23 +1738,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="cipolla's algorithm"><span class="iconfont-archer">&#xe606;</span>cipolla's algorithm</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
-    
-        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
-    
         <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
-        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
-    
-        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
@@ -1679,6 +1753,10 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
     
         <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
+    
+        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
+    
+        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1690,11 +1768,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
     
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
@@ -1702,9 +1778,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
@@ -1724,17 +1802,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="rsa lsb oracle"><span class="iconfont-archer">&#xe606;</span>rsa lsb oracle</span>
     
+        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
+    
+        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
+    
+        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
+    
         <span class="sidebar-tag-name" data-tags="rmi"><span class="iconfont-archer">&#xe606;</span>rmi</span>
     
         <span class="sidebar-tag-name" data-tags="fastjson"><span class="iconfont-archer">&#xe606;</span>fastjson</span>
     
         <span class="sidebar-tag-name" data-tags="jndi"><span class="iconfont-archer">&#xe606;</span>jndi</span>
-    
-        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
-    
-        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
-    
-        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
     
         <span class="sidebar-tag-name" data-tags="reflect"><span class="iconfont-archer">&#xe606;</span>reflect</span>
     
@@ -1779,9 +1857,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
-    
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     

@@ -193,6 +193,7 @@
     
     <!-- 谷歌统计  -->
     
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 </head>
 
     
@@ -250,9 +251,9 @@
                 
                     <div class="post-intro-tags">
     
-        <a class="post-tag" href="javascript:void(0);" data-tags="ecc">ecc</a>
-    
         <a class="post-tag" href="javascript:void(0);" data-tags="RsaCtfTool">RsaCtfTool</a>
+    
+        <a class="post-tag" href="javascript:void(0);" data-tags="ecc">ecc</a>
     
         <a class="post-tag" href="javascript:void(0);" data-tags="xor">xor</a>
     
@@ -388,9 +389,11 @@
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p><strong>Crypto</strong><br><a id="more"></a></p>
+        <p><strong>Crypto</strong></p>
+<a id="more"></a>
 <p><img src="1.png" alt="automne"></p>
-<h2 id="Xarriors-of-the-World-1-baby"><a href="#Xarriors-of-the-World-1-baby" class="headerlink" title="Xarriors of the World 1 (baby)"></a>Xarriors of the World 1 (baby)</h2><p><img src="2.png" alt="automne"></p>
+<h2 id="xarriors-of-the-world-1-baby"><a class="markdownIt-Anchor" href="#xarriors-of-the-world-1-baby"></a> Xarriors of the World 1 (baby)</h2>
+<p><img src="2.png" alt="automne"></p>
 <p>ciphertext.txt:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FhUTDwAQXTwCMAQVKV8NPgdHDQpeDgQvAFE2FlMTAh0OGx0e</span><br></pre></td></tr></table></figure>
 <p>题意明显是异或加密，且加密的key就是captain，密文是一段base64字符串</p>
@@ -403,7 +406,8 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line">secret = <span class="string">"00010110 00010101 00010011 00001111 00000000 00010000 01011101 00111100 00000010 00110000 00000100 00010101 00101001 01011111 00001101 00111110 00000111 01000111 00001101 00001010 01011110 00001110 00000100 00101111 00000000 01010001 00110110 00010110 01010011 00010011 00000010 00011101 00001110 00011011 00011101 00011110"</span></span><br><span class="line">step1 = secret.split(<span class="string">" "</span>)</span><br><span class="line"><span class="keyword">print</span> step1</span><br><span class="line"></span><br><span class="line"><span class="comment">#now the xor crack begins..</span></span><br><span class="line"></span><br><span class="line">xorkey = <span class="string">"01100011 01100001 01110000 01110100 01100001 01101001 01101110 01100011 01100001 01110000 01110100 01100001 01101001 01101110 01100011 01100001 01110000 01110100 01100001 01101001 01101110 01100011 01100001 01110000 01110100 01100001 01101001 01101110 01100011 01100001 01110000 01110100 01100001 01101001 01101110 01100011"</span></span><br><span class="line">xorkey2 = xorkey.split(<span class="string">" "</span>)</span><br><span class="line"><span class="keyword">print</span> len(step1)</span><br><span class="line"><span class="keyword">print</span> len(xorkey2)</span><br><span class="line">flag = <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">36</span>):</span><br><span class="line">	<span class="comment">#print step1[x]</span></span><br><span class="line">	<span class="comment">#print int(step1[x],2)</span></span><br><span class="line">	<span class="comment">#print int(xorkey2[x],2)</span></span><br><span class="line">	flag += chr(int(step1[x],<span class="number">2</span>)^int(xorkey2[x],<span class="number">2</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> flag</span><br></pre></td></tr></table></figure>
 <p>flag: utc{ay3_c@pt@1n_w3lc0me_t0_x0rriors}</p>
 <p><img src="4.png" alt="automne"></p>
-<h2 id="Xarriors-of-the-World-2-baby"><a href="#Xarriors-of-the-World-2-baby" class="headerlink" title="Xarriors of the World 2 (baby)"></a>Xarriors of the World 2 (baby)</h2><p><img src="5.png" alt="automne"></p>
+<h2 id="xarriors-of-the-world-2-baby"><a class="markdownIt-Anchor" href="#xarriors-of-the-world-2-baby"></a> Xarriors of the World 2 (baby)</h2>
+<p><img src="5.png" alt="automne"></p>
 <p>将pyc反编译：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python</span></span><br><span class="line"><span class="comment"># encoding: utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> struct</span><br><span class="line">zzz = int(sys.argv[<span class="number">1</span>])</span><br><span class="line">xxx = sys.argv[<span class="number">2</span>]</span><br><span class="line">yyy = struct.pack(<span class="string">'!'</span> + <span class="string">'i'</span> * len(xxx), *map((<span class="keyword">lambda</span> x: ord(x) ^ zzz), list(xxx)))</span><br><span class="line">outfile = open(<span class="string">'flag.bin'</span>, <span class="string">'wb'</span>)</span><br><span class="line">outfile.write(yyy)</span><br><span class="line">outfile.close()</span><br></pre></td></tr></table></figure>
 <p>python的struct.pack用于将数据封装成字符串，!表示字节对齐方式(big-endian)，i表示integer，4个字节</p>
@@ -423,7 +427,8 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line">secret = <span class="string">"00111001 00111000 00101111 00110111 00100111 00100010 00001100 00111100 00111111 00111000 00001100 00101111 00000111 00010011 00100000 01111100 00111010 01111111 00111111 00010011 00101110 00001100 00101110 00110101 00010011 00110100 01111100 00111110 00110001"</span></span><br><span class="line">step1 = secret.split(<span class="string">" "</span>)</span><br><span class="line"><span class="keyword">print</span> step1</span><br><span class="line"></span><br><span class="line"><span class="comment">#now the xor crack begins..</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#xorkey = "01110101 01110100 01100011 01111011"  # utc&#123;</span></span><br><span class="line">xorkey = <span class="string">"01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100 01001100"</span></span><br><span class="line">xorkey2 = xorkey.split(<span class="string">" "</span>)</span><br><span class="line"><span class="keyword">print</span> len(step1)</span><br><span class="line"><span class="keyword">print</span> len(xorkey2)</span><br><span class="line">flag = <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">29</span>):</span><br><span class="line">	<span class="comment">#print step1[x]</span></span><br><span class="line">	<span class="comment">#print int(step1[x],2)</span></span><br><span class="line">	<span class="comment">#print int(xorkey2[x],2)</span></span><br><span class="line">	flag += chr(int(step1[x],<span class="number">2</span>)^int(xorkey2[x],<span class="number">2</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> flag</span><br></pre></td></tr></table></figure>
 <p>flag: utc{kn@pst@cK_l0v3s_b@by_x0r}</p>
 <p><img src="8.png" alt="automne"></p>
-<h2 id="RSAcue"><a href="#RSAcue" class="headerlink" title="RSAcue"></a>RSAcue</h2><p><img src="9.png" alt="automne"></p>
+<h2 id="rsacue"><a class="markdownIt-Anchor" href="#rsacue"></a> RSAcue</h2>
+<p><img src="9.png" alt="automne"></p>
 <p>challenge_baby.py</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> Crypto.Util.number <span class="keyword">import</span> *</span><br><span class="line"><span class="keyword">from</span> Crypto.PublicKey <span class="keyword">import</span> RSA</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> PKCS1_v1_5</span><br><span class="line"><span class="keyword">import</span> gmpy2</span><br><span class="line"><span class="keyword">from</span> flag <span class="keyword">import</span> m</span><br><span class="line"></span><br><span class="line">p = getPrime(<span class="number">1024</span>)</span><br><span class="line"><span class="keyword">while</span> <span class="keyword">True</span>:</span><br><span class="line">	p1 = gmpy2.next_prime(p)</span><br><span class="line">	<span class="keyword">if</span> p1-p == <span class="number">2</span>:</span><br><span class="line">		q = p1</span><br><span class="line">		<span class="keyword">break</span></span><br><span class="line">	<span class="keyword">else</span>:</span><br><span class="line">		p = p1</span><br><span class="line"></span><br><span class="line">n = p*q</span><br><span class="line">e = <span class="number">65537</span></span><br><span class="line">pub = RSA.construct((long(n), long(e)))</span><br><span class="line">f = open(<span class="string">'publickey.pem'</span>, <span class="string">'w'</span>)</span><br><span class="line">f.write(pub.exportKey())</span><br><span class="line">f.close()</span><br><span class="line">key = PKCS1_v1_5.new(pub)</span><br><span class="line">ct = key.encrypt(m).encode(<span class="string">'base64'</span>)</span><br><span class="line">f1 = open(<span class="string">'ciphertext'</span>, <span class="string">'w'</span>)</span><br><span class="line">f1.write(ct)</span><br><span class="line">f1.close()</span><br></pre></td></tr></table></figure>
 <p>从代码里可以看到p和q是两个质数，可以使用primefac去分解</p>
@@ -443,7 +448,8 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">root@automne:/Pentest/Tool/RsaCtfTool# python RsaCtfTool.py -n 23340969513181681669886867124297366201945838538200009802685175918916975846804407564465991446659110587194498035612776912466980598231734891359851233259880511275720151718945837594008921478180856400092449301945615071348468948166726825972379205191078930318376444669315567445937802438802902489277773238394532264660179274909819475224351258216422153542290105609840561176158021408561703840207392844063034658892035606967061985331583041696160739791355387960973933646534405406373409762058896880070632898708609976063409024168659391417736541832207520205503452433935527234086203176945565493782067913785720671180939691807486166593283 -e 65537 --uncipher 7431951999318612457842115579580638050412683543126034475488630213628702754700226505879103974859876990754837687841187029957327030172170839267101690591618400512846240939580423955366272775594141466143744221186832743831184716692583548438085620288422323963660204279471660842758035765281353244128356800536721490191690543831775228885948722670812123906195703623660426815071786848886175187645906181358760881659925324634097542616951522588823660889985928950266064064687040877294171936782648376324829020780271046423367313650077099793518340524546586532075741401990871482612706470460240388127578285097414867337664489592380401487752 --verbose</span><br></pre></td></tr></table></figure>
 <p>flag: utc{d0n7_k33p_pr1m35_cl053_by_2}</p>
 <p><img src="11.png" alt="automne"></p>
-<h2 id="Curve-it-up"><a href="#Curve-it-up" class="headerlink" title="Curve it up"></a>Curve it up</h2><p><img src="12.png" alt="automne"></p>
+<h2 id="curve-it-up"><a class="markdownIt-Anchor" href="#curve-it-up"></a> Curve it up</h2>
+<p><img src="12.png" alt="automne"></p>
 <p>椭圆曲线密码学</p>
 <p>之前做过功课：<a href="https://ce-automne.github.io/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/">https://ce-automne.github.io/2019/04/25/TGHACK-CTF-2019-UnSolved-WriteUp/</a></p>
 <p>curve.txt:</p>
@@ -451,8 +457,8 @@
 <p>Q = n*P，P为ECC的的一组解(x<sub>1</sub>,y<sub></sub>)，Q为公钥，n为私钥</p>
 <p>这里参数B未知，需要先求出来才能套用公式求解</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">y^2 mod N = (x^3 + A*x + B) mod N</span><br></pre></td></tr></table></figure>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\l3085&gt;python</span><br><span class="line">Python 2.7.12 (v2.7.12:d33e0cf91556, Jun 27 2016, 15:19:22) [MSC v.1500 32 bit (Intel)] on win32</span><br><span class="line">Type "help", "copyright", "credits" or "license" for more information.</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; c = 18509752623395560148909577815970815579696746171847377654079329916213349431951**2</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; c</span><br><span class="line">342610942179298821136823124969382197311315422949911754851681223790922888720253676302146798160327852354115454913443831065106159086984159072345814379666401L</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; c2 = 1499223386326383661524589770996693829399568387777849887556841520506306635197**3 + 1499223386326383661524589770996693829399568387777849887556841520506306635197*76727570604275129576071347306603709762219034167050511215297136720584179974657</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; c2</span><br><span class="line">3369760571314282859166389038406176075686432623212640339854301195366315930613392734269441157744428800250886285807370001519017490202030440149609667757395383550188441402181323170798338801608448516275103046163252853592417979992802L</span><br></pre></td></tr></table></figure>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span>&gt;&gt; 7^2</span><br><span class="line">5</span><br><span class="line"><span class="meta">&gt;</span>&gt;&gt; 7**2</span><br><span class="line">49</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\l3085&gt;python</span><br><span class="line">Python 2.7.12 (v2.7.12:d33e0cf91556, Jun 27 2016, 15:19:22) [MSC v.1500 32 bit (Intel)] on win32</span><br><span class="line">Type "help", "copyright", "credits" or "license" for more information.</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; c = 18509752623395560148909577815970815579696746171847377654079329916213349431951**2</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; c</span></span><br><span class="line">342610942179298821136823124969382197311315422949911754851681223790922888720253676302146798160327852354115454913443831065106159086984159072345814379666401L</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; c2 = 1499223386326383661524589770996693829399568387777849887556841520506306635197**3 + 1499223386326383661524589770996693829399568387777849887556841520506306635197*76727570604275129576071347306603709762219034167050511215297136720584179974657</span></span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; c2</span></span><br><span class="line">3369760571314282859166389038406176075686432623212640339854301195366315930613392734269441157744428800250886285807370001519017490202030440149609667757395383550188441402181323170798338801608448516275103046163252853592417979992802L</span><br></pre></td></tr></table></figure>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; 7^2</span></span><br><span class="line">5</span><br><span class="line"><span class="meta">&gt;</span><span class="bash">&gt;&gt; 7**2</span></span><br><span class="line">49</span><br></pre></td></tr></table></figure>
 <p>ok，那么现在就有下面的等式：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">c = y^2</span><br><span class="line">c2 = x^3 + A*x</span><br><span class="line">于是有：</span><br><span class="line">c2 + B == N*k + c , k为系数</span><br></pre></td></tr></table></figure>
 <p>使用z3进行约束求解：</p>
@@ -599,7 +605,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Xarriors-of-the-World-1-baby"><span class="toc-number">1.</span> <span class="toc-text">Xarriors of the World 1 (baby)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Xarriors-of-the-World-2-baby"><span class="toc-number">2.</span> <span class="toc-text">Xarriors of the World 2 (baby)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RSAcue"><span class="toc-number">3.</span> <span class="toc-text">RSAcue</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Curve-it-up"><span class="toc-number">4.</span> <span class="toc-text">Curve it up</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#xarriors-of-the-world-1-baby"><span class="toc-number">1.</span> <span class="toc-text"> Xarriors of the World 1 (baby)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#xarriors-of-the-world-2-baby"><span class="toc-number">2.</span> <span class="toc-text"> Xarriors of the World 2 (baby)</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#rsacue"><span class="toc-number">3.</span> <span class="toc-text"> RSAcue</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#curve-it-up"><span class="toc-number">4.</span> <span class="toc-text"> Curve it up</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
@@ -612,6 +618,62 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1615,15 +1677,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
@@ -1633,15 +1689,27 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
@@ -1657,15 +1725,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
         <span class="sidebar-tag-name" data-tags="spi"><span class="iconfont-archer">&#xe606;</span>spi</span>
     
         <span class="sidebar-tag-name" data-tags="snakeyaml"><span class="iconfont-archer">&#xe606;</span>snakeyaml</span>
     
         <span class="sidebar-tag-name" data-tags="ScriptEngineManager"><span class="iconfont-archer">&#xe606;</span>ScriptEngineManager</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="lcg"><span class="iconfont-archer">&#xe606;</span>lcg</span>
     
@@ -1675,23 +1743,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="cipolla's algorithm"><span class="iconfont-archer">&#xe606;</span>cipolla's algorithm</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
-    
-        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
-    
         <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
-        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
-    
-        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
@@ -1700,6 +1758,10 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
     
         <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
+    
+        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
+    
+        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1711,11 +1773,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
     
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
@@ -1723,9 +1783,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
@@ -1745,17 +1807,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="rsa lsb oracle"><span class="iconfont-archer">&#xe606;</span>rsa lsb oracle</span>
     
+        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
+    
+        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
+    
+        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
+    
         <span class="sidebar-tag-name" data-tags="rmi"><span class="iconfont-archer">&#xe606;</span>rmi</span>
     
         <span class="sidebar-tag-name" data-tags="fastjson"><span class="iconfont-archer">&#xe606;</span>fastjson</span>
     
         <span class="sidebar-tag-name" data-tags="jndi"><span class="iconfont-archer">&#xe606;</span>jndi</span>
-    
-        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
-    
-        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
-    
-        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
     
         <span class="sidebar-tag-name" data-tags="reflect"><span class="iconfont-archer">&#xe606;</span>reflect</span>
     
@@ -1800,9 +1862,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
-    
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     

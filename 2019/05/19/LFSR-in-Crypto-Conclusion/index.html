@@ -193,6 +193,7 @@
     
     <!-- 谷歌统计  -->
     
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 </head>
 
     
@@ -386,24 +387,26 @@
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p><strong>Crypto</strong><br><a id="more"></a></p>
+        <p><strong>Crypto</strong></p>
+<a id="more"></a>
 <p>LFSR-线性反馈移位寄存器是一种比较简单的PRNG（伪随机数生成器），属于流密码里的概念。LFSR主要用于生成一串随机的比特流，比特流可用做加密明文的密钥流。</p>
-<p>参考<a href="https://zhuanlan.zhihu.com/p/33920501" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/33920501</a></p>
+<p>参考https://zhuanlan.zhihu.com/p/33920501</p>
 <p>看一下LFSR的基本操作。</p>
 <p><img src="1.png" alt="automne"></p>
 <p><img src="2.png" alt="automne"></p>
 <p><img src="3.png" alt="automne"></p>
-<h3 id="已知明文攻击"><a href="#已知明文攻击" class="headerlink" title="已知明文攻击"></a>已知明文攻击</h3><p>LFSR存在已知明文攻击，可以通过比特流，枚举度数，然后还原随机的抽头序列。</p>
+<h3 id="已知明文攻击"><a class="markdownIt-Anchor" href="#已知明文攻击"></a> 已知明文攻击</h3>
+<p>LFSR存在已知明文攻击，可以通过比特流，枚举度数，然后还原随机的抽头序列。</p>
 <p>举个例子：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">假设某lfsr输出的比特流为：101011001101，比特流长度为12，优先考虑12/2=6的度，也就是将比特流6位一组：101011 001101，现在要求解该lfsr接下来12bit的内容。</span><br></pre></td></tr></table></figure>
 <p>根据lfsr的特点，该时刻的初始状态为101011，那么001101里的最左边一位0就是初始状态产生的last bit，现在要确定其抽头序列P，取其索引值从左到右依次为P0,P1,…P5。</p>
 <p>可以列出下面的方程组，注意异或操作：</p>
-<p>101011 <strong>0</strong>01101      0 = P0^P2^P4^P5</p>
-<p>1 010110 <strong>0</strong>1101     0 = P1^P3^P4</p>
-<p>10 101100 <strong>1</strong>101     1 = P0^P2^P3</p>
-<p>101 011001 <strong>1</strong>01     1 = P1^P2^P5</p>
-<p>1010 110011 <strong>0</strong>1     0 = P0^P1^P4^P5</p>
-<p>10101 100110 <strong>1</strong>     1 = P0^P3^P4</p>
+<p>101011 <strong>0</strong>01101      0 = P0<sup>P2</sup>P4^P5</p>
+<p>1 010110 <strong>0</strong>1101     0 = P1<sup>P3</sup>P4</p>
+<p>10 101100 <strong>1</strong>101     1 = P0<sup>P2</sup>P3</p>
+<p>101 011001 <strong>1</strong>01     1 = P1<sup>P2</sup>P5</p>
+<p>1010 110011 <strong>0</strong>1     0 = P0<sup>P1</sup>P4^P5</p>
+<p>10101 100110 <strong>1</strong>     1 = P0<sup>P3</sup>P4</p>
 <p>使用z3-solver来求解这个方程。</p>
 <p>python脚本如下图：</p>
 <p><img src="4.png" alt="automne"></p>
@@ -420,7 +423,8 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lfsr</span><span class="params">(R,mask)</span>:</span></span><br><span class="line">    output = (R &lt;&lt; <span class="number">1</span>) &amp; <span class="number">0xffffff</span></span><br><span class="line">    i=(R&amp;mask)&amp;<span class="number">0xffffff</span></span><br><span class="line">    lastbit=<span class="number">0</span></span><br><span class="line">    <span class="keyword">while</span> i!=<span class="number">0</span>:</span><br><span class="line">        lastbit^=(i&amp;<span class="number">1</span>)</span><br><span class="line">        i=i&gt;&gt;<span class="number">1</span></span><br><span class="line">    output^=lastbit</span><br><span class="line">    <span class="keyword">return</span> (output,lastbit)</span><br><span class="line"></span><br><span class="line"><span class="comment">#R = 0b101011</span></span><br><span class="line">R = <span class="number">0b001101</span> <span class="comment">#初始状态</span></span><br><span class="line">mask = <span class="number">0b100001</span> <span class="comment">#抽头序列</span></span><br><span class="line"></span><br><span class="line">stream = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">12</span>):</span><br><span class="line">	(R,lastbit) = lfsr(R,mask)</span><br><span class="line">	stream.append(str(lastbit))</span><br><span class="line">	<span class="keyword">print</span> lastbit</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> <span class="string">""</span>.join(stream)</span><br></pre></td></tr></table></figure>
 <p>运行后发现和上面的输出内容是一样的</p>
 <p><img src="7.png" alt="automne"></p>
-<h3 id="逆向LFSR数据"><a href="#逆向LFSR数据" class="headerlink" title="逆向LFSR数据"></a>逆向LFSR数据</h3><p>上面的例子，101011 <strong>001101</strong>输出的比特流为<strong>110110</strong> 100100，现在如果知道了抽头序列，那么尝试从110110的输出求解其前6位的比特流（初始状态），这就是逆向lfsr的过程。</p>
+<h3 id="逆向lfsr数据"><a class="markdownIt-Anchor" href="#逆向lfsr数据"></a> 逆向LFSR数据</h3>
+<p>上面的例子，101011 <strong>001101</strong>输出的比特流为<strong>110110</strong> 100100，现在如果知道了抽头序列，那么尝试从110110的输出求解其前6位的比特流（初始状态），这就是逆向lfsr的过程。</p>
 <p>python代码如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">lfsr_inv</span><span class="params">(R,mask)</span>:</span></span><br><span class="line">	str=bin(R)[<span class="number">2</span>:].zfill(<span class="number">6</span>)</span><br><span class="line">	<span class="comment">#print str</span></span><br><span class="line">	new=str[<span class="number">-1</span>:]+str[:<span class="number">-1</span>]</span><br><span class="line">	<span class="comment">#print new</span></span><br><span class="line">	new=int(new,<span class="number">2</span>)                    <span class="comment">#R循环右移一位得到new</span></span><br><span class="line">	i = (new &amp; mask) &amp; <span class="number">0xffffffff</span></span><br><span class="line">	lastbit = <span class="number">0</span></span><br><span class="line">	<span class="keyword">while</span> i != <span class="number">0</span>:</span><br><span class="line">		lastbit ^= (i &amp; <span class="number">1</span>)</span><br><span class="line">		i = i &gt;&gt; <span class="number">1</span></span><br><span class="line">	<span class="keyword">return</span> R&gt;&gt;<span class="number">1</span> | lastbit&lt;&lt;<span class="number">5</span>         <span class="comment">#最高位用lastbit填充</span></span><br><span class="line"></span><br><span class="line">mask = <span class="number">0b100001</span> <span class="comment">#抽头序列</span></span><br><span class="line">c = <span class="number">0b110110</span> <span class="comment">#输出比特流</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> range(<span class="number">6</span>):</span><br><span class="line">	c = lfsr_inv(c,mask)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> bin(c)[<span class="number">2</span>:].zfill(<span class="number">6</span>)</span><br></pre></td></tr></table></figure>
 <p>运行后，就可以得到前一状态的比特流</p>
@@ -567,7 +571,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#已知明文攻击"><span class="toc-number">1.</span> <span class="toc-text">已知明文攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#逆向LFSR数据"><span class="toc-number">2.</span> <span class="toc-text">逆向LFSR数据</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#已知明文攻击"><span class="toc-number">1.</span> <span class="toc-text"> 已知明文攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#逆向lfsr数据"><span class="toc-number">2.</span> <span class="toc-text"> 逆向LFSR数据</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
@@ -580,6 +584,62 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1583,15 +1643,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
@@ -1601,15 +1655,27 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
@@ -1625,15 +1691,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
         <span class="sidebar-tag-name" data-tags="spi"><span class="iconfont-archer">&#xe606;</span>spi</span>
     
         <span class="sidebar-tag-name" data-tags="snakeyaml"><span class="iconfont-archer">&#xe606;</span>snakeyaml</span>
     
         <span class="sidebar-tag-name" data-tags="ScriptEngineManager"><span class="iconfont-archer">&#xe606;</span>ScriptEngineManager</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="lcg"><span class="iconfont-archer">&#xe606;</span>lcg</span>
     
@@ -1643,23 +1709,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="cipolla's algorithm"><span class="iconfont-archer">&#xe606;</span>cipolla's algorithm</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
-    
-        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
-    
         <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
-        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
-    
-        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
@@ -1668,6 +1724,10 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
     
         <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
+    
+        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
+    
+        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1679,11 +1739,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
     
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
@@ -1691,9 +1749,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
@@ -1713,17 +1773,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="rsa lsb oracle"><span class="iconfont-archer">&#xe606;</span>rsa lsb oracle</span>
     
+        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
+    
+        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
+    
+        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
+    
         <span class="sidebar-tag-name" data-tags="rmi"><span class="iconfont-archer">&#xe606;</span>rmi</span>
     
         <span class="sidebar-tag-name" data-tags="fastjson"><span class="iconfont-archer">&#xe606;</span>fastjson</span>
     
         <span class="sidebar-tag-name" data-tags="jndi"><span class="iconfont-archer">&#xe606;</span>jndi</span>
-    
-        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
-    
-        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
-    
-        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
     
         <span class="sidebar-tag-name" data-tags="reflect"><span class="iconfont-archer">&#xe606;</span>reflect</span>
     
@@ -1768,9 +1828,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
-    
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     

@@ -193,6 +193,7 @@
     
     <!-- 谷歌统计  -->
     
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 </head>
 
     
@@ -386,26 +387,32 @@
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p><strong>Crypto</strong><br><a id="more"></a></p>
+        <p><strong>Crypto</strong></p>
+<a id="more"></a>
 <p>利用下班时间打了下这个比赛，挑了部分解出的有趣题目记录下来供参考。</p>
-<h3 id="Echo-Chamber"><a href="#Echo-Chamber" class="headerlink" title="Echo Chamber"></a>Echo Chamber</h3><p>pwntools的简单使用，将获取到的数据重复一遍发送过去</p>
+<h3 id="echo-chamber"><a class="markdownIt-Anchor" href="#echo-chamber"></a> Echo Chamber</h3>
+<p>pwntools的简单使用，将获取到的数据重复一遍发送过去</p>
 <p>脚本如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> pwn <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">c = remote(<span class="string">'echo.tghack.no'</span>,<span class="number">5555</span>)</span><br><span class="line">i = <span class="number">0</span></span><br><span class="line"><span class="keyword">while</span> i &lt;= <span class="number">50</span>:</span><br><span class="line">	s = c.recvline()</span><br><span class="line">	<span class="keyword">print</span> s</span><br><span class="line">	c.sendline(s.strip())</span><br><span class="line">        i += <span class="number">1</span></span><br><span class="line">        <span class="keyword">print</span> i</span><br><span class="line"><span class="keyword">print</span> c.recvline()</span><br></pre></td></tr></table></figure>
 <p>得到flag</p>
 <pre><code>TG19{behold_the_echo_chamber_of_secrets}
-</code></pre><h3 id="Exclusive-Magic-Club"><a href="#Exclusive-Magic-Club" class="headerlink" title="Exclusive Magic Club"></a>Exclusive Magic Club</h3><p><img src="1.png" alt="automne"></p>
+</code></pre>
+<h3 id="exclusive-magic-club"><a class="markdownIt-Anchor" href="#exclusive-magic-club"></a> Exclusive Magic Club</h3>
+<p><img src="1.png" alt="automne"></p>
 <p>上图的二进制代码摘录如下：</p>
 <pre><code>00111001 00101000 01000101 01010001 00011110 00010000 00110000 00011100
 00110001 00001011 00011000 00000100 00110001 00111101 00010001 00011100
 00101011 00011001 00000111 00010001 00110111 00100100 00111011 00000000
 00000100 00011000 00001010 00000101 00011111 00110000 00010000 00000001
 00000000 00001001
-</code></pre><p>直接Binary转Ascii是乱码，查看本题的分值和相关信息，才发现是XOR运算，也就是和mother_knows_best做异或运算，在此之前，做了诸如对二进制代码按位取反等操作，在下面的脚本也有体现。</p>
+</code></pre>
+<p>直接Binary转Ascii是乱码，查看本题的分值和相关信息，才发现是XOR运算，也就是和mother_knows_best做异或运算，在此之前，做了诸如对二进制代码按位取反等操作，在下面的脚本也有体现。</p>
 <p>注意需要将mother_knows_best转换为二进制，因为原文是34个二进制，所以mother_knows_best，也就是xorkey需要补全。</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line">secret = <span class="string">"00111001 00101000 01000101 01010001 00011110 00010000 00110000 00011100 00110001 00001011 00011000 00000100 00110001 00111101 00010001 00011100 00101011 00011001 00000111 00010001 00110111 00100100 00111011 00000000 00000100 00011000 00001010 00000101 00011111 00110000 00010000 00000001 00000000 00001001"</span></span><br><span class="line">step1 = secret.split(<span class="string">" "</span>)</span><br><span class="line"><span class="keyword">print</span> step1</span><br><span class="line"></span><br><span class="line"><span class="comment">#the following is wrong try..</span></span><br><span class="line"></span><br><span class="line">step2 = []</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> step1:</span><br><span class="line">	<span class="keyword">print</span> i</span><br><span class="line">	<span class="keyword">for</span> j <span class="keyword">in</span> i:</span><br><span class="line">		<span class="comment">#print j</span></span><br><span class="line">		step2.append(str(int(j)^<span class="number">1</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> step2</span><br><span class="line">step3 = <span class="string">""</span>.join(step2)</span><br><span class="line"><span class="keyword">print</span> step3</span><br><span class="line">step4 = <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> l <span class="keyword">in</span> range(len(step3)//<span class="number">8</span>):</span><br><span class="line">	<span class="keyword">print</span> int(step3[l*<span class="number">8</span>:l*<span class="number">8</span>+<span class="number">8</span>],<span class="number">2</span>)</span><br><span class="line">	step4 += step3[l*<span class="number">8</span>:l*<span class="number">8</span>+<span class="number">8</span>] + <span class="string">" "</span></span><br><span class="line"><span class="keyword">print</span> step4</span><br><span class="line"><span class="comment">#print step4[::-1]</span></span><br><span class="line"></span><br><span class="line">step5 = step4.strip().split(<span class="string">" "</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> step5</span><br><span class="line"></span><br><span class="line"><span class="comment">#now the xor crack begins..</span></span><br><span class="line"></span><br><span class="line">xorkey = <span class="string">"01101101 01101111 01110100 01101000 01100101 01110010 01011111 01101011 01101110 01101111 01110111 01110011 01011111 01100010 01100101 01110011 01110100 01101101 01101111 01110100 01101000 01100101 01110010 01011111 01101011 01101110 01101111 01110111 01110011 01011111 01100010 01100101 01110011 01110100"</span></span><br><span class="line">xorkey2 = xorkey.split(<span class="string">" "</span>)</span><br><span class="line"><span class="keyword">print</span> len(step1)</span><br><span class="line"><span class="keyword">print</span> len(xorkey2)</span><br><span class="line">flag = <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">34</span>):</span><br><span class="line">	<span class="comment">#print step1[x]</span></span><br><span class="line">	<span class="comment">#print int(step1[x],2)</span></span><br><span class="line">	<span class="comment">#print int(xorkey2[x],2)</span></span><br><span class="line">	flag += chr(int(step1[x],<span class="number">2</span>)^int(xorkey2[x],<span class="number">2</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> flag</span><br></pre></td></tr></table></figure>
 <p>最终得到flag</p>
 <p><img src="2.png" alt="automne"></p>
-<h3 id="Josefssons-Final-Exam"><a href="#Josefssons-Final-Exam" class="headerlink" title="Josefssons Final Exam"></a>Josefssons Final Exam</h3><p><img src="3.png" alt="automne"></p>
+<h3 id="josefssons-final-exam"><a class="markdownIt-Anchor" href="#josefssons-final-exam"></a> Josefssons Final Exam</h3>
+<p><img src="3.png" alt="automne"></p>
 <p>有了上题的经验，第一部分明显是使用good_luck作为xorkey，与二进制异或。</p>
 <p>使用类似的脚本处理</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#encoding=utf-8</span></span><br><span class="line"></span><br><span class="line">secret = <span class="string">"00100011 00100010 00000100 00000010 00001000 00101010 00010111 00001011 00000001 01010101 01010110 00001100 00100010 01101100 00011000 00010001 00001111 00101111 01011110 00011111 00000100 00010001 00011011 00000010 00011001 00101100 00011011 00010011 00101001 01011101 00110010 00111000 00000001 00110011 00101001 01011011 00001101 01011110 01010110 00000110 00011000 00101010 00100011 01010011 00100011 00100001 00111101 01010110"</span></span><br><span class="line"></span><br><span class="line">step1 = secret.split(<span class="string">" "</span>)</span><br><span class="line"><span class="keyword">print</span> step1</span><br><span class="line"></span><br><span class="line"><span class="comment">#now the crack begins.</span></span><br><span class="line">xorkey = <span class="string">"01100111 01101111 01101111 01100100 01011111 01101100 01110101 01100011 01101011 01100111 01101111 01101111 01100100 01011111 01101100 01110101 01100011 01101011 01100111 01101111 01101111 01100100 01011111 01101100 01110101 01100011 01101011 01100111 01101111 01101111 01100100 01011111 01101100 01110101 01100011 01101011 01100111 01101111 01101111 01100100 01011111 01101100 01110101 01100011 01101011 01100111 01101111 01101111"</span></span><br><span class="line">xorkey2 = xorkey.split(<span class="string">" "</span>)</span><br><span class="line"><span class="keyword">print</span> len(step1)</span><br><span class="line"><span class="keyword">print</span> len(xorkey2)</span><br><span class="line">flag = <span class="string">""</span></span><br><span class="line"><span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">48</span>):</span><br><span class="line">	<span class="comment">#print step1[x]</span></span><br><span class="line">	<span class="comment">#print int(step1[x],2)</span></span><br><span class="line">	<span class="comment">#print int(xorkey2[x],2)</span></span><br><span class="line">	flag += chr(int(step1[x],<span class="number">2</span>)^int(xorkey2[x],<span class="number">2</span>))</span><br><span class="line"></span><br><span class="line"><span class="keyword">print</span> flag</span><br></pre></td></tr></table></figure>
@@ -413,22 +420,30 @@
 <p><img src="4.png" alt="automne"></p>
 <p>输出了下面的内容：</p>
 <pre><code>DMkfWFbhj29cF3tdlD9pkuDnlOptF2VgmFJ0j19bGFV0HFR9
-</code></pre><p>到这里思路断了，因为使用base64去解密是乱码。<br>后来考虑是不是使用了移位密码把一段base64字符串做了处理，于是验证了一下</p>
+</code></pre>
+<p>到这里思路断了，因为使用base64去解密是乱码。<br>
+后来考虑是不是使用了移位密码把一段base64字符串做了处理，于是验证了一下</p>
 <pre><code>&gt;&gt;&gt; import base64
 &gt;&gt;&gt; base64.b64encode(&quot;TG19{blablabla}&quot;)
-&apos;VEcxOXtibGFibGFibGF9&apos;
-</code></pre><p>再看看移位处理后的字符串，前面的字符果然是相同的。</p>
+'VEcxOXtibGFibGFibGF9'
+</code></pre>
+<p>再看看移位处理后的字符串，前面的字符果然是相同的。</p>
 <p><img src="5.png" alt="automne"></p>
 <p>最后就是按照输出的内容修改字符大小写</p>
 <pre><code>VEcxOXtzb29uX3lvdV9hcmVfdGhlX2NyeXB0b19tYXN0ZXJ9
-</code></pre><p>得到flag</p>
+</code></pre>
+<p>得到flag</p>
 <pre><code>&gt;&gt;&gt; base64.b64decode(&quot;VEcxOXtzb29uX3lvdV9hcmVfdGhlX2NyeXB0b19tYXN0ZXJ9&quot;)
-&apos;TG19{soon_you_are_the_crypto_master}&apos;
-</code></pre><h3 id="Passing-Notes"><a href="#Passing-Notes" class="headerlink" title="Passing Notes"></a>Passing Notes</h3><p>题目首先给了一段AES的密文</p>
+'TG19{soon_you_are_the_crypto_master}'
+</code></pre>
+<h3 id="passing-notes"><a class="markdownIt-Anchor" href="#passing-notes"></a> Passing Notes</h3>
+<p>题目首先给了一段AES的密文</p>
 <pre><code>vyLlwWSY1PCK5ELNTPUVdpl8z0rIXiB2+Ybcu/BeXidR3MEiym852HCkS6wHVCr+CdpP6Moe9VQUeFcyq3vZDpVK/orl+8vREYMRrnQR9O4=
-</code></pre><p>然后给出了一段hash</p>
+</code></pre>
+<p>然后给出了一段hash</p>
 <pre><code>bbb2c5e63d2ef893106fdd0d797aa97a
-</code></pre><p>这段hash可以经过md5解密，解密后的内容为supersecretpassword</p>
+</code></pre>
+<p>这段hash可以经过md5解密，解密后的内容为supersecretpassword</p>
 <p>最后给出了一段加密代码，告诉我们使用的是AES加密</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"><span class="keyword">from</span> Crypto <span class="keyword">import</span> Random</span><br><span class="line"><span class="keyword">from</span> Crypto.Hash <span class="keyword">import</span> SHA256</span><br><span class="line"><span class="keyword">from</span> struct <span class="keyword">import</span> pack</span><br><span class="line"></span><br><span class="line">BS = <span class="number">16</span></span><br><span class="line">secret = <span class="string">b'not_the_secret'</span></span><br><span class="line">key = SHA256.new()</span><br><span class="line">key.update(secret)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(key, message)</span>:</span></span><br><span class="line">    iv = Random.new().read(BS)</span><br><span class="line">    pad_len = BS - divmod(len(message), BS)[<span class="number">1</span>]</span><br><span class="line">    padding = [pad_len]*pad_len</span><br><span class="line">    padding = pack(<span class="string">'b'</span>*pad_len, *padding)</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line">    <span class="keyword">return</span> base64.b64encode(iv + cipher.encrypt(message + padding))</span><br></pre></td></tr></table></figure>
 <p>这里有个坑，就是上面的代码里key.update(secret)得到的不是可用的key</p>
@@ -436,21 +451,26 @@
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">from</span> Crypto.Cipher <span class="keyword">import</span> AES</span><br><span class="line"><span class="keyword">from</span> Crypto <span class="keyword">import</span> Random</span><br><span class="line"><span class="keyword">from</span> struct <span class="keyword">import</span> pack</span><br><span class="line"><span class="keyword">import</span> hashlib</span><br><span class="line"></span><br><span class="line">BS = <span class="number">16</span></span><br><span class="line">secret = <span class="string">b'supersecretpassword'</span></span><br><span class="line">key = hashlib.sha256(secret.encode(<span class="string">'utf-8'</span>)).digest()</span><br><span class="line"></span><br><span class="line">unpad = <span class="keyword">lambda</span> s: s[:-ord(s[len(s) - <span class="number">1</span>:])]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">encrypt</span><span class="params">(key, message)</span>:</span></span><br><span class="line">    iv = Random.new().read(BS)</span><br><span class="line">    pad_len = BS - divmod(len(message), BS)[<span class="number">1</span>]</span><br><span class="line">    padding = [pad_len]*pad_len</span><br><span class="line">    padding = pack(<span class="string">'b'</span>*pad_len, *padding)</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line">    <span class="keyword">return</span> base64.b64encode(iv + cipher.encrypt(message + padding))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">decrypt</span><span class="params">(key, cipher)</span>:</span></span><br><span class="line">    enc = base64.b64decode(cipher)</span><br><span class="line">    iv = enc[:<span class="number">16</span>]</span><br><span class="line">    cipher = AES.new(key, AES.MODE_CBC, iv)</span><br><span class="line">    <span class="keyword">return</span> unpad(cipher.decrypt(enc[<span class="number">16</span>:])).decode(<span class="string">'utf8'</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</span><br><span class="line">    cipher = <span class="string">'vyLlwWSY1PCK5ELNTPUVdpl8z0rIXiB2+Ybcu/BeXidR3MEiym852HCkS6wHVCr+CdpP6Moe9VQUeFcyq3vZDpVK/orl+8vREYMRrnQR9O4='</span></span><br><span class="line">    <span class="keyword">print</span> decrypt(key,cipher)</span><br></pre></td></tr></table></figure>
 <p>运行</p>
 <p><img src="6.png" alt="automne"></p>
-<h3 id="Superb-Owlput"><a href="#Superb-Owlput" class="headerlink" title="Superb Owlput"></a>Superb Owlput</h3><p><a href="superb-owlput.pcap">superb-owlput.pcap</a> </p>
+<h3 id="superb-owlput"><a class="markdownIt-Anchor" href="#superb-owlput"></a> Superb Owlput</h3>
+<p><a href="superb-owlput.pcap">superb-owlput.pcap</a></p>
 <p>提供了一个流量包文件供我们分析，使用wireshark分析，发现主要是DNS流量</p>
 <p><img src="7.png" alt="automne"></p>
-<p>从上图就可以看到Info信息里的域名长串有点东西<br>转一下就发现是JPEG的文件头，那么这题的思路就很清楚了，把所有的域名字串拼起来得到一张图片。</p>
+<p>从上图就可以看到Info信息里的域名长串有点东西<br>
+转一下就发现是JPEG的文件头，那么这题的思路就很清楚了，把所有的域名字串拼起来得到一张图片。</p>
 <p><img src="8.png" alt="automne"></p>
 <p>这里使用tshark和awk脚本可以很方便的处理，注意-Y是做过滤的</p>
-<pre><code>tshark -r superb-owlput.pcap -Y &quot;ip.src == 172.19.1.50 &amp;&amp; dns&quot; -T fields -e dns.qry.name | awk &apos;{if ($1~/.dw.tghekk.local/) print $1}&apos; | awk -F &apos;.&apos; &apos;{print $1}&apos; | tr -d &apos;\n&apos; &gt; dns
-</code></pre><p>得到dns后，再使用xxd转换为图片文件，命令如下：</p>
-<pre><code>xxd -p -r dns flagdns
-</code></pre><p>然而打开图片后并没有flag，使用exiftool看一下文件头</p>
-<p><img src="9.png" alt="automne"></p>
-<p>明显是一段base64字符串<br>加入=之后就可以解密了。</p>
-<pre><code>&gt;&gt;&gt; base64.b64decode(&quot;VEcxOXtUSEVfV0FMTFNfQVJFX0NPVkVSRURfV0lUSF9NQUdJQ0FMX1NBTFR9Cg==&quot;)
-&apos;TG19{THE_WALLS_ARE_COVERED_WITH_MAGICAL_SALT}\n&apos;
+<pre><code>tshark -r superb-owlput.pcap -Y &quot;ip.src == 172.19.1.50 &amp;&amp; dns&quot; -T fields -e dns.qry.name | awk '{if ($1~/.dw.tghekk.local/) print $1}' | awk -F '.' '{print $1}' | tr -d '\n' &gt; dns
 </code></pre>
+<p>得到dns后，再使用xxd转换为图片文件，命令如下：</p>
+<pre><code>xxd -p -r dns flagdns
+</code></pre>
+<p>然而打开图片后并没有flag，使用exiftool看一下文件头</p>
+<p><img src="9.png" alt="automne"></p>
+<p>明显是一段base64字符串<br>
+加入=之后就可以解密了。</p>
+<pre><code>&gt;&gt;&gt; base64.b64decode(&quot;VEcxOXtUSEVfV0FMTFNfQVJFX0NPVkVSRURfV0lUSF9NQUdJQ0FMX1NBTFR9Cg==&quot;)
+'TG19{THE_WALLS_ARE_COVERED_WITH_MAGICAL_SALT}\n'</code></pre>
+
     </article>
     <!-- license  -->
     
@@ -584,7 +604,7 @@ top:50vh;
         <div class="toc-catalog">
             <span class="iconfont-archer catalog-icon">&#xe613;</span><span>CATALOG</span>
         </div>
-        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Echo-Chamber"><span class="toc-number">1.</span> <span class="toc-text">Echo Chamber</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Exclusive-Magic-Club"><span class="toc-number">2.</span> <span class="toc-text">Exclusive Magic Club</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Josefssons-Final-Exam"><span class="toc-number">3.</span> <span class="toc-text">Josefssons Final Exam</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Passing-Notes"><span class="toc-number">4.</span> <span class="toc-text">Passing Notes</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Superb-Owlput"><span class="toc-number">5.</span> <span class="toc-text">Superb Owlput</span></a></li></ol>
+        <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#echo-chamber"><span class="toc-number">1.</span> <span class="toc-text"> Echo Chamber</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#exclusive-magic-club"><span class="toc-number">2.</span> <span class="toc-text"> Exclusive Magic Club</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#josefssons-final-exam"><span class="toc-number">3.</span> <span class="toc-text"> Josefssons Final Exam</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#passing-notes"><span class="toc-number">4.</span> <span class="toc-text"> Passing Notes</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#superb-owlput"><span class="toc-number">5.</span> <span class="toc-text"> Superb Owlput</span></a></li></ol>
     </div>
     
     <div class="back-top iconfont-archer">&#xe639;</div>
@@ -597,6 +617,62 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1600,15 +1676,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
@@ -1618,15 +1688,27 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
@@ -1642,15 +1724,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
         <span class="sidebar-tag-name" data-tags="spi"><span class="iconfont-archer">&#xe606;</span>spi</span>
     
         <span class="sidebar-tag-name" data-tags="snakeyaml"><span class="iconfont-archer">&#xe606;</span>snakeyaml</span>
     
         <span class="sidebar-tag-name" data-tags="ScriptEngineManager"><span class="iconfont-archer">&#xe606;</span>ScriptEngineManager</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="lcg"><span class="iconfont-archer">&#xe606;</span>lcg</span>
     
@@ -1660,23 +1742,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="cipolla's algorithm"><span class="iconfont-archer">&#xe606;</span>cipolla's algorithm</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
-    
-        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
-    
         <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
-        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
-    
-        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
@@ -1685,6 +1757,10 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
     
         <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
+    
+        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
+    
+        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1696,11 +1772,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
     
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
@@ -1708,9 +1782,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
@@ -1730,17 +1806,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="rsa lsb oracle"><span class="iconfont-archer">&#xe606;</span>rsa lsb oracle</span>
     
+        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
+    
+        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
+    
+        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
+    
         <span class="sidebar-tag-name" data-tags="rmi"><span class="iconfont-archer">&#xe606;</span>rmi</span>
     
         <span class="sidebar-tag-name" data-tags="fastjson"><span class="iconfont-archer">&#xe606;</span>fastjson</span>
     
         <span class="sidebar-tag-name" data-tags="jndi"><span class="iconfont-archer">&#xe606;</span>jndi</span>
-    
-        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
-    
-        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
-    
-        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
     
         <span class="sidebar-tag-name" data-tags="reflect"><span class="iconfont-archer">&#xe606;</span>reflect</span>
     
@@ -1785,9 +1861,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
-    
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     

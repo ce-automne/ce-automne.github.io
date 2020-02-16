@@ -193,6 +193,7 @@
     
     <!-- 谷歌统计  -->
     
+	<link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css" rel="stylesheet" type="text/css">
 </head>
 
     
@@ -388,7 +389,8 @@
         <div class="container container-unloaded">
             <main class="main post-page">
     <article class="article-entry">
-        <p><strong>Android</strong><br><a id="more"></a></p>
+        <p><strong>Android</strong></p>
+<a id="more"></a>
 <p>参考链接：<a href="https://aadityapurani.com/2019/03/07/bsidessf-ctf-2019-mobile-track/#weather" target="_blank" rel="noopener">https://aadityapurani.com/2019/03/07/bsidessf-ctf-2019-mobile-track/#weather</a></p>
 <p>感谢大佬分享。</p>
 <p>拿到apk，在JEB中打开，找到MainActivity，先看一下全局的逻辑。</p>
@@ -399,12 +401,15 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> String <span class="title">a</span><span class="params">()</span></span>&#123;</span><br><span class="line">	</span><br><span class="line">    ......省略此处代码......		</span><br><span class="line">		</span><br><span class="line">    <span class="keyword">try</span>&#123;</span><br><span class="line">            ......省略此处代码......</span><br><span class="line"></span><br><span class="line">            URLConnection v1_4 = v1_3.openConnection();</span><br><span class="line">            v1_4.connect();</span><br><span class="line">            v1_4.getContentLength();</span><br><span class="line">            BufferedReader v2_1 = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(v1_4.getInputStream()));</span><br><span class="line">            StringBuffer v1_5 = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">            <span class="keyword">while</span>(<span class="keyword">true</span>) &#123;</span><br><span class="line">                v0 = v2_1.readLine();</span><br><span class="line">                <span class="keyword">if</span>(v0 == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                v1_5.append(v0 + <span class="string">"\n"</span>);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            v0 = v1_5.toString();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span>(IOException v1_2) &#123;</span><br><span class="line">            v1_2.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(v4 != <span class="keyword">null</span>) &#123;</span><br><span class="line">            Log.d(<span class="string">"Background url"</span>, <span class="string">"Background URL in progress"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> v0;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
 <p>然后从响应里取数据，并在应用上显示</p>
 <p><img src="2.png" alt="automne"></p>
-<p>大体逻辑分析清楚了，接下来要关注的就是上面提到的v6_1这个json字符串里到底是什么内容。<br>用到的函数在Utils()里</p>
+<p>大体逻辑分析清楚了，接下来要关注的就是上面提到的v6_1这个json字符串里到底是什么内容。<br>
+用到的函数在Utils()里</p>
 <p><img src="3.png" alt="automne"></p>
 <p>可以看到，分别是Base64解码，int转char，BigInteger转Hex以及三个native层的函数。</p>
-<p>为了方便，使用frida框架去hook对应的函数，上传frida server到root的手机设备里，<br>运行</p>
+<p>为了方便，使用frida框架去hook对应的函数，上传frida server到root的手机设备里，<br>
+运行</p>
 <pre><code>setenforce 0
-</code></pre><p>关闭SELinux机制，然后运行frida server，并编写hook脚本，这里直接使用参考链接里大佬的脚本。</p>
+</code></pre>
+<p>关闭SELinux机制，然后运行frida server，并编写hook脚本，这里直接使用参考链接里大佬的脚本。</p>
 <p>代码的第一部分使用了android hook时绕过SSL Pinning的一种方法，实际测试时发现删除了也可以hook。相关绕过方法的<a href="https://techblog.mediaservice.net/2018/11/universal-android-ssl-pinning-bypass-2/" target="_blank" rel="noopener">链接</a></p>
 <p>第二部分是hook  java String类中的toString()方法，完美展示了frida万物皆可hook的强大功能。为什么hook这个函数是因为前面代码里有个将URL toString()的操作，把通过各种编码加密处理后的内容呈现出来。</p>
 <p>第三部分则是将hook到的toString()打印出来。</p>
@@ -412,19 +417,22 @@
 <p>将上述脚本保存为hook.js</p>
 <p>在Android 8.0的Nexus 6P上运行这个应用，使用如下命令开始hook：</p>
 <pre><code>frida -U -f com.example.myapplication -l D:\Learning\Android\CTF\hook.js
-</code></pre><p>稍等片刻，即可得到下面的内容。</p>
+</code></pre>
+<p>稍等片刻，即可得到下面的内容。</p>
 <p><img src="4.png" alt="automne"></p>
-<p>这段json格式的字符串其实就是Google Cloud Storage里使用服务账号进行授权的密钥文件(json格式)，<a href="https://cloud.google.com/sdk/docs/authorizing#authorizing_with_a_service_account。" target="_blank" rel="noopener">https://cloud.google.com/sdk/docs/authorizing#authorizing_with_a_service_account。</a></p>
+<p>这段json格式的字符串其实就是Google Cloud Storage里使用服务账号进行授权的密钥文件(json格式)，<a href="https://cloud.google.com/sdk/docs/authorizing#authorizing_with_a_service_account%E3%80%82" target="_blank" rel="noopener">https://cloud.google.com/sdk/docs/authorizing#authorizing_with_a_service_account。</a></p>
 <p>我是第一次听到Google Cloud Storage这个词。。</p>
 <p>从网上了解到这个密钥文件的格式后，将上图的hook内容整理（注意\n的使用）如下并保存为key.json文件：</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"type"</span>: <span class="string">"service_account"</span>,</span><br><span class="line">  <span class="attr">"project_id"</span>: <span class="string">"bsides-sf-ctf-2019"</span>,</span><br><span class="line">  <span class="attr">"private_key_id"</span>: <span class="string">"6dd7fc48a8b1d49edf7f03f74bc47713bec7d989"</span>,</span><br><span class="line">  <span class="attr">"private_key"</span>: <span class="string">"-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCbNaJX7qZ2Sec4\n5W4ir+yYXJ3IwjZ8fwyw0PZSoiTb/iJqTcKk/ltjP61TrJHB5MqKm6Vz/WGw7GSm\nnd21xMFqclwuG8N7f+zhIK0XuvRBrS+cMEhw0RbHNUbcO3ZaghKffaLThzPY4x2r\nHh/N8lUYi4TB8WAGaAzCJH3pUi9rTG4+ucxO6pMNz3/ENzyOSmihR9Xb5OkMY/Aq\n7NJ7BAwH8oSWRlTllaC8Chl8wDdun6fKWgYYmmcBWXSjropu8f6MR7vMM3F0PEua\nYBz1ZpxVvYc1iiMS0WiNtAa1ZBuWhRenAiTfwOCt4rISfbgYSqCTSoK5tOWS52tM\ntuzt/OVjAgMBAAECggEAC9T230UuI25W1huHXdWTb7n/vUIw7SSyTvhfDsWVkb+5\n1+i9od5SESrVh79sDR/n4NEkt8blH5ulwJ3gPO8W34qARHORX2TNJgxbpad231rY\nekuj+hW2atFA6aEO0K+Bw+7L7twrs6j8pgLR4d1LZ2ebYz2HWHWuI06s2pCNVNyM\nSMn593YgfmzNotaoJ3dHAwKG8PuNRHh0qDqqLnu0574dXkTFkEePcedyzza007Iy\nCoNTUYJxDO7aJbTQPVyqm7mOewh1SYUdHSofcfALlC9eT2nn6+c9qRgGO3AwbC8V\ns9TmMR9+DWfHrUmPN8AKB4YKov/QGUv29svI0d8YwQKBgQDTobsDSI96xm2s+NnE\nPabZ+W76sg/1o1dPU4w4+/0u/RUT+vJoumsvwf5n7KUXVAP8npu6LYouNlHz9+zV\nThTINxyTrrA5VamFhoEpeY8OFboNVltxKj9nFvbS2jw2GLZQLapN0XIYE0axRNJs\nCSyc2LDYVVj0abjzx0CCFc0S+QKBgQC7v7kpSMJmIwl7FpJm/T9oakdvyZNzt3ZU\n+DTRmPXh/WM5c6j9vdzGKq3IlmHV/SSzVUfwQaxF8VzQlAi69fru/DStT8h7CpGd\nLEz8S0qq7ubbs7gODK/ZrwSQhv8doegZGu0ntURfaVL7AnyKGJVq2SLheVhMhJeZ\nm94mGME2OwKBgFXFSWcGRGhM/WxKGvAG0JWtGwZtnjw+rAcRZFZAApfFqIJFhXNe\ngkyDwhjadvpiaY87tP+ar1MVXteS1qCImbGfbGyKMw+5oQ/luHlXs9vQgGwhYMQX\njES6sOQ54IdIMrOCHnCVfzk0rsTvkJyKh1M2G05CIOBF7NiYG5PdRBT5AoGABEwT\nFNrReDz9DpApsanCNcWY9PoMIe3lC3TS4Kk7l3yRNNNs3sHlt7NqXtjyTE+K83/U\nMa+PHdq0YSHCQWU35RhorD7TO922D37gFDY080ychBLM96VasQTMefJdDHSUN17i\nZrJDaluixpP7/b0qTlPB9J8uYjH2tlFW+FBAu9kCgYBch8VvyBzlGay5r07joRju\ncdnVfrGAUdZRLxA5hrIaKvKFy28CaaKV/lZNI9NmdZntj6aIQ0rzUWidOQsmj2o4\n7VcArl5UNurhx4uhg2GClcUIHY5YdExHfEujBu6uMQdZjBpX87uoaggC7jwJanQC\nlApTPc3478g/mho9S5eDMw==\n-----END PRIVATE KEY-----\n"</span>,</span><br><span class="line">  <span class="attr">"client_email"</span>: <span class="string">"weather-companion-service-acco@bsides-sf-ctf-2019.iam.gserviceaccount.com"</span>,</span><br><span class="line">  <span class="attr">"client_id"</span>: <span class="string">"116037946827001874660"</span>,</span><br><span class="line">  <span class="attr">"auth_uri"</span>: <span class="string">"https://accounts.google.com/o/oauth2/auth"</span>,</span><br><span class="line">  <span class="attr">"token_uri"</span>: <span class="string">"https://oauth2.googleapis.com/token"</span>,</span><br><span class="line">  <span class="attr">"auth_provider_x509_cert_url"</span>: <span class="string">"https://www.googleapis.com/oauth2/v1/certs"</span>,</span><br><span class="line">  <span class="attr">"client_x509_cert_url"</span> : <span class="string">"https://www.googleapis.com/robot/v1/metadata/x509/weather-companion-service-acco%40bsides-sf-ctf-2019.iam.gserviceaccount.com"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>但是在安装Google Cloud SDK（安装过程中需要断开shadowsocks，要求使用python2.7.9+）后使用</p>
 <pre><code>gcloud auth activate-service-account --key-file=key.json
-</code></pre><p>却被告知invalid_grant，一度怀疑是json格式没整理好的原因，纠结蛮久的。结果后面发现是主办方把这道题的项目或者密钥删了。。</p>
+</code></pre>
+<p>却被告知invalid_grant，一度怀疑是json格式没整理好的原因，纠结蛮久的。结果后面发现是主办方把这道题的项目或者密钥删了。。</p>
 <p><img src="5.png" alt="automne"></p>
 <p>为了搞清楚什么情况，我决定动手生成一个自己的服务账号密钥。</p>
-<p>通过下面的网址进入服务账号界面：<br><a href="https://console.cloud.google.com/iam-admin/serviceaccounts?_ga=2.264695759.-1360606619.1552115951" target="_blank" rel="noopener">https://console.cloud.google.com/iam-admin/serviceaccounts?_ga=2.264695759.-1360606619.1552115951</a></p>
-<p>创建一个服务账号后，Google Cloud Platform的菜单栏里选择”API和服务”，然后就看图操作。</p>
+<p>通过下面的网址进入服务账号界面：<br>
+<a href="https://console.cloud.google.com/iam-admin/serviceaccounts?_ga=2.264695759.-1360606619.1552115951" target="_blank" rel="noopener">https://console.cloud.google.com/iam-admin/serviceaccounts?_ga=2.264695759.-1360606619.1552115951</a></p>
+<p>创建一个服务账号后，Google Cloud Platform的菜单栏里选择&quot;API和服务&quot;，然后就看图操作。</p>
 <p><img src="6.png" alt="automne"></p>
 <p><img src="7.png" alt="automne"></p>
 <p><img src="8.png" alt="automne"></p>
@@ -432,9 +440,9 @@
 <p><img src="10.png" alt="automne"></p>
 <p>下面是我创建的服务账号密钥，用于测试。</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"type"</span>: <span class="string">"service_account"</span>,</span><br><span class="line">  <span class="attr">"project_id"</span>: <span class="string">"l-project-6598"</span>,</span><br><span class="line">  <span class="attr">"private_key_id"</span>: <span class="string">"44ce83da2a92a53255bc0549c7516ec0f51532d1"</span>,</span><br><span class="line">  <span class="attr">"private_key"</span>: <span class="string">"-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDOgpO10EsII69Y\n3VMI7a90sv+rpedkl2lIyWWwDjz9//f6qtpY7OKg3me0qR7MeN6VnP9E51A6RFVT\nt+x9GEEFIfeh4FAawOg97lcmRNcAqoDx9T4mIGQkY5Ynrz6hNc1NIVgXSSceUP4r\nHJgElOhzTE5W9lsr7D6+MOaabuqZWLVODBz8adBdwMW0386yWRwxK/hdJ3k0Vkkh\nWCsXypaMUMJiw9yLy2wP6T4Me0tA4poP2uMv7fA38YY3KQTiL5obNtqg5VMo8UGJ\nvdVF7vGMjxUZ28+ZcF3KgRyVlhMzZ8kkJhlihSzqEIgiKRbULtCZ8bABznZaJ4LQ\nUT5VapERAgMBAAECggEAYuE7AM9fXeJYT2CKJbhJTsN2kCW8CfpFu0hTnFz071nk\nzu2H5xRl30ketu5ThOxLB7BIuiFX1M5rXM6wOaWnXGHLRIM3V9gOW7kHmZdUq0j4\nvOIEhBT2XkYg25eZkW9Fgiz5FQ094dI+IT5ru6XhN3PN/u2u8fUIheC8Si3ZvtpR\nsbQCH8mJdzWMRKbHNpvxI9pvv5jNqs297MyNqgaGmM2UfAnaZogWOWklnagm2oda\nUTzN6SHreOJA/58PQ+zjh8E7sHhDuvq2xcaYvlJXEIZpoAjdOqE38fb/VmUMxmm7\nTGFGxlBuuCPNLhEC/PFT0fk8YfIe00zEGG9eJOw00QKBgQD8VTyeYLKpVJStgh+M\nOS4L+s7tREOiSbmn4cPJrVz1d4iVNQIs464HXPSIP+Sd7c8FDaUwC9FrVS22Prly\nRwNDQpRx5byq1l1VzzlL08ONJilAotdoN3Dcm5+kZtWuyynnnsTBpGHb3CTlpt+t\nAs8FF05GTNHlPhiig9Ogj8IfrwKBgQDRgt0aht2/B+AAGQMPGU0y3pYOHY1J2baR\nCsKqZJ4/Bti15QhpuP9+/QlGwuo+e8iWFKd2dj+HT3Lm1JKQQ9C+tZ0gkToMgn6h\nWw6mDpVWeavfs/yP0XuEz90/0LwfyTRORF9C3IZpjniQB3UAXfvmw5FhdSuNDTa5\nnqm/JwvLPwKBgCB/9fvMJpbKrw+d9+Q+pSCj4C0NIszvQ/tMh8QdESEIkU3ucuZH\nOO332gMGf7Kbo5NaC5GhpAp4ARg9AfOnE9OA6s+0sFUsoP7hXtbWYpR2es+5aZch\ntOalIK2zFQibYD1V5K+wNW5070eo85w8BV/5fXpugIZPNisQYZyHh5A/AoGBAMbm\noBYw95AGX+h31mmdMacbngWklKAJ6sLkHk852uonC9ITr9r+4MCkZQwiu9O6HIIu\n9ZUHSeShzonKQaJoX2LOdG+YsC10Ldft5IhNzAUe2cc0zo+S5tr9pCSTfCYJFHlB\ne9a0GX9Y3KiQC8nfb+hyvjBx1njAlLXAJZLt9MptAoGBAIlG4ehIBWD2xxQ9Mdu4\nyEM621WHb32SHTBa3CSrOs1egUjh6QysYF3nHV8GbLBTW2CSnkVA1lrmz+pU8lYZ\n1vyr0PG8FUz68H/FMbE5MDdTLHwytZh2cr9bmZwJIzn+6KcY4d8NyJRMWCTUmGNI\nniT6f27B8msLzwYNU96EbhGY\n-----END PRIVATE KEY-----\n"</span>,</span><br><span class="line">  <span class="attr">"client_email"</span>: <span class="string">"l-project@l-project-6598.iam.gserviceaccount.com"</span>,</span><br><span class="line">  <span class="attr">"client_id"</span>: <span class="string">"112915449445549367190"</span>,</span><br><span class="line">  <span class="attr">"auth_uri"</span>: <span class="string">"https://accounts.google.com/o/oauth2/auth"</span>,</span><br><span class="line">  <span class="attr">"token_uri"</span>: <span class="string">"https://oauth2.googleapis.com/token"</span>,</span><br><span class="line">  <span class="attr">"auth_provider_x509_cert_url"</span>: <span class="string">"https://www.googleapis.com/oauth2/v1/certs"</span>,</span><br><span class="line">  <span class="attr">"client_x509_cert_url"</span>: <span class="string">"https://www.googleapis.com/robot/v1/metadata/x509/l-project%40l-project-6598.iam.gserviceaccount.com"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>使用gcloud auth activate-service-account –key-file=xxx.json是可以访问的。</p>
+<p>使用gcloud auth activate-service-account --key-file=xxx.json是可以访问的。</p>
 <p><img src="11.png" alt="automne"></p>
-<p>尝试使用gsutil创建存储分区(<a href="https://cloud.google.com/storage/docs/quickstart-gsutil)" target="_blank" rel="noopener">https://cloud.google.com/storage/docs/quickstart-gsutil)</a>,</p>
+<p>尝试使用gsutil创建存储分区(<a href="https://cloud.google.com/storage/docs/quickstart-gsutil" target="_blank" rel="noopener">https://cloud.google.com/storage/docs/quickstart-gsutil</a>),</p>
 <p>发现创建不了，好像是需要注册结算账号，而且注册需要visa卡，我哪有这个。。</p>
 <p>最后测试一下删除服务账号密钥，再用gcloud auth命令认证</p>
 <p><img src="12.png" alt="automne"></p>
@@ -591,6 +599,62 @@ top:50vh;
     <div class="sidebar-content sidebar-content-show-archive">
           <div class="sidebar-panel-archives">
     <!-- 在ejs中将archive按照时间排序 -->
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
     
     
@@ -1594,15 +1658,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="broadcastreceiver"><span class="iconfont-archer">&#xe606;</span>broadcastreceiver</span>
     
-        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
-    
         <span class="sidebar-tag-name" data-tags="fat"><span class="iconfont-archer">&#xe606;</span>fat</span>
     
         <span class="sidebar-tag-name" data-tags="git"><span class="iconfont-archer">&#xe606;</span>git</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
-    
-        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="cbc"><span class="iconfont-archer">&#xe606;</span>cbc</span>
     
@@ -1612,15 +1670,27 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="photorec"><span class="iconfont-archer">&#xe606;</span>photorec</span>
     
-        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+        <span class="sidebar-tag-name" data-tags="sqli"><span class="iconfont-archer">&#xe606;</span>sqli</span>
+    
+        <span class="sidebar-tag-name" data-tags="sqlite"><span class="iconfont-archer">&#xe606;</span>sqlite</span>
     
         <span class="sidebar-tag-name" data-tags="padding oracle"><span class="iconfont-archer">&#xe606;</span>padding oracle</span>
+    
+        <span class="sidebar-tag-name" data-tags="MAC"><span class="iconfont-archer">&#xe606;</span>MAC</span>
+    
+        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
+    
+        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
     
         <span class="sidebar-tag-name" data-tags="golang"><span class="iconfont-archer">&#xe606;</span>golang</span>
     
         <span class="sidebar-tag-name" data-tags="race condition"><span class="iconfont-archer">&#xe606;</span>race condition</span>
     
-        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
+    
+        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+    
+        <span class="sidebar-tag-name" data-tags="sha-1"><span class="iconfont-archer">&#xe606;</span>sha-1</span>
     
         <span class="sidebar-tag-name" data-tags="frida"><span class="iconfont-archer">&#xe606;</span>frida</span>
     
@@ -1636,15 +1706,15 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="boneh durfee"><span class="iconfont-archer">&#xe606;</span>boneh durfee</span>
     
+        <span class="sidebar-tag-name" data-tags="pwntools"><span class="iconfont-archer">&#xe606;</span>pwntools</span>
+    
         <span class="sidebar-tag-name" data-tags="spi"><span class="iconfont-archer">&#xe606;</span>spi</span>
     
         <span class="sidebar-tag-name" data-tags="snakeyaml"><span class="iconfont-archer">&#xe606;</span>snakeyaml</span>
     
         <span class="sidebar-tag-name" data-tags="ScriptEngineManager"><span class="iconfont-archer">&#xe606;</span>ScriptEngineManager</span>
     
-        <span class="sidebar-tag-name" data-tags="sso"><span class="iconfont-archer">&#xe606;</span>sso</span>
-    
-        <span class="sidebar-tag-name" data-tags="oauth 2.0"><span class="iconfont-archer">&#xe606;</span>oauth 2.0</span>
+        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
     
         <span class="sidebar-tag-name" data-tags="lcg"><span class="iconfont-archer">&#xe606;</span>lcg</span>
     
@@ -1654,23 +1724,13 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="cipolla's algorithm"><span class="iconfont-archer">&#xe606;</span>cipolla's algorithm</span>
     
-        <span class="sidebar-tag-name" data-tags="mysql"><span class="iconfont-archer">&#xe606;</span>mysql</span>
-    
-        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
-    
         <span class="sidebar-tag-name" data-tags="malware"><span class="iconfont-archer">&#xe606;</span>malware</span>
     
         <span class="sidebar-tag-name" data-tags="codereflect"><span class="iconfont-archer">&#xe606;</span>codereflect</span>
     
-        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
-    
-        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
-    
         <span class="sidebar-tag-name" data-tags="gmpy2"><span class="iconfont-archer">&#xe606;</span>gmpy2</span>
     
-        <span class="sidebar-tag-name" data-tags="ecb"><span class="iconfont-archer">&#xe606;</span>ecb</span>
-    
-        <span class="sidebar-tag-name" data-tags="socat"><span class="iconfont-archer">&#xe606;</span>socat</span>
+        <span class="sidebar-tag-name" data-tags="yara plugin"><span class="iconfont-archer">&#xe606;</span>yara plugin</span>
     
         <span class="sidebar-tag-name" data-tags="rsa"><span class="iconfont-archer">&#xe606;</span>rsa</span>
     
@@ -1679,6 +1739,10 @@ top:50vh;
         <span class="sidebar-tag-name" data-tags="javascript prototype pollution"><span class="iconfont-archer">&#xe606;</span>javascript prototype pollution</span>
     
         <span class="sidebar-tag-name" data-tags="nodejs"><span class="iconfont-archer">&#xe606;</span>nodejs</span>
+    
+        <span class="sidebar-tag-name" data-tags="deserialization"><span class="iconfont-archer">&#xe606;</span>deserialization</span>
+    
+        <span class="sidebar-tag-name" data-tags="log4j"><span class="iconfont-archer">&#xe606;</span>log4j</span>
     
         <span class="sidebar-tag-name" data-tags="primefac"><span class="iconfont-archer">&#xe606;</span>primefac</span>
     
@@ -1690,11 +1754,9 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="tshark"><span class="iconfont-archer">&#xe606;</span>tshark</span>
     
-        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
+        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
     
-        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
-    
-        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
+        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
     
         <span class="sidebar-tag-name" data-tags="flask"><span class="iconfont-archer">&#xe606;</span>flask</span>
     
@@ -1702,9 +1764,11 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="ecc"><span class="iconfont-archer">&#xe606;</span>ecc</span>
     
-        <span class="sidebar-tag-name" data-tags="RsaCtfTool"><span class="iconfont-archer">&#xe606;</span>RsaCtfTool</span>
+        <span class="sidebar-tag-name" data-tags=".iso"><span class="iconfont-archer">&#xe606;</span>.iso</span>
     
-        <span class="sidebar-tag-name" data-tags="Hex"><span class="iconfont-archer">&#xe606;</span>Hex</span>
+        <span class="sidebar-tag-name" data-tags="gpg"><span class="iconfont-archer">&#xe606;</span>gpg</span>
+    
+        <span class="sidebar-tag-name" data-tags="outguess"><span class="iconfont-archer">&#xe606;</span>outguess</span>
     
         <span class="sidebar-tag-name" data-tags="nim game"><span class="iconfont-archer">&#xe606;</span>nim game</span>
     
@@ -1724,17 +1788,17 @@ top:50vh;
     
         <span class="sidebar-tag-name" data-tags="rsa lsb oracle"><span class="iconfont-archer">&#xe606;</span>rsa lsb oracle</span>
     
+        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
+    
+        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
+    
+        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
+    
         <span class="sidebar-tag-name" data-tags="rmi"><span class="iconfont-archer">&#xe606;</span>rmi</span>
     
         <span class="sidebar-tag-name" data-tags="fastjson"><span class="iconfont-archer">&#xe606;</span>fastjson</span>
     
         <span class="sidebar-tag-name" data-tags="jndi"><span class="iconfont-archer">&#xe606;</span>jndi</span>
-    
-        <span class="sidebar-tag-name" data-tags="xor"><span class="iconfont-archer">&#xe606;</span>xor</span>
-    
-        <span class="sidebar-tag-name" data-tags="weblogic"><span class="iconfont-archer">&#xe606;</span>weblogic</span>
-    
-        <span class="sidebar-tag-name" data-tags="xxe"><span class="iconfont-archer">&#xe606;</span>xxe</span>
     
         <span class="sidebar-tag-name" data-tags="reflect"><span class="iconfont-archer">&#xe606;</span>reflect</span>
     
@@ -1779,9 +1843,9 @@ jsonContent:
     
         <span class="sidebar-category-name" data-categories="Android"><span class="iconfont-archer">&#xe60a;</span>Android</span>
     
-        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
-    
         <span class="sidebar-category-name" data-categories="Forensics"><span class="iconfont-archer">&#xe60a;</span>Forensics</span>
+    
+        <span class="sidebar-category-name" data-categories="Web"><span class="iconfont-archer">&#xe60a;</span>Web</span>
     
         <span class="sidebar-category-name" data-categories="Misc"><span class="iconfont-archer">&#xe60a;</span>Misc</span>
     
